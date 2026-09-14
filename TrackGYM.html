@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="id"><head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260914-05-802a9e5","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/c21197326e9a1154.telemetry_sdk.js" integrity="sha512-Aqwl+NmLtKBcMQM4HY+W9lmBHa+zP5MqSEuYfCjkzt4xeOSv2xNz81cCp7JyXBVrY+zojg5o94FHY/R31v2d3Q=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GymFlow</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <!-- Library html2pdf untuk ekspor PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d13; --surface: #111923; --surface-2: #182331; --line: #293846;
+      --text: #edf5f1; --muted: #90a2ac; --lime: #bcf04a; --lime-dark: #8abb23;
+      --danger: #fb7185; --warning: #f6c453; --shadow: 0 16px 42px rgba(0,0,0,.23);
+    }
+    body.light { --bg:#f4f7f4; --surface:#ffffff; --surface-2:#edf3ed; --line:#d6e0d7; --text:#17221b; --muted:#647469; --shadow:0 14px 34px rgba(22,34,27,.10); }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:"DM Sans",sans-serif; transition:background .25s,color .25s; }
+    button, input, select, textarea { font:inherit; }
+    button { cursor:pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:3px solid rgba(188,240,74,.5); outline-offset:2px; }
+    .app-shell { width:100%; min-height:calc(100 * min(var(--vh, 1vh), 1vh)); }
+    .panel { background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); border-radius:20px; }
+    .metric { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:16px; }
+    .muted { color:var(--muted); }
+    .lime-btn { background:#bcf04a; color:#142009; min-height:44px; border-radius:12px; font-weight:800; transition:transform .16s,filter .16s; }
+    .lime-btn:hover { filter:brightness(1.06); transform:translateY(-1px); }
+    .secondary-btn { background:var(--surface-2); color:var(--text); border:1px solid var(--line); min-height:44px; border-radius:12px; font-weight:700; }
+    .danger-btn { background:rgba(251,113,133,.12); color:#ff98a8; border:1px solid rgba(251,113,133,.3); min-height:42px; border-radius:12px; font-weight:700; }
+    .icon-btn { width:44px; height:44px; display:inline-grid; place-items:center; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); color:var(--text); }
+    .nav-item { color:var(--muted); border-radius:14px; min-height:48px; display:flex; align-items:center; gap:12px; padding:0 14px; font-weight:700; }
+    .nav-item.active { color:#152008; background:#bcf04a; }
+    .tab { display:none; animation:fade .22s ease; }
+    .tab.active { display:block; }
+    @keyframes fade { from { opacity:0; transform:translateY(7px) } to { opacity:1; transform:none } }
+    .chip { display:inline-flex; align-items:center; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); border-radius:999px; padding:5px 9px; font-size:12px; font-weight:700; }
+    .day-chip.active { background:rgba(188,240,74,.16); border-color:#bcf04a; color:var(--text); }
+    .field { width:100%; min-height:46px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; color:var(--text); }
+    .field::placeholder { color:var(--muted); }
+    
+    /* Styling Custom Dropdown Keren */
+    .custom-select-wrapper { position: relative; width: 100%; user-select: none; }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .custom-options { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); max-height: 240px; overflow-y: auto; z-index: 40; display: none; padding: 4px; }
+    .custom-select-wrapper.open .custom-options { display: block; animation: fade .18s ease; }
+    .custom-option { padding: 10px 12px; border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: background 0.15s; }
+    .custom-option:hover { background: var(--surface-2); color: var(--lime); }
+    .custom-option.selected { background: rgba(188,240,74,0.12); color: var(--lime); font-weight: 700; }
+
+    .modal-layer { position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.62); padding:16px; display:none; align-items:flex-end; justify-content:center; }
+    .modal-layer.open { display:flex; }
+    .modal { width:100%; max-width:720px; max-height:calc(92 * min(var(--vh, 1vh), 1vh)); overflow:auto; background:var(--surface); border:1px solid var(--line); border-radius:24px 24px 16px 16px; padding:20px; }
+    .toast { position:fixed; z-index:70; left:16px; right:16px; bottom:88px; max-width:480px; margin:auto; background:#eaf6d0; color:#193005; border-radius:12px; padding:12px 15px; font-weight:700; box-shadow:var(--shadow); display:none; }
+    .toast.show { display:block; animation:fade .2s ease; }
+    .set-done { opacity:.7; border-color:rgba(188,240,74,.5)!important; background:rgba(188,240,74,.08)!important; }
+    .progress-line { height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
+    .progress-line > span { display:block; height:100%; border-radius:inherit; background:#bcf04a; transition:width .25s; }
+    
+    .bottom-nav { 
+      position: fixed; 
+      z-index: 30; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      background: var(--surface); 
+      border-top: 1px solid var(--line); 
+      display: flex; 
+      justify-content: space-around; 
+      align-items: center; 
+      height: 70px;
+      padding: 0 10px calc(env(safe-area-inset-bottom)); 
+      box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+    }
+    .mobile-nav-btn { 
+      color: var(--muted); 
+      background: transparent;
+      border: none;
+      flex: 1;
+      height: 100%;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 3px; 
+      font-size: 10px; 
+      font-weight: 700; 
+      transition: color 0.2s;
+    }
+    .mobile-nav-btn.active { color: var(--lime); }
+    .mobile-nav-btn.center-pill-btn { position: relative; }
+    .mobile-nav-btn.center-pill-btn .fab-icon {
+      position: absolute;
+      top: -22px;
+      width: 52px;
+      height: 52px;
+      background: var(--lime);
+      color: #142009;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 16px rgba(188, 240, 74, 0.35);
+      border: 4px solid var(--surface);
+      transition: transform 0.2s;
+    }
+    body.light .mobile-nav-btn.center-pill-btn .fab-icon {
+      background: #15803d;
+      color: #ffffff;
+      border: 4px solid #ffffff;
+    }
+    .mobile-nav-btn.center-pill-btn span { margin-top: 22px; }
+    .mobile-nav-btn.active.center-pill-btn .fab-icon { transform: scale(1.08); }
+
+    .sidebar { display:none; }
+    @media (min-width: 900px) {
+      .sidebar { display:flex; position:fixed; inset:0 auto 0 0; width:244px; flex-direction:column; padding:24px 16px; border-right:1px solid var(--line); background:var(--surface); }
+      .main-area { margin-left:244px; padding:28px 34px 45px; max-width:1510px; }
+      .bottom-nav { display:none; }
+      .toast { bottom:24px; }
+      .modal-layer { align-items:center; }
+      .modal { border-radius:24px; }
+    }
+    @media (max-width: 899px) { .main-area { padding:16px 16px 96px; } }
+  </style>
+  <script src="/_sdk/efe904fe8a212716.data_sdk.js" type="text/javascript" integrity="sha512-oiO0pmn5llS1uDeB2l690YywxqOe/a0U1kzY6RGaLZXtyh9YjTk1CUoK/bJUugc1QbUaJMJ3IE1MtpNY5NBZCw=="></script>
+  <script src="/_sdk/2099ab88d396666e.resizing_sdk.js" type="text/javascript" integrity="sha512-kSUXG3yWRngnaymRBbHGHc798S5hBVjvLyKd0iZCVHaYqBaJhLAS8ROSbROVwO39DSZ0AypHrjep526fop7p7A=="></script>
+ </head>
+ <body data-template-id="__page-root" class="w-full" style="background: rgb(9, 13, 19);">
+  <div class="app-shell">
+   <aside class="sidebar" aria-label="Navigasi utama desktop">
+    <div class="flex items-center gap-3 px-3 mb-10">
+     <div class="w-10 h-10 rounded-xl overflow-hidden bg-lime-300 text-slate-950 grid place-items-center">
+      <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+     </div><span class="font-extrabold text-xl tracking-tight">GYMFlow</span>
+    </div>
+    <nav class="space-y-2" id="desktop-nav">
+     <button class="nav-item active w-full" data-tab="dashboard"><i data-lucide="layout-dashboard"></i>Dashboard</button> 
+     <button class="nav-item w-full" data-tab="routines"><i data-lucide="repeat-2"></i>Routines</button> 
+     <button class="nav-item w-full" data-tab="exercises"><i data-lucide="library-big"></i>Exercises</button> 
+     <button class="nav-item w-full" data-tab="workout"><i data-lucide="timer"></i>Workout</button> 
+     <button class="nav-item w-full" data-tab="history"><i data-lucide="chart-no-axes-combined"></i>History</button>
+    </nav>
+    <div class="mt-auto space-y-3"><button id="desktop-reset" class="secondary-btn w-full text-sm">Reset data</button>
+     <p class="muted text-xs px-2">Data tersimpan di perangkat ini.</p>
+    </div>
+   </aside>
+   <main class="main-area">
+    <header class="flex items-center justify-between gap-4 mb-7">
+     <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl overflow-hidden bg-lime-300/10 border border-lime-500/20 grid place-items-center shrink-0">
+       <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+      </div>
+      <div>
+       <h1 class="font-extrabold text-2xl tracking-tight">GYMFlow</h1>
+      </div>
+     </div>
+     <div class="flex items-center gap-2">
+      <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span> 
+      <button id="open-profile-btn" type="button" class="icon-btn text-lime-300 bg-lime-500/10 border-lime-500/20 hover:bg-lime-500/20" aria-label="Profil & Target" title="Profil & Target">
+        <i data-lucide="user-cog" class="w-4 h-4"></i>
+      </button>
+      <button id="mobile-reset-btn" type="button" class="icon-btn text-rose-400 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20" aria-label="Reset data" title="Reset Data">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+      </button>
+      <button id="theme-toggle" type="button" class="icon-btn" aria-label="Ubah tema"><i data-lucide="sun-moon"></i></button>
+     </div>
+    </header>
+    
+    <section id="dashboard" class="tab active" aria-label="Dashboard">
+     <div class="panel p-5 md:p-7 mb-5 overflow-hidden relative">
+      <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
+      <p class="text-lime-300 font-bold text-sm relative tracking-wider">SIAP BERGERAK?</p>
+      <h2 class="font-extrabold text-3xl md:text-4xl mt-2 max-w-xl relative">Bangun kekuatan, satu set setiap kali.</h2>
+      <p id="next-workout-copy" class="muted mt-3 relative">Pilih routine dan mulai saat kamu siap.</p>
+      
+      <div class="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
+        <span class="chip"><i data-lucide="weight" class="w-3 h-3 mr-1.5 text-lime-300"></i>BB: <strong id="profile-bb-display" class="ml-1 text-[var(--text)]">65 kg</strong></span>
+        <span class="chip"><i data-lucide="ruler" class="w-3 h-3 mr-1.5 text-lime-300"></i>TB: <strong id="profile-tb-display" class="ml-1 text-[var(--text)]">170 cm</strong></span>
+        <span class="chip"><i data-lucide="target" class="w-3 h-3 mr-1.5 text-lime-300"></i>Target Mingguan: <strong id="profile-target-display" class="ml-1 text-[var(--text)]">3 sesi</strong></span>
+        <button type="button" class="text-lime-300 font-bold underline ml-auto hover:opacity-80" onclick="openProfileModal()">Ubah Profil & Target</button>
+      </div>
+
+      <button id="dashboard-start" class="lime-btn px-5 mt-5 relative">Mulai Workout</button>
+     </div>
+     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
+      <div class="metric">
+       <p class="muted text-xs font-bold">Streak latihan</p><strong id="streak-value" class="block text-2xl mt-1">0 hari</strong>
+      </div>
+      <div class="metric">
+       <p class="muted text-xs font-bold">Target minggu ini</p><strong id="goal-value" class="block text-2xl mt-1">0 / 3</strong>
+      </div>
+      <div class="metric col-span-2 lg:col-span-1">
+       <p class="muted text-xs font-bold">Volume minggu ini</p><strong id="week-volume" class="block text-2xl mt-1">0 kg</strong>
+      </div>
+     </div>
+     <div class="panel p-5">
+      <div class="flex items-center justify-between gap-3">
+       <div>
+        <h2 class="font-extrabold text-xl">Sesi aktif</h2>
+        <p id="active-session-copy" class="muted text-sm mt-1"></p>
+       </div><button id="resume-workout" class="secondary-btn px-4 hidden">Lanjutkan</button>
+      </div>
+     </div>
+    </section>
+    
+    <section id="routines" class="tab" aria-label="Routines">
+     <div class="flex flex-wrap justify-between items-end gap-3 mb-5">
+      <div>
+       <h2 class="font-extrabold text-2xl">Routines</h2>
+       <p class="muted text-sm mt-1">Bangun alur latihan yang sesuai dengan targetmu.</p>
+      </div><button id="open-routine-builder" class="lime-btn px-4">Buat Routine</button>
+     </div>
+     <div id="routine-list" class="grid lg:grid-cols-2 gap-4"></div>
+     <div id="routine-empty" class="panel p-8 text-center hidden">
+      <p class="muted">Belum ada routine. Buat routine pertama untuk mulai workout.</p>
+     </div>
+    </section>
+    
+    <section id="exercises" class="tab" aria-label="Exercise Library">
+     <div class="flex flex-wrap justify-between items-end gap-3 mb-5">
+      <div>
+       <h2 class="font-extrabold text-2xl">Exercise Library</h2>
+       <p class="muted text-sm mt-1">Cari exercise bawaan atau tambahkan gerakan custom.</p>
+      </div><button id="open-exercise-builder" class="lime-btn px-4">Tambah Exercise</button>
+     </div>
+     <div class="grid md:grid-cols-[1fr_220px] gap-3 mb-4">
+      <label class="sr-only" for="exercise-search">Cari exercise</label> 
+      <input id="exercise-search" class="field" type="search" placeholder="Cari exercise..."> 
+      
+      <!-- Custom Select Target Otot -->
+      <div id="custom-muscle-filter" class="custom-select-wrapper">
+        <div class="field custom-select-trigger" tabindex="0">
+          <span class="selected-label">Semua target otot</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        </div>
+        <div class="custom-options">
+          <div class="custom-option selected" data-value="">Semua target otot</div>
+          <div class="custom-option" data-value="Chest">Chest</div>
+          <div class="custom-option" data-value="Back">Back</div>
+          <div class="custom-option" data-value="Shoulders">Shoulders</div>
+          <div class="custom-option" data-value="Legs">Legs</div>
+          <div class="custom-option" data-value="Arms">Arms</div>
+          <div class="custom-option" data-value="Core">Core</div>
+        </div>
+      </div>
+     </div>
+     <div id="exercise-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+     <div id="exercise-empty" class="panel p-8 text-center hidden">
+      <p class="muted">Exercise tidak ditemukan. Ubah pencarian atau tambahkan exercise custom.</p>
+     </div>
+    </section>
+    
+    <section id="workout" class="tab" aria-label="Live Workout">
+     <div id="workout-start-state" class="panel p-6 max-w-2xl">
+      <p class="text-lime-300 font-bold text-sm tracking-wider">LIVE WORKOUT</p>
+      <h2 class="font-extrabold text-3xl mt-2">Mulai sesi berikutnya.</h2>
+      <p class="muted mt-2">Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.</p>
+      
+      <label class="block mt-6 text-sm font-bold mb-2">Pilih routine</label> 
+      <!-- Custom Select Workout Routine -->
+      <div id="custom-workout-routine" class="custom-select-wrapper mb-4">
+        <div class="field custom-select-trigger" tabindex="0">
+          <span class="selected-label">Pilih routine...</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        </div>
+        <div class="custom-options" id="workout-routine-options"></div>
+      </div> 
+      
+      <button id="start-workout-button" class="lime-btn px-5 mt-2">Mulai Sesi</button>
+
+      <div class="mt-4">
+        <button type="button" class="secondary-btn text-xs px-3 py-2" onclick="openRoutineBuilder()">+ Buat Routine Baru</button>
+      </div>
+     </div>
+     <div id="workout-live-state" class="hidden">
+      <div class="panel p-4 mb-4 sticky top-3 z-10">
+       <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+         <p id="workout-routine-name" class="font-extrabold"></p>
+         <p id="workout-elapsed" class="muted text-sm">00:00</p>
+        </div>
+        <div class="min-w-[150px] flex-1 max-w-xs">
+         <div class="flex justify-between text-xs mb-1">
+          <span>Progress</span><span id="workout-progress-label">0/0 Set</span>
+         </div>
+         <div class="progress-line">
+          <span id="workout-progress-bar"></span>
+         </div>
+        </div><button id="end-workout-button" class="danger-btn px-4">Akhiri workout</button>
+       </div>
+      </div>
+      <div id="rest-timer-card" class="panel p-4 mb-4 hidden border-lime-300">
+       <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+         <p class="text-sm font-bold text-lime-300 tracking-wider">WAKTU ISTIRAHAT</p><strong id="rest-time" class="block text-3xl tracking-tight">01:30</strong>
+        </div>
+        <div class="flex gap-2"><button id="rest-pause" class="secondary-btn px-3">Jeda</button> <button id="rest-skip" class="secondary-btn px-3">Lewati</button> <button id="rest-reset" class="secondary-btn px-3">Reset</button>
+        </div>
+       </div>
+      </div>
+      <article class="panel p-5">
+       <div class="flex justify-between gap-3 items-start">
+        <div>
+         <p id="exercise-position" class="text-lime-300 text-sm font-bold"></p>
+         <h2 id="active-exercise-name" class="font-extrabold text-2xl mt-1"></h2>
+         <p id="previous-performance" class="muted text-sm mt-1"></p>
+        </div><span id="active-exercise-muscle" class="chip"></span>
+       </div><label class="block mt-5 text-sm font-bold" for="exercise-notes">Catatan</label> <textarea id="exercise-notes" class="field mt-2 min-h-20" placeholder="Contoh: jaga tempo saat turun"></textarea>
+       <div class="grid grid-cols-[44px_1fr_1fr_122px] gap-2 text-xs muted font-bold mt-6 mb-2">
+        <span>Set</span><span>Reps</span><span>Weight (kg)</span><span>Status</span>
+       </div>
+       <div id="set-list" class="space-y-2"></div><button id="add-set-button" class="secondary-btn px-4 mt-4"><i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>Tambah Set</button>
+       <div class="flex justify-between gap-3 mt-6"><button id="previous-exercise" class="secondary-btn px-4">← Sebelumnya</button> <button id="next-exercise" class="lime-btn px-4">Exercise berikutnya →</button>
+       </div>
+      </article>
+     </div>
+    </section>
+    
+    <section id="history" class="tab" aria-label="Workout History">
+     <div class="flex flex-wrap justify-between items-end gap-3 mb-5">
+      <div>
+       <h2 class="font-extrabold text-2xl">History &amp; Progress</h2>
+       <p class="muted text-sm mt-1">Lihat konsistensi latihan dan perkembangan Weight.</p>
+      </div>
+      <div class="flex gap-2">
+       <button id="export-pdf-daily" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
+         <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF Harian
+       </button>
+       <button id="export-pdf-weekly" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
+         <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF Mingguan
+       </button>
+      </div>
+     </div>
+     <div class="grid md:grid-cols-2 gap-3 mb-5">
+      <!-- Custom Select History Routine Filter -->
+      <div id="custom-history-filter" class="custom-select-wrapper">
+        <div class="field custom-select-trigger" tabindex="0">
+          <span class="selected-label">Semua routine</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        </div>
+        <div class="custom-options" id="history-routine-options">
+          <div class="custom-option selected" data-value="">Semua routine</div>
+        </div>
+      </div> 
+
+      <!-- Custom Select Chart Exercise Selector -->
+      <div id="custom-chart-exercise" class="custom-select-wrapper">
+        <div class="field custom-select-trigger" tabindex="0">
+          <span class="selected-label">Pilih exercise untuk melihat tren</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        </div>
+        <div class="custom-options" id="chart-exercise-options">
+          <div class="custom-option selected" data-value="">Pilih exercise untuk melihat tren</div>
+        </div>
+      </div>
+     </div>
+     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
+      <div class="metric">
+       <p class="muted text-xs font-bold">Total sesi</p><strong id="history-session-count" class="block text-2xl mt-1">0</strong>
+      </div>
+      <div class="metric">
+       <p class="muted text-xs font-bold">Total set</p><strong id="history-set-count" class="block text-2xl mt-1">0</strong>
+      </div>
+      <div class="metric col-span-2 lg:col-span-1">
+       <p class="muted text-xs font-bold">Total volume</p><strong id="history-volume" class="block text-2xl mt-1">0 kg</strong>
+      </div>
+     </div>
+     <div class="panel p-5 mb-5">
+      <h3 class="font-extrabold text-lg">Tren Weight</h3>
+      <p id="chart-caption" class="muted text-sm mt-1"></p>
+      <div id="chart-area" class="mt-4 h-48"></div>
+     </div>
+     <div id="history-list" class="space-y-3"></div>
+     <div id="history-empty" class="panel p-8 text-center hidden">
+      <p class="muted">Belum ada history. Selesaikan workout untuk melihat progress di sini.</p>
+     </div>
+    </section>
+   </main>
+   
+   <nav class="bottom-nav" aria-label="Navigasi utama mobile" id="mobile-nav">
+    <button class="mobile-nav-btn active" data-tab="dashboard">
+      <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+      <span>Dashboard</span>
+    </button> 
+    <button class="mobile-nav-btn" data-tab="exercises">
+      <i data-lucide="library-big" class="w-5 h-5"></i>
+      <span>Exercise</span>
+    </button> 
+    <button class="mobile-nav-btn center-pill-btn" data-tab="routines">
+      <div class="fab-icon">
+        <i data-lucide="repeat-2" class="w-6 h-6"></i>
+      </div>
+      <span>Routine</span>
+    </button> 
+    <button class="mobile-nav-btn" data-tab="workout">
+      <i data-lucide="timer" class="w-5 h-5"></i>
+      <span>Workout</span>
+    </button> 
+    <button class="mobile-nav-btn" data-tab="history">
+      <i data-lucide="chart-no-axes-combined" class="w-5 h-5"></i>
+      <span>History</span>
+    </button>
+   </nav>
+  </div>
+
+  <!-- MODAL PROFIL & TARGET OLAHRAGA MINGGUAN -->
+  <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+   <form id="profile-form" class="modal max-w-md">
+    <div class="flex justify-between gap-3 items-center mb-5">
+     <h2 id="profile-modal-title" class="font-extrabold text-xl">Profil & Target Latihan</h2>
+     <button type="button" class="icon-btn close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x"></i></button>
+    </div>
+    <p class="muted text-sm mb-5">Perubahan Berat Badan (BB), Tinggi Badan (TB), dan Target Mingguan akan tersimpan otomatis (autosave).</p>
+    
+    <label class="block text-sm font-bold" for="profile-bb">Berat Badan (kg)</label>
+    <input id="profile-bb" class="field mt-2" type="number" step="0.5" min="20" max="300" required placeholder="Contoh: 65">
+
+    <label class="block text-sm font-bold mt-4" for="profile-tb">Tinggi Badan (cm)</label>
+    <input id="profile-tb" class="field mt-2" type="number" min="50" max="250" required placeholder="Contoh: 170">
+
+    <label class="block text-sm font-bold mt-4">Target Olahraga Mingguan (Sesi)</label>
+    <!-- Custom Select Profile Target -->
+    <div id="custom-profile-target" class="custom-select-wrapper mt-2">
+      <div class="field custom-select-trigger" tabindex="0">
+        <span class="selected-label">3-5 Sesi / minggu (4)</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+      </div>
+      <div class="custom-options">
+        <div class="custom-option" data-value="2">1-3 Sesi / minggu (2)</div>
+        <div class="custom-option selected" data-value="4">3-5 Sesi / minggu (4)</div>
+        <div class="custom-option" data-value="6">6-7 Sesi / minggu (6)</div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-6">
+     <button type="button" class="secondary-btn px-4 close-modal" data-close="profile-modal">Tutup</button>
+     <button class="lime-btn px-4" type="submit">Selesai</button>
+    </div>
+   </form>
+  </div>
+
+  <div id="routine-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
+   <form id="routine-form" class="modal">
+    <div class="flex justify-between gap-3 items-center mb-5">
+     <h2 id="routine-modal-title" class="font-extrabold text-xl">Routine Builder</h2><button type="button" class="icon-btn close-modal" data-close="routine-modal" aria-label="Tutup builder routine"><i data-lucide="x"></i></button>
+    </div>
+    <p class="muted text-sm mb-5">Contoh alur: beri nama routine, pilih hari latihan, lalu pilih dan urutkan exercise dari library.</p><input id="routine-id" type="hidden"> <label class="block text-sm font-bold" for="routine-name">Nama routine</label><input id="routine-name" class="field mt-2" required="" maxlength="50" placeholder="Contoh: Upper Body"> <label class="block text-sm font-bold mt-4" for="routine-description">Deskripsi singkat <span class="muted font-normal">(opsional)</span></label><textarea id="routine-description" class="field mt-2 min-h-20" maxlength="140" placeholder="Fokus dan tujuan latihan"></textarea>
+    <fieldset class="mt-5">
+     <legend class="text-sm font-bold">Hari latihan</legend>
+     <div id="day-picker" class="flex flex-wrap gap-2 mt-3"></div>
+    </fieldset>
+    <div class="mt-6 flex justify-between items-end gap-3">
+     <div>
+      <h3 class="font-extrabold">Daftar exercise</h3>
+      <p class="muted text-xs mt-1">Pilih dari library, lalu atur urutannya.</p>
+     </div><span id="selected-count" class="chip">0 dipilih</span>
+    </div>
+    <div id="builder-selected-exercises" class="space-y-2 mt-3"></div>
+    <div class="border-t border-slate-700/50 mt-5 pt-5">
+     <label class="block text-sm font-bold" for="builder-exercise-search">Tambah dari library</label><input id="builder-exercise-search" class="field mt-2" type="search" placeholder="Cari exercise untuk routine...">
+     <div id="builder-library" class="max-h-48 overflow-auto mt-2 space-y-2"></div>
+    </div>
+    <div class="flex justify-end gap-2 mt-6">
+     <button type="button" class="secondary-btn px-4 close-modal" data-close="routine-modal">Batal</button><button class="lime-btn px-4" type="submit">Simpan Routine</button>
+    </div>
+   </form>
+  </div>
+  
+  <div id="exercise-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
+   <form id="exercise-form" class="modal max-w-md">
+    <div class="flex justify-between gap-3 items-center mb-5">
+     <h2 id="exercise-modal-title" class="font-extrabold text-xl">Tambah Exercise Custom</h2><button type="button" class="icon-btn close-modal" data-close="exercise-modal" aria-label="Tutup form exercise"><i data-lucide="x"></i></button>
+    </div><label class="block text-sm font-bold" for="custom-exercise-name">Nama exercise</label><input id="custom-exercise-name" class="field mt-2" required="" maxlength="60" placeholder="Contoh: Cable Fly"> 
+    
+    <label class="block text-sm font-bold mt-4">Target otot</label>
+    <!-- Custom Select Custom Exercise Muscle -->
+    <div id="custom-exercise-muscle-select" class="custom-select-wrapper mt-2">
+      <div class="field custom-select-trigger" tabindex="0">
+        <span class="selected-label">Pilih target otot</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+      </div>
+      <div class="custom-options">
+        <div class="custom-option selected" data-value="">Pilih target otot</div>
+        <div class="custom-option" data-value="Chest">Chest</div>
+        <div class="custom-option" data-value="Back">Back</div>
+        <div class="custom-option" data-value="Shoulders">Shoulders</div>
+        <div class="custom-option" data-value="Legs">Legs</div>
+        <div class="custom-option" data-value="Arms">Arms</div>
+        <div class="custom-option" data-value="Core">Core</div>
+      </div>
+    </div> 
+
+    <label class="block text-sm font-bold mt-4" for="custom-exercise-equipment">Equipment</label><input id="custom-exercise-equipment" class="field mt-2" required="" maxlength="40" placeholder="Contoh: Cable machine">
+    <div class="flex justify-end gap-2 mt-6">
+     <button type="button" class="secondary-btn px-4 close-modal" data-close="exercise-modal">Batal</button><button class="lime-btn px-4" type="submit">Simpan Exercise</button>
+    </div>
+   </form>
+  </div>
+  
+  <div id="confirm-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+   <div class="modal max-w-md">
+    <h2 id="confirm-title" class="font-extrabold text-xl">Konfirmasi tindakan</h2>
+    <p id="confirm-message" class="muted mt-2"></p>
+    <div class="flex justify-end gap-2 mt-6">
+     <button id="confirm-cancel" class="secondary-btn px-4">Batal</button><button id="confirm-action" class="danger-btn px-4">Hapus</button>
+    </div>
+   </div>
+  </div>
+  
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/_sdk/d3b1f5fdf3d3ed7d.editing_sdk.js" integrity="sha512-1kN2li6Bi1y+hyASeQrjX3T1ejbJuofO7QFHYwSxVmnYpAQy3WUUNCT5CEfq3aK+7Vbwgt8v89WSm0fddrQpfw=="></script>
+  <script>
+    const KEY = "gymflow-v1";
+    const muscles = ["Chest","Back","Shoulders","Legs","Arms","Core"];
+    const days = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"];
+    const uid = () => "gf_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    let state, selectedRoutineExercises = [], restInterval = null, confirmCallback = null, elapsedInterval = null;
+
+    const seedExercises = [
+      ["ex_bench","Bench Press","Chest","Barbell"],["ex_incline","Incline Dumbbell Press","Chest","Dumbbell"],["ex_row","Barbell Row","Back","Barbell"],["ex_pullup","Lat Pulldown","Back","Cable"],
+      ["ex_ohp","Overhead Press","Shoulders","Barbell"],["ex_lateral","Lateral Raise","Shoulders","Dumbbell"],["ex_squat","Back Squat","Legs","Barbell"],["ex_rdl","Romanian Deadlift","Legs","Barbell"],
+      ["ex_curl","Bicep Curl","Arms","Dumbbell"],["ex_pushdown","Tricep Pushdown","Arms","Cable"],["ex_plank","Plank","Core","Bodyweight"]
+    ].map(([id,name,muscle,equipment]) => ({id,name,muscle,equipment,isCustom:false}));
+
+    function seedState() {
+      return {
+        settings:{theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4},
+        exercises:seedExercises,
+        routines:[],
+        activeSession:null,
+        history:[]
+      };
+    }
+    function loadState(){ 
+      try { 
+        let loaded = JSON.parse(localStorage.getItem(KEY)) || seedState(); 
+        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4};
+        if(loaded.settings.weight === undefined) loaded.settings.weight = 65;
+        if(loaded.settings.height === undefined) loaded.settings.height = 170;
+        if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
+        return loaded;
+      } catch(e){ return seedState(); } 
+    }
+    function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+    function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+    function fmtKg(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kg"; }
+    function formatDuration(s){ s=Math.max(0,Math.floor(s||0)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+    function routineById(id){ return state.routines.find(r=>r.id===id); }
+    function exerciseById(id){ return state.exercises.find(e=>e.id===id); }
+    function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove("show"),3200); }
+    function openModal(id){ document.getElementById(id).classList.add("open"); }
+    function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+    function showConfirm(title,message,actionText,cb){ document.getElementById("confirm-title").textContent=title; document.getElementById("confirm-message").textContent=message; document.getElementById("confirm-action").textContent=actionText; confirmCallback=cb; openModal("confirm-modal"); }
+
+    // Fungsi autosave khusus profil & target mingguan
+    function saveProfileSettings() {
+      const bbVal = parseFloat(document.getElementById("profile-bb").value);
+      const tbVal = parseInt(document.getElementById("profile-tb").value);
+      const targetVal = document.querySelector("#custom-profile-target .custom-option.selected")?.dataset.value;
+      
+      let updated = false;
+      if (!isNaN(bbVal) && state.settings.weight !== bbVal) {
+        state.settings.weight = bbVal;
+        updated = true;
+      }
+      if (!isNaN(tbVal) && state.settings.height !== tbVal) {
+        state.settings.height = tbVal;
+        updated = true;
+      }
+      const parsedTarget = parseInt(targetVal);
+      if (!isNaN(parsedTarget) && state.settings.weeklyGoal !== parsedTarget) {
+        state.settings.weeklyGoal = parsedTarget;
+        updated = true;
+      }
+
+      if (updated) {
+        save();
+        renderDashboard();
+      }
+    }
+
+    // Helper Inisialisasi Custom Dropdown
+    function initCustomSelect(wrapperId, onSelectCb) {
+      const wrapper = document.getElementById(wrapperId);
+      if(!wrapper) return;
+      const trigger = wrapper.querySelector('.custom-select-trigger');
+      const label = trigger.querySelector('.selected-label');
+      const optionsContainer = wrapper.querySelector('.custom-options');
+
+      trigger.onclick = (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.custom-select-wrapper.open').forEach(w => {
+          if(w !== wrapper) w.classList.remove('open');
+        });
+        wrapper.classList.toggle('open');
+      };
+
+      optionsContainer.onclick = (e) => {
+        const option = e.target.closest('.custom-option');
+        if(!option) return;
+        const val = option.dataset.value;
+        const text = option.textContent;
+
+        optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        label.textContent = text;
+        wrapper.classList.remove('open');
+
+        if(typeof onSelectCb === 'function') onSelectCb(val, text);
+      };
+    }
+
+    function setCustomSelectValue(wrapperId, val) {
+      const wrapper = document.getElementById(wrapperId);
+      if(!wrapper) return;
+      const optionsContainer = wrapper.querySelector('.custom-options');
+      const label = wrapper.querySelector('.selected-label');
+      const targetOption = optionsContainer.querySelector(`.custom-option[data-value="${val}"]`);
+      if(targetOption) {
+        optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        targetOption.classList.add('selected');
+        label.textContent = targetOption.textContent;
+      }
+    }
+
+    window.addEventListener('click', () => {
+      document.querySelectorAll('.custom-select-wrapper.open').forEach(w => w.classList.remove('open'));
+    });
+
+    function openProfileModal(){
+      document.getElementById("profile-bb").value = state.settings.weight;
+      document.getElementById("profile-tb").value = state.settings.height;
+      setCustomSelectValue("custom-profile-target", state.settings.weeklyGoal);
+      openModal("profile-modal");
+    }
+
+    function setTheme(){
+      document.body.classList.toggle("light",state.settings.theme==="light");
+      document.documentElement.style.colorScheme=state.settings.theme==="light"?"light":"dark";
+    }
+    function navigate(tab){
+      document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",el.id===tab));
+      document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
+      if(tab==="workout") renderWorkout(); if(tab==="history") renderHistory();
+    }
+    function renderDashboard(){
+      const h=state.history, now=Date.now(), week=h.filter(s=>now-new Date(s.endedAt).getTime()<604800000);
+      const volume=week.reduce((a,s)=>a+s.totalVolume,0);
+      
+      document.getElementById("profile-bb-display").textContent = state.settings.weight + " kg";
+      document.getElementById("profile-tb-display").textContent = state.settings.height + " cm";
+      document.getElementById("profile-target-display").textContent = state.settings.weeklyGoal + " sesi";
+
+      document.getElementById("week-volume").textContent=fmtKg(volume);
+      document.getElementById("goal-value").textContent=week.length+" / "+state.settings.weeklyGoal;
+      
+      const dates=[...new Set(h.map(s=>new Date(s.endedAt).toDateString()))].sort((a,b)=>new Date(b)-new Date(a));
+      let streak=0, cursor=new Date(); cursor.setHours(0,0,0,0);
+      while(dates.includes(cursor.toDateString())){streak++;cursor.setDate(cursor.getDate()-1);}
+      document.getElementById("streak-value").textContent=streak+" hari";
+      
+      const upcoming=state.routines[0];
+      document.getElementById("next-workout-copy").textContent=upcoming ? upcoming.name+" · "+upcoming.exerciseIds.length+" exercise siap dijalankan." : "Buat routine pertama untuk mulai mencatat progress.";
+      const active=state.activeSession, activeCopy=document.getElementById("active-session-copy"), resume=document.getElementById("resume-workout");
+      activeCopy.textContent=active ? "Sesi "+(routineById(active.routineId)?.name||"Workout")+" masih berjalan." : "Belum ada sesi aktif.";
+      resume.classList.toggle("hidden",!active);
+    }
+    function renderRoutines(){
+      const list=document.getElementById("routine-list"), empty=document.getElementById("routine-empty");
+      list.innerHTML=""; empty.classList.toggle("hidden",state.routines.length!==0);
+      state.routines.forEach(r=>{
+        const el=document.createElement("article"); el.className="panel p-5";
+        el.innerHTML=`<div class="flex justify-between gap-3"><div><h3 class="font-extrabold text-xl">${esc(r.name)}</h3><p class="muted text-sm mt-1">${esc(r.description||"Tanpa deskripsi")}</p></div><button class="icon-btn edit-routine" data-id="${r.id}" aria-label="Edit ${esc(r.name)}"><i data-lucide="pencil"></i></button></div>
+        <div class="flex flex-wrap gap-2 mt-4">${r.days.map(d=>`<span class="chip">${d}</span>`).join("")}</div>
+        <p class="muted text-sm mt-4">${r.exerciseIds.length} exercise dalam routine</p>
+        <div class="flex gap-2 mt-4"><button class="lime-btn px-4 flex-1 start-routine" data-id="${r.id}">Mulai</button><button class="danger-btn px-3 delete-routine" data-id="${r.id}" aria-label="Hapus ${esc(r.name)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+        list.appendChild(el);
+      });
+      lucide.createIcons();
+    }
+    function renderExercises(){
+      const q=document.getElementById("exercise-search").value.toLowerCase();
+      const wrapper = document.getElementById("custom-muscle-filter");
+      const m = wrapper.querySelector('.custom-option.selected')?.dataset.value || "";
+      
+      const filtered=state.exercises.filter(e=>(!m||e.muscle===m)&&(`${e.name} ${e.equipment} ${e.muscle}`).toLowerCase().includes(q));
+      const list=document.getElementById("exercise-list"), empty=document.getElementById("exercise-empty"); list.innerHTML=""; empty.classList.toggle("hidden",filtered.length!==0);
+      filtered.forEach(e=>{const el=document.createElement("article");el.className="panel p-4";el.innerHTML=`<div class="flex justify-between gap-3"><div><h3 class="font-bold">${esc(e.name)}</h3><p class="muted text-sm mt-1">${esc(e.equipment)}</p></div>${e.isCustom?`<button class="icon-btn delete-exercise" data-id="${e.id}" aria-label="Hapus ${esc(e.name)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:""}</div><span class="chip mt-3">${esc(e.muscle)}${e.isCustom?" · Custom":""}</span>`;list.appendChild(el);});
+      lucide.createIcons();
+    }
+    function populateSelects(){
+      const workoutOptsContainer = document.getElementById("workout-routine-options");
+      if (state.routines.length === 0) {
+        workoutOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">(Belum ada routine, buat dulu yuk!)</div>';
+        document.querySelector("#custom-workout-routine .selected-label").textContent = "(Belum ada routine, buat dulu yuk!)";
+        document.querySelector("#custom-workout-routine").dataset.selectedVal = "";
+      } else {
+        workoutOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Pilih routine...</div>';
+        state.routines.forEach(r => {
+          workoutOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${r.id}">${esc(r.name)}</div>`);
+        });
+        document.querySelector("#custom-workout-routine .selected-label").textContent = "Pilih routine...";
+        document.querySelector("#custom-workout-routine").dataset.selectedVal = "";
+      }
+
+      const historyOptsContainer = document.getElementById("history-routine-options");
+      historyOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Semua routine</div>';
+      state.routines.forEach(r => {
+        historyOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${r.id}">${esc(r.name)}</div>`);
+      });
+      document.querySelector("#custom-history-filter .selected-label").textContent = "Semua routine";
+
+      const chartOptsContainer = document.getElementById("chart-exercise-options");
+      chartOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Pilih exercise untuk melihat tren</div>';
+      state.exercises.forEach(e => {
+        chartOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${e.id}">${esc(e.name)}</div>`);
+      });
+      document.querySelector("#custom-chart-exercise .selected-label").textContent = "Pilih exercise untuk melihat tren";
+    }
+
+    function openRoutineBuilder(id){
+      const r=id?routineById(id):null; document.getElementById("routine-id").value=r?.id||"";document.getElementById("routine-name").value=r?.name||"";document.getElementById("routine-description").value=r?.description||"";selectedRoutineExercises=[...(r?.exerciseIds||[])];
+      document.getElementById("day-picker").innerHTML=days.map(d=>`<button type="button" class="chip day-chip ${(r?.days||[]).includes(d)?"active":""}" data-day="${d}">${d}</button>`).join("");
+      renderBuilderExercises(); openModal("routine-modal"); document.getElementById("routine-name").focus();
+    }
+    function renderBuilderExercises(){
+      const holder=document.getElementById("builder-selected-exercises"), q=document.getElementById("builder-exercise-search").value.toLowerCase();
+      document.getElementById("selected-count").textContent=selectedRoutineExercises.length+" dipilih";
+      holder.innerHTML=selectedRoutineExercises.length?selectedRoutineExercises.map((id,i)=>{const e=exerciseById(id); return e?`<div class="flex items-center gap-2 bg-[var(--surface-2)] border border-[var(--line)] p-2 rounded-xl"><span class="w-7 text-center muted text-sm">${i+1}</span><span class="flex-1 font-bold text-sm">${esc(e.name)}</span><button type="button" class="icon-btn move-exercise" data-id="${id}" data-dir="-1" aria-label="Naikkan exercise"><i data-lucide="chevron-up"></i></button><button type="button" class="icon-btn move-exercise" data-id="${id}" data-dir="1" aria-label="Turunkan exercise"><i data-lucide="chevron-down"></i></button><button type="button" class="icon-btn remove-builder-exercise" data-id="${id}" aria-label="Hapus dari routine"><i data-lucide="x"></i></button></div>`:"";}).join(""):'<p class="muted text-sm py-3">Belum ada exercise. Cari dan pilih exercise di bawah.</p>';
+      document.getElementById("builder-library").innerHTML=state.exercises.filter(e=>e.name.toLowerCase().includes(q)&&!selectedRoutineExercises.includes(e.id)).map(e=>`<button type="button" class="w-full flex justify-between gap-2 text-left p-3 rounded-xl border border-[var(--line)] hover:bg-[var(--surface-2)] add-builder-exercise" data-id="${e.id}"><span class="font-bold text-sm">${esc(e.name)}</span><span class="muted text-xs">${e.muscle}</span></button>`).join("") || '<p class="muted text-sm py-3">Exercise tidak ditemukan.</p>';
+      lucide.createIcons();
+    }
+
+    function startWorkout(routineId){
+      if(!routineId){toast("Pilih routine terlebih dahulu.");return;}
+      const r=routineById(routineId); if(!r){toast("Pilih routine terlebih dahulu.");return;} if(!r.exerciseIds.length){toast("Routine ini belum memiliki exercise.");return;}
+      state.activeSession={id:uid(),routineId:r.id,startedAt:new Date().toISOString(),pausedSeconds:0,pauseStartedAt:null,currentExerciseIndex:0,restRemaining:0,restPaused:true,exercises:r.exerciseIds.map(id=>({exerciseId:id,sets:[{reps:"",weight:"",completedAt:null}],notes:""}))};save(); navigate("workout"); renderDashboard(); toast("Workout dimulai. Semangat!");
+    }
+    function currentExercise(){ return state.activeSession?.exercises[state.activeSession.currentExerciseIndex]; }
+    function renderWorkout(){
+      const active=state.activeSession;document.getElementById("workout-start-state").classList.toggle("hidden",!!active);document.getElementById("workout-live-state").classList.toggle("hidden",!active);
+      if(!active){populateSelects();return;}
+      const r=routineById(active.routineId), ex=currentExercise(), e=exerciseById(ex.exerciseId);
+      document.getElementById("workout-routine-name").textContent=r?.name||"Workout";
+      document.getElementById("exercise-position").textContent=`EXERCISE ${active.currentExerciseIndex+1} DARI ${active.exercises.length}`;
+      document.getElementById("active-exercise-name").textContent=e?.name||"Exercise";
+      document.getElementById("active-exercise-muscle").textContent=e?.muscle||"";
+      const previous=[...state.history].reverse().flatMap(s=>s.exercises).find(x=>x.exerciseId===e?.id&&x.sets.some(s=>s.completedAt));
+      document.getElementById("previous-performance").textContent=previous?"Sebelumnya: "+previous.sets.filter(s=>s.completedAt).map(s=>`${s.reps}×${s.weight}kg`).join(" · "):"Belum ada catatan performance sebelumnya.";
+      document.getElementById("exercise-notes").value=ex.notes||"";
+      const list=document.getElementById("set-list");list.innerHTML="";
+      ex.sets.forEach((set,i)=>{const row=document.createElement("div");row.className="grid grid-cols-[44px_1fr_1fr_122px] gap-2 items-center border border-[var(--line)] rounded-xl p-2 "+(set.completedAt?"set-done":"");row.innerHTML=`<span class="text-center font-bold">${i+1}</span><label class="sr-only" for="reps-${i}">Reps set ${i+1}</label><input id="reps-${i}" data-field="reps" data-index="${i}" inputmode="numeric" type="number" min="0" class="field !min-h-[42px]" value="${esc(set.reps)}" ${set.completedAt?"disabled":""}><label class="sr-only" for="weight-${i}">Weight set ${i+1}</label><input id="weight-${i}" data-field="weight" data-index="${i}" inputmode="decimal" type="number" min="0" step="0.5" class="field !min-h-[42px]" value="${esc(set.weight)}" ${set.completedAt?"disabled":""}><button class="${set.completedAt?"secondary-btn":"lime-btn"} complete-set px-2 !min-h-[42px] text-sm" data-index="${i}" ${set.completedAt?"disabled":""}>${set.completedAt?"✓ Selesai":"Selesai Set"}</button>`;list.appendChild(row);});
+      const all=active.exercises.flatMap(x=>x.sets), done=all.filter(s=>s.completedAt).length; document.getElementById("workout-progress-label").textContent=done+"/"+all.length+" Set";document.getElementById("workout-progress-bar").style.width=(all.length?done/all.length*100:0)+"%";
+      document.getElementById("previous-exercise").disabled=active.currentExerciseIndex===0; document.getElementById("next-exercise").textContent=active.currentExerciseIndex===active.exercises.length-1?"Selesai workout →":"Exercise berikutnya →";
+      updateTimers(); lucide.createIcons();
+    }
+    function elapsed(){const a=state.activeSession;if(!a)return 0;const end=a.pauseStartedAt?new Date(a.pauseStartedAt).getTime():Date.now();return Math.floor((end-new Date(a.startedAt).getTime())/1000)-a.pausedSeconds;}
+    function updateTimers(){if(!state.activeSession)return;document.getElementById("workout-elapsed").textContent=formatDuration(elapsed());const a=state.activeSession,card=document.getElementById("rest-timer-card");card.classList.toggle("hidden",!a.restRemaining);document.getElementById("rest-time").textContent=formatDuration(a.restRemaining);document.getElementById("rest-pause").textContent=a.restPaused?"Lanjut":"Jeda";}
+    function tick(){const a=state.activeSession;if(!a)return; if(a.restRemaining&&!a.restPaused){a.restRemaining--;if(a.restRemaining<=0){a.restRemaining=0;a.restPaused=true;toast("Waktu istirahat selesai. Siap set berikutnya!");}save();}updateTimers();}
+    function endWorkout(){
+      const a=state.activeSession;if(!a)return;const totalVolume=a.exercises.reduce((sum,x)=>sum+x.sets.reduce((v,s)=>v+(s.completedAt?(Number(s.reps)||0)*(Number(s.weight)||0):0),0),0);const totalSets=a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.completedAt).length,0);
+      if(!totalSets){toast("Selesaikan minimal satu set sebelum mengakhiri workout.");return;}
+      const endedAt=new Date().toISOString();state.history.unshift({id:a.id,routineId:a.routineId,startedAt:a.startedAt,endedAt,duration:elapsed(),exercises:a.exercises,totalVolume});state.activeSession=null;save();renderDashboard();navigate("history");toast("Workout tersimpan ke History.");
+    }
+    function renderHistory(){
+      const filter = document.querySelector("#custom-history-filter .custom-option.selected")?.dataset.value || "";
+      const sessions=state.history.filter(s=>!filter||s.routineId===filter), allSets=sessions.flatMap(s=>s.exercises.flatMap(e=>e.sets.filter(x=>x.completedAt)));
+      document.getElementById("history-session-count").textContent=sessions.length;document.getElementById("history-set-count").textContent=allSets.length;document.getElementById("history-volume").textContent=fmtKg(sessions.reduce((n,s)=>n+s.totalVolume,0));
+      const list=document.getElementById("history-list"),empty=document.getElementById("history-empty");list.innerHTML="";empty.classList.toggle("hidden",sessions.length!==0);
+      sessions.forEach(s=>{const r=routineById(s.routineId);const el=document.createElement("article");el.className="panel p-4 flex flex-wrap justify-between gap-4";el.innerHTML=`<div><h3 class="font-extrabold">${esc(r?.name||"Routine dihapus")}</h3><p class="muted text-sm mt-1">${new Date(s.endedAt).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${formatDuration(s.duration)}</p></div><div class="flex gap-5"><div><p class="muted text-xs font-bold">Set</p><strong>${s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.completedAt).length,0)}</strong></div><div><p class="muted text-xs font-bold">Volume</p><strong>${fmtKg(s.totalVolume)}</strong></div></div>`;list.appendChild(el);});
+      renderChart();
+    }
+    function renderChart(){
+      const id = document.querySelector("#custom-chart-exercise .custom-option.selected")?.dataset.value || "";
+      const area=document.getElementById("chart-area"),caption=document.getElementById("chart-caption");if(!id){area.innerHTML='<div class="h-full grid place-items-center muted text-sm">Pilih exercise untuk melihat perkembangan weight.</div>';caption.textContent="Gunakan data sesi yang sudah selesai.";return;}
+      const points=state.history.slice().reverse().flatMap(s=>{const ex=s.exercises.find(x=>x.exerciseId===id);if(!ex)return [];const ws=ex.sets.filter(x=>x.completedAt).map(x=>Number(x.weight)||0);return ws.length?[{date:new Date(s.endedAt),weight:Math.max(...ws)}]:[];});
+      caption.textContent=points.length?"Berat set tertinggi dari setiap sesi.":"Belum ada data set selesai untuk exercise ini.";if(!points.length){area.innerHTML='<div class="h-full grid place-items-center muted text-sm">Selesaikan workout untuk membangun grafik progress.</div>';return;}
+      const max=Math.max(...points.map(p=>p.weight)),min=Math.min(...points.map(p=>p.weight)),range=max-min||1,w=600,h=170;
+      const coords=points.map((p,i)=>`${points.length===1?w/2:25+i*(w-50)/(points.length-1)},${h-25-(p.weight-min)/range*(h-55)}`).join(" ");
+      area.innerHTML=`<svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik perkembangan weight"><line x1="25" y1="${h-25}" x2="${w-25}" y2="${h-25}" stroke="var(--line)"/><polyline fill="none" stroke="#bcf04a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>${points.map((p,i)=>{const x=points.length===1?w/2:25+i*(w-50)/(points.length-1),y=h-25-(p.weight-min)/range*(h-55);return `<circle cx="${x}" cy="${y}" r="5" fill="#bcf04a"/><text x="${x}" y="${h-7}" text-anchor="middle" fill="var(--muted)" font-size="11">${p.weight}kg</text>`}).join("")}</svg>`;
+    }
+
+    // Fungsi Ekspor Laporan PDF yang Diperbaiki
+    function exportPDF(type) {
+      if(state.history.length === 0) {
+        toast("Belum ada data history latihan untuk didownload.");
+        return;
+      }
+
+      toast("Sedang meracik file PDF...");
+
+      const now = new Date();
+      let sessionsToExport = [];
+      let titleText = "";
+      let subtitleText = `Dicetak pada: ${now.toLocaleDateString("id-ID", {dateStyle: 'full'})}`;
+
+      if (type === 'daily') {
+        const todayStr = now.toDateString();
+        sessionsToExport = state.history.filter(s => new Date(s.endedAt).toDateString() === todayStr);
+        titleText = "Laporan Progress Latihan Harian";
+        if(sessionsToExport.length === 0) {
+          sessionsToExport = [state.history[0]];
+          subtitleText = `Sesi terakhir (${new Date(state.history[0].endedAt).toLocaleDateString("id-ID")})`;
+        }
+      } else {
+        const oneWeekAgo = now.getTime() - 604800000;
+        sessionsToExport = state.history.filter(s => new Date(s.endedAt).getTime() >= oneWeekAgo);
+        titleText = "Laporan Progress Latihan Mingguan";
+        if(sessionsToExport.length === 0) {
+          sessionsToExport = state.history.slice(0, 3);
+        }
+      }
+
+      const totalVol = sessionsToExport.reduce((acc, s) => acc + s.totalVolume, 0);
+      const totalSesi = sessionsToExport.length;
+
+      let htmlContent = `
+        <div id="pdf-render-container" style="font-family: 'DM Sans', sans-serif; color: #17221b; padding: 24px; background: #ffffff; width: 100%; box-sizing: border-box;">
+          <div style="border-bottom: 3px solid #bcf04a; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #111923;">GYMFlow PROGRESS REPORT</h1>
+              <p style="margin: 4px 0 0 0; font-size: 14px; color: #647469; font-weight: 600;">${titleText}</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="margin: 0; font-size: 11px; color: #647469;">${subtitleText}</p>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #647469;">Berat Badan: <strong>${state.settings.weight} kg</strong> | Tinggi: <strong>${state.settings.height} cm</strong></p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <div style="flex: 1; background: #f4f7f4; padding: 12px; border-radius: 10px; border: 1px solid #d6e0d7;">
+              <span style="font-size: 10px; color: #647469; font-weight: 700; display: block;">TOTAL SESI</span>
+              <strong style="font-size: 18px; color: #17221b;">${totalSesi} Sesi</strong>
+            </div>
+            <div style="flex: 1; background: #f4f7f4; padding: 12px; border-radius: 10px; border: 1px solid #d6e0d7;">
+              <span style="font-size: 10px; color: #647469; font-weight: 700; display: block;">TOTAL VOLUME</span>
+              <strong style="font-size: 18px; color: #17221b;">${fmtKg(totalVol)}</strong>
+            </div>
+          </div>
+
+          <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px; color: #111923;">Rincian Sesi Latihan:</h3>
+      `;
+
+      sessionsToExport.forEach((s, idx) => {
+        const rName = routineById(s.routineId)?.name || "Custom Workout";
+        
+        const dObj = new Date(s.endedAt);
+        const dateStr = isNaN(dObj.getTime()) ? s.endedAt : dObj.toLocaleDateString("id-ID", {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+        
+        htmlContent += `
+          <div style="margin-bottom: 14px; background: #f9faf9; border: 1px solid #d6e0d7; border-radius: 10px; padding: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <strong style="font-size: 13px; color: #111923;">#${idx + 1} - ${esc(rName)}</strong>
+              <span style="font-size: 11px; color: #647469;">${dateStr} (${formatDuration(s.duration)})</span>
+            </div>
+        `;
+
+        s.exercises.forEach(ex => {
+          const exObj = exerciseById(ex.exerciseId);
+          const completedSets = ex.sets.filter(st => st.completedAt);
+          if(completedSets.length > 0) {
+            htmlContent += `
+              <div style="font-size: 11px; margin-top: 4px; padding-left: 8px; border-left: 2px solid #bcf04a;">
+                <span style="font-weight: 700; color: #17221b;">${esc(exObj?.name || "Exercise")}</span>: 
+                <span style="color: #647469;">${completedSets.map(st => `${st.reps} reps × ${st.weight} kg`).join(" | ")}</span>
+              </div>
+            `;
+          }
+        });
+
+        htmlContent += `</div>`;
+      });
+
+      htmlContent += `
+          <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            Digenerate secara otomatis oleh GYMFlow Tracker &copy; 2026
+          </div>
+        </div>
+      `;
+
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "absolute";
+      wrapper.style.left = "-9999px";
+      wrapper.style.top = "0";
+      wrapper.style.width = "794px";
+      wrapper.innerHTML = htmlContent;
+      document.body.appendChild(wrapper);
+
+      const opt = {
+        margin:       10,
+        filename:     `GYMFlow-Progress-${type === 'daily' ? 'Harian' : 'Mingguan'}-${now.toISOString().slice(0,10)}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      setTimeout(() => {
+        html2pdf().from(wrapper.firstElementChild).set(opt).save().then(() => {
+          wrapper.remove();
+          toast("PDF berhasil didownload!");
+        }).catch(err => {
+          wrapper.remove();
+          toast("Gagal mendownload PDF.");
+          console.error(err);
+        });
+      }, 100);
+    }
+
+    state=loadState();setTheme();
+    document.addEventListener("DOMContentLoaded",()=>{
+      populateSelects();
+      
+      initCustomSelect("custom-muscle-filter", () => renderExercises());
+      
+      // Mengaktifkan autosave pada custom select target profil mingguan
+      initCustomSelect("custom-profile-target", () => {
+        saveProfileSettings();
+        toast("Target mingguan diperbarui otomatis.");
+      });
+
+      initCustomSelect("custom-exercise-muscle-select", (val) => {
+        document.getElementById("custom-exercise-muscle-select").dataset.value = val;
+      });
+      initCustomSelect("custom-history-filter", () => renderHistory());
+      initCustomSelect("custom-chart-exercise", () => renderChart());
+      initCustomSelect("custom-workout-routine");
+
+      renderDashboard();renderRoutines();renderExercises();renderWorkout();renderHistory();lucide.createIcons();
+      elapsedInterval=setInterval(tick,1000);
+      document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.tab)));
+      document.getElementById("theme-toggle").onclick=()=>{state.settings.theme=state.settings.theme==="dark"?"light":"dark";save();setTheme();};
+      
+      const triggerReset = () => {
+        showConfirm("Reset data?","Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
+          state=seedState();save();setTheme();populateSelects();renderDashboard();renderRoutines();renderExercises();renderWorkout();renderHistory();toast("Data berhasil direset.");
+        });
+      };
+      document.getElementById("desktop-reset").onclick = triggerReset;
+      document.getElementById("mobile-reset-btn").onclick = triggerReset;
+      document.getElementById("open-profile-btn").onclick = openProfileModal;
+
+      // Event listener tombol download PDF
+      document.getElementById("export-pdf-daily").onclick = () => exportPDF('daily');
+      document.getElementById("export-pdf-weekly").onclick = () => exportPDF('weekly');
+
+      // Autosave event pada input berat badan & tinggi badan saat diketik
+      document.getElementById("profile-bb").oninput = () => saveProfileSettings();
+      document.getElementById("profile-tb").oninput = () => saveProfileSettings();
+
+      document.getElementById("profile-form").onsubmit = e => {
+        e.preventDefault();
+        saveProfileSettings();
+        closeModal("profile-modal");
+        toast("Profil & target tersimpan.");
+      };
+
+      document.getElementById("dashboard-start").onclick=()=>navigate("workout");document.getElementById("resume-workout").onclick=()=>navigate("workout");
+      document.getElementById("open-routine-builder").onclick=()=>openRoutineBuilder();document.getElementById("open-exercise-builder").onclick=()=>openModal("exercise-modal");
+      document.querySelectorAll(".close-modal").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+      document.getElementById("confirm-cancel").onclick=()=>closeModal("confirm-modal");document.getElementById("confirm-action").onclick=()=>{closeModal("confirm-modal");if(confirmCallback)confirmCallback();};
+      document.getElementById("exercise-search").oninput=renderExercises;
+      document.getElementById("routine-list").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.id;if(b.classList.contains("start-routine"))startWorkout(id);if(b.classList.contains("edit-routine"))openRoutineBuilder(id);if(b.classList.contains("delete-routine"))showConfirm("Hapus routine?","Routine ini akan dihapus, tetapi history workout lama tetap disimpan.","Hapus",()=>{state.routines=state.routines.filter(r=>r.id!==id);save();populateSelects();renderRoutines();renderDashboard();toast("Routine dihapus.");});};
+      document.getElementById("exercise-list").onclick=e=>{const b=e.target.closest(".delete-exercise");if(!b)return;const id=b.dataset.id,ex=exerciseById(id);showConfirm("Hapus exercise custom?","Exercise akan dihapus dari library dan routine terkait.","Hapus",()=>{state.exercises=state.exercises.filter(x=>x.id!==id);state.routines.forEach(r=>r.exerciseIds=r.exerciseIds.filter(x=>x!==id));save();populateSelects();renderExercises();renderRoutines();toast(ex.name+" dihapus.");});};
+      document.getElementById("day-picker").onclick=e=>{const b=e.target.closest("[data-day]");if(b)b.classList.toggle("active");};
+      document.getElementById("builder-exercise-search").oninput=renderBuilderExercises;
+      document.getElementById("builder-selected-exercises").onclick=e=>{const b=e.target.closest("button");if(!b)return;const i=selectedRoutineExercises.indexOf(b.dataset.id);if(b.classList.contains("remove-builder-exercise"))selectedRoutineExercises.splice(i,1);if(b.classList.contains("move-exercise")){const to=i+Number(b.dataset.dir);if(to>=0&&to<selectedRoutineExercises.length)[selectedRoutineExercises[i],selectedRoutineExercises[to]]=[selectedRoutineExercises[to],selectedRoutineExercises[i]];}renderBuilderExercises();};
+      document.getElementById("builder-library").onclick=e=>{const b=e.target.closest(".add-builder-exercise");if(b){selectedRoutineExercises.push(b.dataset.id);renderBuilderExercises();}};
+      document.getElementById("routine-form").onsubmit=e=>{e.preventDefault();const name=document.getElementById("routine-name").value.trim(),id=document.getElementById("routine-id").value,chosenDays=[...document.querySelectorAll(".day-chip.active")].map(x=>x.dataset.day);if(!name){toast("Nama routine wajib diisi.");return;}if(!selectedRoutineExercises.length){toast("Tambahkan minimal satu exercise.");return;}const payload={id:id||uid(),name,description:document.getElementById("routine-description").value.trim(),days:chosenDays,exerciseIds:[...selectedRoutineExercises],createdAt:id?routineById(id).createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};if(id)state.routines=state.routines.map(r=>r.id===id?payload:r);else state.routines.push(payload);save();populateSelects();renderRoutines();renderDashboard();closeModal("routine-modal");toast("Routine berhasil disimpan.");};
+      
+      document.getElementById("exercise-form").onsubmit=e=>{
+        e.preventDefault();
+        const name=document.getElementById("custom-exercise-name").value.trim();
+        const muscle=document.querySelector("#custom-exercise-muscle-select .custom-option.selected")?.dataset.value || "";
+        const equipment=document.getElementById("custom-exercise-equipment").value.trim();
+        
+        if(!name||!muscle||!equipment){toast("Lengkapi semua field exercise.");return;}
+        state.exercises.push({id:uid(),name,muscle,equipment,isCustom:true});
+        save();
+        populateSelects();
+        renderExercises();
+        e.target.reset();
+        setCustomSelectValue("custom-exercise-muscle-select", "");
+        closeModal("exercise-modal");
+        toast("Exercise custom ditambahkan.");
+      };
+
+      document.getElementById("start-workout-button").onclick=()=>{
+        const selectedRoutineId = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
+        startWorkout(selectedRoutineId);
+      };
+
+      document.getElementById("set-list").oninput=e=>{const input=e.target;if(!input.dataset.field)return;currentExercise().sets[Number(input.dataset.index)][input.dataset.field]=input.value;save();};
+      document.getElementById("set-list").onclick=e=>{const b=e.target.closest(".complete-set");if(!b)return;const set=currentExercise().sets[Number(b.dataset.index)];if(!(Number(set.reps)>0)||Number(set.weight)<0){toast("Isi Reps dan Weight terlebih dahulu.");return;}set.completedAt=new Date().toISOString();state.activeSession.restRemaining=state.settings.restSeconds;state.activeSession.restPaused=false;save();renderWorkout();};
+      document.getElementById("add-set-button").onclick=()=>{currentExercise().sets.push({reps:"",weight:"",completedAt:null});save();renderWorkout();};
+      document.getElementById("exercise-notes").onchange=e=>{currentExercise().notes=e.target.value;save();};
+      document.getElementById("previous-exercise").onclick=()=>{if(state.activeSession.currentExerciseIndex>0){state.activeSession.currentExerciseIndex--;save();renderWorkout();}};
+      document.getElementById("next-exercise").onclick=()=>{const a=state.activeSession;if(a.currentExerciseIndex<a.exercises.length-1){a.currentExerciseIndex++;save();renderWorkout();}else showConfirm("Akhiri workout?","Set yang sudah selesai akan disimpan ke History.","Akhiri",endWorkout);};
+      document.getElementById("end-workout-button").onclick=()=>showConfirm("Akhiri workout?","Sesi ini akan disimpan ke History.","Akhiri",endWorkout);
+      document.getElementById("rest-pause").onclick=()=>{state.activeSession.restPaused=!state.activeSession.restPaused;save();updateTimers();};
+      document.getElementById("rest-skip").onclick=()=>{state.activeSession.restRemaining=0;state.activeSession.restPaused=true;save();updateTimers();};
+      document.getElementById("rest-reset").onclick=()=>{state.activeSession.restRemaining=state.settings.restSeconds;state.activeSession.restPaused=true;save();updateTimers();};
+      
+      window.addEventListener("online",()=>document.getElementById("offline-badge").classList.add("hidden"));window.addEventListener("offline",()=>document.getElementById("offline-badge").classList.remove("hidden"));if(!navigator.onLine)document.getElementById("offline-badge").classList.remove("hidden");
+    });
+  </script>
+ 
+</body></html>
