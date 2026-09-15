@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="id"><head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260914-05-802a9e5","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/c21197326e9a1154.telemetry_sdk.js" integrity="sha512-Aqwl+NmLtKBcMQM4HY+W9lmBHa+zP5MqSEuYfCjkzt4xeOSv2xNz81cCp7JyXBVrY+zojg5o94FHY/R31v2d3Q=="></script>
+<html lang="id">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GymFlow</title>
@@ -8,6 +9,7 @@
   <!-- Library html2pdf untuk ekspor PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --bg: #090d13; --surface: #111923; --surface-2: #182331; --line: #293846;
@@ -28,18 +30,34 @@
     .lime-btn:hover { filter:brightness(1.06); transform:translateY(-1px); }
     .secondary-btn { background:var(--surface-2); color:var(--text); border:1px solid var(--line); min-height:44px; border-radius:12px; font-weight:700; }
     .danger-btn { background:rgba(251,113,133,.12); color:#ff98a8; border:1px solid rgba(251,113,133,.3); min-height:42px; border-radius:12px; font-weight:700; }
-    .icon-btn { width:44px; height:44px; display:inline-grid; place-items:center; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); color:var(--text); }
+    .icon-btn { 
+  width: 44px; 
+  height: 44px; 
+  display: inline-flex; /* Ubah dari inline-grid jika perlu atau pertahankan */
+  align-items: center; 
+  justify-content: center; 
+  border-radius: 12px; 
+  background: var(--surface-2); 
+  border: 1px solid var(--line); 
+  color: var(--text); 
+}
+
+/* Khusus override tombol reset header agar icon di dalamnya sentris */
+#mobile-reset-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}.icon-btn { width:44px; height:44px; display:inline-grid; place-items:center; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); color:var(--text); }
     .nav-item { color:var(--muted); border-radius:14px; min-height:48px; display:flex; align-items:center; gap:12px; padding:0 14px; font-weight:700; }
     .nav-item.active { color:#152008; background:#bcf04a; }
     .tab { display:none; animation:fade .22s ease; }
     .tab.active { display:block; }
     @keyframes fade { from { opacity:0; transform:translateY(7px) } to { opacity:1; transform:none } }
-    .chip { display:inline-flex; align-items:center; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); border-radius:999px; padding:5px 9px; font-size:12px; font-weight:700; }
+    .chip { display:inline-flex; align-items:center; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); border-radius:999px; padding:5px 9px; font-size:12px; font-weight:700; cursor: pointer; }
     .day-chip.active { background:rgba(188,240,74,.16); border-color:#bcf04a; color:var(--text); }
     .field { width:100%; min-height:46px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; color:var(--text); }
     .field::placeholder { color:var(--muted); }
     
-    /* Styling Custom Dropdown Keren */
     .custom-select-wrapper { position: relative; width: 100%; user-select: none; }
     .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
     .custom-options { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); max-height: 240px; overflow-y: auto; z-index: 40; display: none; padding: 4px; }
@@ -51,7 +69,7 @@
     .modal-layer { position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.62); padding:16px; display:none; align-items:flex-end; justify-content:center; }
     .modal-layer.open { display:flex; }
     .modal { width:100%; max-width:720px; max-height:calc(92 * min(var(--vh, 1vh), 1vh)); overflow:auto; background:var(--surface); border:1px solid var(--line); border-radius:24px 24px 16px 16px; padding:20px; }
-    .toast { position:fixed; z-index:70; left:16px; right:16px; bottom:88px; max-width:480px; margin:auto; background:#eaf6d0; color:#193005; border-radius:12px; padding:12px 15px; font-weight:700; box-shadow:var(--shadow); display:none; }
+    .toast { position:fixed; z-index:70; left:16px; right:16px; bottom:100px; max-width:480px; margin:auto; background:#eaf6d0; color:#193005; border-radius:12px; padding:12px 15px; font-weight:700; box-shadow:var(--shadow); display:none; }
     .toast.show { display:block; animation:fade .2s ease; }
     .set-done { opacity:.7; border-color:rgba(188,240,74,.5)!important; background:rgba(188,240,74,.08)!important; }
     .progress-line { height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
@@ -59,59 +77,60 @@
     
     .bottom-nav { 
       position: fixed; 
-      z-index: 30; 
-      bottom: 0; 
-      left: 0; 
-      right: 0; 
+      bottom: 20px;
+      left: 16px;
+      right: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      height: 72px;
       background: var(--surface); 
-      border-top: 1px solid var(--line); 
+      border: 1px solid var(--line);
+      border-radius: 999px; 
       display: flex; 
-      justify-content: space-around; 
       align-items: center; 
-      height: 70px;
-      padding: 0 10px calc(env(safe-area-inset-bottom)); 
-      box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
+      justify-content: space-around; 
+      padding: 0 8px; 
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+      z-index: 50;
     }
     .mobile-nav-btn { 
-      color: var(--muted); 
       background: transparent;
       border: none;
-      flex: 1;
-      height: 100%;
+      color: var(--muted);
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
+      flex: 1;
+      height: 100%;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+      font-size: 11px; 
+      font-weight: 600; 
       gap: 3px; 
-      font-size: 10px; 
-      font-weight: 700; 
-      transition: color 0.2s;
     }
-    .mobile-nav-btn.active { color: var(--lime); }
-    .mobile-nav-btn.center-pill-btn { position: relative; }
-    .mobile-nav-btn.center-pill-btn .fab-icon {
-      position: absolute;
-      top: -22px;
-      width: 52px;
-      height: 52px;
-      background: var(--lime);
-      color: #142009;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 6px 16px rgba(188, 240, 74, 0.35);
-      border: 4px solid var(--surface);
-      transition: transform 0.2s;
+    .mobile-nav-btn span { 
+      display: block !important; 
+      font-size: 10px;
+      letter-spacing: -0.01em;
     }
-    body.light .mobile-nav-btn.center-pill-btn .fab-icon {
-      background: #15803d;
-      color: #ffffff;
-      border: 4px solid #ffffff;
+    .mobile-nav-btn svg {
+      width: 20px;
+      height: 20px;
     }
-    .mobile-nav-btn.center-pill-btn span { margin-top: 22px; }
-    .mobile-nav-btn.active.center-pill-btn .fab-icon { transform: scale(1.08); }
+    .mobile-nav-btn.active { 
+      color: var(--lime) !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      transform: translateY(-2px);
+    }
+    .mobile-nav-btn.active span {
+      font-weight: 700;
+    }
+    .mobile-nav-btn:not(.active):hover {
+      color: var(--text);
+    }
 
     .sidebar { display:none; }
     @media (min-width: 900px) {
@@ -122,12 +141,84 @@
       .modal-layer { align-items:center; }
       .modal { border-radius:24px; }
     }
-    @media (max-width: 899px) { .main-area { padding:16px 16px 96px; } }
+    @media (max-width: 899px) { .main-area { padding:16px 16px 110px; } }
+
+    :root{
+      --bg:#f6f7f5;--surface:#fff;--surface-2:#f0f2ef;--line:#e4e7e2;
+      --text:#171a18;--muted:#747b75;--lime:#b8e94d;--lime-dark:#83a92b;
+      --danger:#dc5d6f;--warning:#d79d28;
+    }
+    body:not(.light){
+      --bg:#0c0f0d;--surface:#141815;--surface-2:#1b201c;--line:#292f2a;
+      --text:#f2f5f1;--muted:#8f9890;--lime:#b8e94d;--lime-dark:#8eaf35;
+      --danger:#f17889;--warning:#e0ad4a;
+    }
+    html{background:var(--bg);scroll-behavior:smooth}
+    body{background:var(--bg)!important;color:var(--text);font-family:"DM Sans",system-ui,sans-serif;letter-spacing:-.01em}
+    
+    .sidebar .flex.items-center.gap-3.px-3.mb-10{padding:4px 10px!important;margin-bottom:28px!important}
+    .sidebar .w-10.h-10{width:34px!important;height:34px!important;border-radius:10px!important}
+    .sidebar .font-extrabold.text-xl{font-size:18px!important}
+    #desktop-nav{display:grid;gap:4px!important}
+    .nav-item{
+      min-height:44px!important;padding:0 12px!important;border-radius:10px!important;
+      font-size:13px!important;font-weight:600!important;background:transparent!important;
+      color:var(--muted)!important;
+    }
+    .nav-item svg{width:17px!important;height:17px!important}
+    .nav-item.active{background:var(--surface-2)!important;color:var(--text)!important;position:relative}
+    .nav-item.active:before{content:"";width:3px;height:18px;border-radius:9px;background:var(--lime);position:absolute;left:0}
+
+    .main-area>header{
+      min-height:58px;padding:0 0 18px!important;margin-bottom:22px!important;
+      border-bottom:1px solid var(--line);align-items:center!important;
+    }
+    .main-area>header .w-12.h-12{display:grid !important; width:40px !important; height:40px !important;}
+    .main-area>header h1{font-size:20px!important;letter-spacing:-.04em!important}
+    .main-area>header .flex.items-center.gap-2 button{width:38px!important;height:38px!important;border-radius:10px!important;border:1px solid var(--line)!important;background:transparent!important}
+    
+    #mobile-reset-btn{display:inline-flex !important;}
+
+    #offline-badge{font-size:11px!important;padding:5px 8px!important}
+
+    .panel,.metric{
+      background:var(--surface)!important;border:1px solid var(--line)!important;
+      box-shadow:none!important;border-radius:16px!important;
+    }
+    .panel{padding:22px!important}
+    .metric{padding:16px!important}
+    .muted{color:var(--muted)!important}
+    .chip{
+      background:var(--surface-2)!important;border:1px solid var(--line)!important;
+      color:var(--muted)!important;border-radius:8px!important;padding:5px 8px!important;
+      font-size:11px!important;font-weight:600!important;cursor:pointer;
+    }
+    .day-chip{pointer-events:auto!important;position:relative;z-index:2;}
+    .day-chip.active{background:rgba(188,240,74,.18)!important;border-color:#bcf04a!important;color:var(--text)!important;}
+    .lime-btn{
+      min-height:42px!important;border-radius:9px!important;background:var(--lime)!important;
+      color:#18200e!important;font-size:13px!important;font-weight:700!important;
+      box-shadow:none!important;border:0!important;padding-left:15px!important;padding-right:15px!important;
+    }
+    
+    .secondary-btn,.danger-btn{min-height:40px!important;border-radius:9px!important;font-size:13px!important;box-shadow:none!important;}
+    .secondary-btn{background:var(--surface-2)!important;color:var(--text)!important;border:1px solid var(--line)!important}
+    .danger-btn{background:transparent!important;color:var(--danger)!important;border:1px solid color-mix(in srgb,var(--danger) 28%,var(--line))!important}
+    .icon-btn{width:38px!important;height:38px!important;border-radius:9px!important;background:var(--surface-2)!important;border:1px solid var(--line)!important}
+    .field{
+      min-height:44px!important;border-radius:9px!important;background:var(--surface-2)!important;
+      border:1px solid var(--line)!important;color:var(--text)!important;font-size:13px!important;
+    }
+    .field:focus{border-color:var(--lime)!important;box-shadow:0 0 0 3px rgba(184,233,77,.10)!important;outline:0!important}
+
+    @media (max-width:899px){
+      .main-area{padding:14px 14px 96px!important}
+      #dashboard>.grid{grid-template-columns:1fr 1fr!important}
+      #dashboard>.grid .metric.col-span-2{grid-column:1/-1!important}
+    }
   </style>
-  <script src="/_sdk/efe904fe8a212716.data_sdk.js" type="text/javascript" integrity="sha512-oiO0pmn5llS1uDeB2l690YywxqOe/a0U1kzY6RGaLZXtyh9YjTk1CUoK/bJUugc1QbUaJMJ3IE1MtpNY5NBZCw=="></script>
-  <script src="/_sdk/2099ab88d396666e.resizing_sdk.js" type="text/javascript" integrity="sha512-kSUXG3yWRngnaymRBbHGHc798S5hBVjvLyKd0iZCVHaYqBaJhLAS8ROSbROVwO39DSZ0AypHrjep526fop7p7A=="></script>
- </head>
- <body data-template-id="__page-root" class="w-full" style="background: rgb(9, 13, 19);">
+</head>
+<body class="w-full" style="background: rgb(9, 13, 19);">
   <div class="app-shell">
    <aside class="sidebar" aria-label="Navigasi utama desktop">
     <div class="flex items-center gap-3 px-3 mb-10">
@@ -136,11 +227,11 @@
      </div><span class="font-extrabold text-xl tracking-tight">GYMFlow</span>
     </div>
     <nav class="space-y-2" id="desktop-nav">
-     <button class="nav-item active w-full" data-tab="dashboard"><i data-lucide="layout-dashboard"></i>Dashboard</button> 
-     <button class="nav-item w-full" data-tab="routines"><i data-lucide="repeat-2"></i>Routines</button> 
-     <button class="nav-item w-full" data-tab="exercises"><i data-lucide="library-big"></i>Exercises</button> 
+     <button class="nav-item active w-full" data-tab="dashboard"><i data-lucide="layout-grid"></i>Home</button> 
+     <button class="nav-item w-full" data-tab="exercises"><i data-lucide="book-open"></i>Exercises</button> 
+     <button class="nav-item w-full" data-tab="routines"><i data-lucide="repeat"></i>Routines</button> 
      <button class="nav-item w-full" data-tab="workout"><i data-lucide="timer"></i>Workout</button> 
-     <button class="nav-item w-full" data-tab="history"><i data-lucide="chart-no-axes-combined"></i>History</button>
+     <button class="nav-item w-full" data-tab="history"><i data-lucide="trending-up"></i>Progress</button>
     </nav>
     <div class="mt-auto space-y-3"><button id="desktop-reset" class="secondary-btn w-full text-sm">Reset data</button>
      <p class="muted text-xs px-2">Data tersimpan di perangkat ini.</p>
@@ -206,7 +297,7 @@
     </section>
     
     <section id="routines" class="tab" aria-label="Routines">
-     <div class="flex flex-wrap justify-between items-end gap-3 mb-5">
+     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
       <div>
        <h2 class="font-extrabold text-2xl">Routines</h2>
        <p class="muted text-sm mt-1">Bangun alur latihan yang sesuai dengan targetmu.</p>
@@ -219,9 +310,9 @@
     </section>
     
     <section id="exercises" class="tab" aria-label="Exercise Library">
-     <div class="flex flex-wrap justify-between items-end gap-3 mb-5">
+     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
       <div>
-       <h2 class="font-extrabold text-2xl">Exercise Library</h2>
+       <h2 class="font-extrabold text-2xl">Exercises</h2>
        <p class="muted text-sm mt-1">Cari exercise bawaan atau tambahkan gerakan custom.</p>
       </div><button id="open-exercise-builder" class="lime-btn px-4">Tambah Exercise</button>
      </div>
@@ -229,7 +320,6 @@
       <label class="sr-only" for="exercise-search">Cari exercise</label> 
       <input id="exercise-search" class="field" type="search" placeholder="Cari exercise..."> 
       
-      <!-- Custom Select Target Otot -->
       <div id="custom-muscle-filter" class="custom-select-wrapper">
         <div class="field custom-select-trigger" tabindex="0">
           <span class="selected-label">Semua target otot</span>
@@ -259,7 +349,6 @@
       <p class="muted mt-2">Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.</p>
       
       <label class="block mt-6 text-sm font-bold mb-2">Pilih routine</label> 
-      <!-- Custom Select Workout Routine -->
       <div id="custom-workout-routine" class="custom-select-wrapper mb-4">
         <div class="field custom-select-trigger" tabindex="0">
           <span class="selected-label">Pilih routine...</span>
@@ -319,22 +408,18 @@
     </section>
     
     <section id="history" class="tab" aria-label="Workout History">
-     <div class="flex flex-wrap justify-between items-end gap-3 mb-5">
+     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
       <div>
-       <h2 class="font-extrabold text-2xl">History &amp; Progress</h2>
-       <p class="muted text-sm mt-1">Lihat konsistensi latihan dan perkembangan Weight.</p>
+       <h2 class="font-extrabold text-2xl">Progress</h2>
+       <p class="muted text-sm mt-1">Pantau konsistensi dan perkembangan latihanmu.</p>
       </div>
-      <div class="flex gap-2">
+      <div class="flex items-center">
        <button id="export-pdf-daily" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
-         <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF Harian
-       </button>
-       <button id="export-pdf-weekly" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
-         <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF Mingguan
+         <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF
        </button>
       </div>
      </div>
      <div class="grid md:grid-cols-2 gap-3 mb-5">
-      <!-- Custom Select History Routine Filter -->
       <div id="custom-history-filter" class="custom-select-wrapper">
         <div class="field custom-select-trigger" tabindex="0">
           <span class="selected-label">Semua routine</span>
@@ -345,7 +430,6 @@
         </div>
       </div> 
 
-      <!-- Custom Select Chart Exercise Selector -->
       <div id="custom-chart-exercise" class="custom-select-wrapper">
         <div class="field custom-select-trigger" tabindex="0">
           <span class="selected-label">Pilih exercise untuk melihat tren</span>
@@ -379,33 +463,34 @@
     </section>
    </main>
    
-   <nav class="bottom-nav" aria-label="Navigasi utama mobile" id="mobile-nav">
-    <button class="mobile-nav-btn active" data-tab="dashboard">
-      <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-      <span>Dashboard</span>
+   <nav class="bottom-nav" aria-label="Bottom Navigation">
+    <button class="mobile-nav-btn active" data-tab="dashboard" title="Home">
+      <i data-lucide="layout-grid"></i>
+      <span>Home</span>
     </button> 
-    <button class="mobile-nav-btn" data-tab="exercises">
-      <i data-lucide="library-big" class="w-5 h-5"></i>
-      <span>Exercise</span>
+
+    <button class="mobile-nav-btn" data-tab="exercises" title="Exercises">
+      <i data-lucide="book-open"></i>
+      <span>Exercises</span>
     </button> 
-    <button class="mobile-nav-btn center-pill-btn" data-tab="routines">
-      <div class="fab-icon">
-        <i data-lucide="repeat-2" class="w-6 h-6"></i>
-      </div>
-      <span>Routine</span>
+
+    <button class="mobile-nav-btn" data-tab="routines" title="Routines">
+      <i data-lucide="repeat"></i>
+      <span>Routines</span>
     </button> 
-    <button class="mobile-nav-btn" data-tab="workout">
-      <i data-lucide="timer" class="w-5 h-5"></i>
+
+    <button class="mobile-nav-btn" data-tab="workout" title="Workout">
+      <i data-lucide="timer"></i>
       <span>Workout</span>
     </button> 
-    <button class="mobile-nav-btn" data-tab="history">
-      <i data-lucide="chart-no-axes-combined" class="w-5 h-5"></i>
-      <span>History</span>
+
+    <button class="mobile-nav-btn" data-tab="history" title="Progress">
+      <i data-lucide="trending-up"></i>
+      <span>Progress</span>
     </button>
    </nav>
   </div>
 
-  <!-- MODAL PROFIL & TARGET OLAHRAGA MINGGUAN -->
   <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
    <form id="profile-form" class="modal max-w-md">
     <div class="flex justify-between gap-3 items-center mb-5">
@@ -421,7 +506,6 @@
     <input id="profile-tb" class="field mt-2" type="number" min="50" max="250" required placeholder="Contoh: 170">
 
     <label class="block text-sm font-bold mt-4">Target Olahraga Mingguan (Sesi)</label>
-    <!-- Custom Select Profile Target -->
     <div id="custom-profile-target" class="custom-select-wrapper mt-2">
       <div class="field custom-select-trigger" tabindex="0">
         <span class="selected-label">3-5 Sesi / minggu (4)</span>
@@ -451,7 +535,7 @@
      <legend class="text-sm font-bold">Hari latihan</legend>
      <div id="day-picker" class="flex flex-wrap gap-2 mt-3"></div>
     </fieldset>
-    <div class="mt-6 flex justify-between items-end gap-3">
+    <div class="mt-6 flex justify-between items-center gap-3">
      <div>
       <h3 class="font-extrabold">Daftar exercise</h3>
       <p class="muted text-xs mt-1">Pilih dari library, lalu atur urutannya.</p>
@@ -475,7 +559,6 @@
     </div><label class="block text-sm font-bold" for="custom-exercise-name">Nama exercise</label><input id="custom-exercise-name" class="field mt-2" required="" maxlength="60" placeholder="Contoh: Cable Fly"> 
     
     <label class="block text-sm font-bold mt-4">Target otot</label>
-    <!-- Custom Select Custom Exercise Muscle -->
     <div id="custom-exercise-muscle-select" class="custom-select-wrapper mt-2">
       <div class="field custom-select-trigger" tabindex="0">
         <span class="selected-label">Pilih target otot</span>
@@ -510,7 +593,7 @@
   </div>
   
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/_sdk/d3b1f5fdf3d3ed7d.editing_sdk.js" integrity="sha512-1kN2li6Bi1y+hyASeQrjX3T1ejbJuofO7QFHYwSxVmnYpAQy3WUUNCT5CEfq3aK+7Vbwgt8v89WSm0fddrQpfw=="></script>
+  
   <script>
     const KEY = "gymflow-v1";
     const muscles = ["Chest","Back","Shoulders","Legs","Arms","Core"];
@@ -554,7 +637,6 @@
     function closeModal(id){ document.getElementById(id).classList.remove("open"); }
     function showConfirm(title,message,actionText,cb){ document.getElementById("confirm-title").textContent=title; document.getElementById("confirm-message").textContent=message; document.getElementById("confirm-action").textContent=actionText; confirmCallback=cb; openModal("confirm-modal"); }
 
-    // Fungsi autosave khusus profil & target mingguan
     function saveProfileSettings() {
       const bbVal = parseFloat(document.getElementById("profile-bb").value);
       const tbVal = parseInt(document.getElementById("profile-tb").value);
@@ -581,7 +663,6 @@
       }
     }
 
-    // Helper Inisialisasi Custom Dropdown
     function initCustomSelect(wrapperId, onSelectCb) {
       const wrapper = document.getElementById(wrapperId);
       if(!wrapper) return;
@@ -640,11 +721,13 @@
       document.body.classList.toggle("light",state.settings.theme==="light");
       document.documentElement.style.colorScheme=state.settings.theme==="light"?"light":"dark";
     }
+    
     function navigate(tab){
       document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",el.id===tab));
       document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
       if(tab==="workout") renderWorkout(); if(tab==="history") renderHistory();
     }
+    
     function renderDashboard(){
       const h=state.history, now=Date.now(), week=h.filter(s=>now-new Date(s.endedAt).getTime()<604800000);
       const volume=week.reduce((a,s)=>a+s.totalVolume,0);
@@ -667,6 +750,7 @@
       activeCopy.textContent=active ? "Sesi "+(routineById(active.routineId)?.name||"Workout")+" masih berjalan." : "Belum ada sesi aktif.";
       resume.classList.toggle("hidden",!active);
     }
+    
     function renderRoutines(){
       const list=document.getElementById("routine-list"), empty=document.getElementById("routine-empty");
       list.innerHTML=""; empty.classList.toggle("hidden",state.routines.length!==0);
@@ -680,6 +764,7 @@
       });
       lucide.createIcons();
     }
+    
     function renderExercises(){
       const q=document.getElementById("exercise-search").value.toLowerCase();
       const wrapper = document.getElementById("custom-muscle-filter");
@@ -690,19 +775,18 @@
       filtered.forEach(e=>{const el=document.createElement("article");el.className="panel p-4";el.innerHTML=`<div class="flex justify-between gap-3"><div><h3 class="font-bold">${esc(e.name)}</h3><p class="muted text-sm mt-1">${esc(e.equipment)}</p></div>${e.isCustom?`<button class="icon-btn delete-exercise" data-id="${e.id}" aria-label="Hapus ${esc(e.name)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:""}</div><span class="chip mt-3">${esc(e.muscle)}${e.isCustom?" · Custom":""}</span>`;list.appendChild(el);});
       lucide.createIcons();
     }
+    
     function populateSelects(){
       const workoutOptsContainer = document.getElementById("workout-routine-options");
       if (state.routines.length === 0) {
         workoutOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">(Belum ada routine, buat dulu yuk!)</div>';
         document.querySelector("#custom-workout-routine .selected-label").textContent = "(Belum ada routine, buat dulu yuk!)";
-        document.querySelector("#custom-workout-routine").dataset.selectedVal = "";
       } else {
         workoutOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Pilih routine...</div>';
         state.routines.forEach(r => {
           workoutOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${r.id}">${esc(r.name)}</div>`);
         });
         document.querySelector("#custom-workout-routine .selected-label").textContent = "Pilih routine...";
-        document.querySelector("#custom-workout-routine").dataset.selectedVal = "";
       }
 
       const historyOptsContainer = document.getElementById("history-routine-options");
@@ -718,6 +802,10 @@
         chartOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${e.id}">${esc(e.name)}</div>`);
       });
       document.querySelector("#custom-chart-exercise .selected-label").textContent = "Pilih exercise untuk melihat tren";
+      
+      initCustomSelect("custom-history-filter", () => renderHistory());
+      initCustomSelect("custom-chart-exercise", () => renderChart());
+      initCustomSelect("custom-workout-routine");
     }
 
     function openRoutineBuilder(id){
@@ -725,6 +813,7 @@
       document.getElementById("day-picker").innerHTML=days.map(d=>`<button type="button" class="chip day-chip ${(r?.days||[]).includes(d)?"active":""}" data-day="${d}">${d}</button>`).join("");
       renderBuilderExercises(); openModal("routine-modal"); document.getElementById("routine-name").focus();
     }
+    
     function renderBuilderExercises(){
       const holder=document.getElementById("builder-selected-exercises"), q=document.getElementById("builder-exercise-search").value.toLowerCase();
       document.getElementById("selected-count").textContent=selectedRoutineExercises.length+" dipilih";
@@ -738,7 +827,9 @@
       const r=routineById(routineId); if(!r){toast("Pilih routine terlebih dahulu.");return;} if(!r.exerciseIds.length){toast("Routine ini belum memiliki exercise.");return;}
       state.activeSession={id:uid(),routineId:r.id,startedAt:new Date().toISOString(),pausedSeconds:0,pauseStartedAt:null,currentExerciseIndex:0,restRemaining:0,restPaused:true,exercises:r.exerciseIds.map(id=>({exerciseId:id,sets:[{reps:"",weight:"",completedAt:null}],notes:""}))};save(); navigate("workout"); renderDashboard(); toast("Workout dimulai. Semangat!");
     }
+    
     function currentExercise(){ return state.activeSession?.exercises[state.activeSession.currentExerciseIndex]; }
+    
     function renderWorkout(){
       const active=state.activeSession;document.getElementById("workout-start-state").classList.toggle("hidden",!!active);document.getElementById("workout-live-state").classList.toggle("hidden",!active);
       if(!active){populateSelects();return;}
@@ -756,14 +847,17 @@
       document.getElementById("previous-exercise").disabled=active.currentExerciseIndex===0; document.getElementById("next-exercise").textContent=active.currentExerciseIndex===active.exercises.length-1?"Selesai workout →":"Exercise berikutnya →";
       updateTimers(); lucide.createIcons();
     }
+    
     function elapsed(){const a=state.activeSession;if(!a)return 0;const end=a.pauseStartedAt?new Date(a.pauseStartedAt).getTime():Date.now();return Math.floor((end-new Date(a.startedAt).getTime())/1000)-a.pausedSeconds;}
     function updateTimers(){if(!state.activeSession)return;document.getElementById("workout-elapsed").textContent=formatDuration(elapsed());const a=state.activeSession,card=document.getElementById("rest-timer-card");card.classList.toggle("hidden",!a.restRemaining);document.getElementById("rest-time").textContent=formatDuration(a.restRemaining);document.getElementById("rest-pause").textContent=a.restPaused?"Lanjut":"Jeda";}
     function tick(){const a=state.activeSession;if(!a)return; if(a.restRemaining&&!a.restPaused){a.restRemaining--;if(a.restRemaining<=0){a.restRemaining=0;a.restPaused=true;toast("Waktu istirahat selesai. Siap set berikutnya!");}save();}updateTimers();}
+    
     function endWorkout(){
       const a=state.activeSession;if(!a)return;const totalVolume=a.exercises.reduce((sum,x)=>sum+x.sets.reduce((v,s)=>v+(s.completedAt?(Number(s.reps)||0)*(Number(s.weight)||0):0),0),0);const totalSets=a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.completedAt).length,0);
       if(!totalSets){toast("Selesaikan minimal satu set sebelum mengakhiri workout.");return;}
       const endedAt=new Date().toISOString();state.history.unshift({id:a.id,routineId:a.routineId,startedAt:a.startedAt,endedAt,duration:elapsed(),exercises:a.exercises,totalVolume});state.activeSession=null;save();renderDashboard();navigate("history");toast("Workout tersimpan ke History.");
     }
+    
     function renderHistory(){
       const filter = document.querySelector("#custom-history-filter .custom-option.selected")?.dataset.value || "";
       const sessions=state.history.filter(s=>!filter||s.routineId===filter), allSets=sessions.flatMap(s=>s.exercises.flatMap(e=>e.sets.filter(x=>x.completedAt)));
@@ -772,6 +866,7 @@
       sessions.forEach(s=>{const r=routineById(s.routineId);const el=document.createElement("article");el.className="panel p-4 flex flex-wrap justify-between gap-4";el.innerHTML=`<div><h3 class="font-extrabold">${esc(r?.name||"Routine dihapus")}</h3><p class="muted text-sm mt-1">${new Date(s.endedAt).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${formatDuration(s.duration)}</p></div><div class="flex gap-5"><div><p class="muted text-xs font-bold">Set</p><strong>${s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.completedAt).length,0)}</strong></div><div><p class="muted text-xs font-bold">Volume</p><strong>${fmtKg(s.totalVolume)}</strong></div></div>`;list.appendChild(el);});
       renderChart();
     }
+    
     function renderChart(){
       const id = document.querySelector("#custom-chart-exercise .custom-option.selected")?.dataset.value || "";
       const area=document.getElementById("chart-area"),caption=document.getElementById("chart-caption");if(!id){area.innerHTML='<div class="h-full grid place-items-center muted text-sm">Pilih exercise untuk melihat perkembangan weight.</div>';caption.textContent="Gunakan data sesi yang sudah selesai.";return;}
@@ -782,35 +877,22 @@
       area.innerHTML=`<svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik perkembangan weight"><line x1="25" y1="${h-25}" x2="${w-25}" y2="${h-25}" stroke="var(--line)"/><polyline fill="none" stroke="#bcf04a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>${points.map((p,i)=>{const x=points.length===1?w/2:25+i*(w-50)/(points.length-1),y=h-25-(p.weight-min)/range*(h-55);return `<circle cx="${x}" cy="${y}" r="5" fill="#bcf04a"/><text x="${x}" y="${h-7}" text-anchor="middle" fill="var(--muted)" font-size="11">${p.weight}kg</text>`}).join("")}</svg>`;
     }
 
-    // Fungsi Ekspor Laporan PDF yang Diperbaiki
-    function exportPDF(type) {
+    function exportPDF() {
       if(state.history.length === 0) {
         toast("Belum ada data history latihan untuk didownload.");
         return;
       }
-
       toast("Sedang meracik file PDF...");
-
       const now = new Date();
       let sessionsToExport = [];
-      let titleText = "";
+      const todayStr = now.toDateString();
+      sessionsToExport = state.history.filter(s => new Date(s.endedAt).toDateString() === todayStr);
+      let titleText = "Laporan Progress Latihan";
       let subtitleText = `Dicetak pada: ${now.toLocaleDateString("id-ID", {dateStyle: 'full'})}`;
 
-      if (type === 'daily') {
-        const todayStr = now.toDateString();
-        sessionsToExport = state.history.filter(s => new Date(s.endedAt).toDateString() === todayStr);
-        titleText = "Laporan Progress Latihan Harian";
-        if(sessionsToExport.length === 0) {
-          sessionsToExport = [state.history[0]];
-          subtitleText = `Sesi terakhir (${new Date(state.history[0].endedAt).toLocaleDateString("id-ID")})`;
-        }
-      } else {
-        const oneWeekAgo = now.getTime() - 604800000;
-        sessionsToExport = state.history.filter(s => new Date(s.endedAt).getTime() >= oneWeekAgo);
-        titleText = "Laporan Progress Latihan Mingguan";
-        if(sessionsToExport.length === 0) {
-          sessionsToExport = state.history.slice(0, 3);
-        }
+      if(sessionsToExport.length === 0) {
+        sessionsToExport = [state.history[0]];
+        subtitleText = `Sesi terakhir (${new Date(state.history[0].endedAt).toLocaleDateString("id-ID")})`;
       }
 
       const totalVol = sessionsToExport.reduce((acc, s) => acc + s.totalVolume, 0);
@@ -828,7 +910,6 @@
               <p style="margin: 2px 0 0 0; font-size: 11px; color: #647469;">Berat Badan: <strong>${state.settings.weight} kg</strong> | Tinggi: <strong>${state.settings.height} cm</strong></p>
             </div>
           </div>
-
           <div style="display: flex; gap: 12px; margin-bottom: 20px;">
             <div style="flex: 1; background: #f4f7f4; padding: 12px; border-radius: 10px; border: 1px solid #d6e0d7;">
               <span style="font-size: 10px; color: #647469; font-weight: 700; display: block;">TOTAL SESI</span>
@@ -839,13 +920,11 @@
               <strong style="font-size: 18px; color: #17221b;">${fmtKg(totalVol)}</strong>
             </div>
           </div>
-
           <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px; color: #111923;">Rincian Sesi Latihan:</h3>
       `;
 
       sessionsToExport.forEach((s, idx) => {
         const rName = routineById(s.routineId)?.name || "Custom Workout";
-        
         const dObj = new Date(s.endedAt);
         const dateStr = isNaN(dObj.getTime()) ? s.endedAt : dObj.toLocaleDateString("id-ID", {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'});
         
@@ -869,7 +948,6 @@
             `;
           }
         });
-
         htmlContent += `</div>`;
       });
 
@@ -890,7 +968,7 @@
 
       const opt = {
         margin:       10,
-        filename:     `GYMFlow-Progress-${type === 'daily' ? 'Harian' : 'Mingguan'}-${now.toISOString().slice(0,10)}.pdf`,
+        filename:     `GYMFlow-Progress-${now.toISOString().slice(0,10)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, logging: false },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -913,23 +991,28 @@
       populateSelects();
       
       initCustomSelect("custom-muscle-filter", () => renderExercises());
-      
-      // Mengaktifkan autosave pada custom select target profil mingguan
       initCustomSelect("custom-profile-target", () => {
         saveProfileSettings();
         toast("Target mingguan diperbarui otomatis.");
       });
-
       initCustomSelect("custom-exercise-muscle-select", (val) => {
         document.getElementById("custom-exercise-muscle-select").dataset.value = val;
       });
-      initCustomSelect("custom-history-filter", () => renderHistory());
-      initCustomSelect("custom-chart-exercise", () => renderChart());
-      initCustomSelect("custom-workout-routine");
 
       renderDashboard();renderRoutines();renderExercises();renderWorkout();renderHistory();lucide.createIcons();
       elapsedInterval=setInterval(tick,1000);
-      document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.tab)));
+      
+      const handleTabNavigation = (targetTab) => {
+        navigate(targetTab);
+        document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.tab === targetTab);
+        });
+      };
+
+      document.querySelectorAll("[data-tab]").forEach(b => {
+        b.addEventListener("click", () => handleTabNavigation(b.dataset.tab));
+      });
+
       document.getElementById("theme-toggle").onclick=()=>{state.settings.theme=state.settings.theme==="dark"?"light":"dark";save();setTheme();};
       
       const triggerReset = () => {
@@ -940,12 +1023,8 @@
       document.getElementById("desktop-reset").onclick = triggerReset;
       document.getElementById("mobile-reset-btn").onclick = triggerReset;
       document.getElementById("open-profile-btn").onclick = openProfileModal;
+      document.getElementById("export-pdf-daily").onclick = () => exportPDF();
 
-      // Event listener tombol download PDF
-      document.getElementById("export-pdf-daily").onclick = () => exportPDF('daily');
-      document.getElementById("export-pdf-weekly").onclick = () => exportPDF('weekly');
-
-      // Autosave event pada input berat badan & tinggi badan saat diketik
       document.getElementById("profile-bb").oninput = () => saveProfileSettings();
       document.getElementById("profile-tb").oninput = () => saveProfileSettings();
 
@@ -956,17 +1035,31 @@
         toast("Profil & target tersimpan.");
       };
 
-      document.getElementById("dashboard-start").onclick=()=>navigate("workout");document.getElementById("resume-workout").onclick=()=>navigate("workout");
-      document.getElementById("open-routine-builder").onclick=()=>openRoutineBuilder();document.getElementById("open-exercise-builder").onclick=()=>openModal("exercise-modal");
+      document.getElementById("dashboard-start").onclick=()=>handleTabNavigation("workout");
+      document.getElementById("resume-workout").onclick=()=>handleTabNavigation("workout");
+      document.getElementById("open-routine-builder").onclick=()=>openRoutineBuilder();
+      document.getElementById("open-exercise-builder").onclick=()=>openModal("exercise-modal");
       document.querySelectorAll(".close-modal").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
-      document.getElementById("confirm-cancel").onclick=()=>closeModal("confirm-modal");document.getElementById("confirm-action").onclick=()=>{closeModal("confirm-modal");if(confirmCallback)confirmCallback();};
+      document.getElementById("confirm-cancel").onclick=()=>closeModal("confirm-modal");
+      document.getElementById("confirm-action").onclick=()=>{closeModal("confirm-modal");if(confirmCallback)confirmCallback();};
       document.getElementById("exercise-search").oninput=renderExercises;
+      
       document.getElementById("routine-list").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.id;if(b.classList.contains("start-routine"))startWorkout(id);if(b.classList.contains("edit-routine"))openRoutineBuilder(id);if(b.classList.contains("delete-routine"))showConfirm("Hapus routine?","Routine ini akan dihapus, tetapi history workout lama tetap disimpan.","Hapus",()=>{state.routines=state.routines.filter(r=>r.id!==id);save();populateSelects();renderRoutines();renderDashboard();toast("Routine dihapus.");});};
       document.getElementById("exercise-list").onclick=e=>{const b=e.target.closest(".delete-exercise");if(!b)return;const id=b.dataset.id,ex=exerciseById(id);showConfirm("Hapus exercise custom?","Exercise akan dihapus dari library dan routine terkait.","Hapus",()=>{state.exercises=state.exercises.filter(x=>x.id!==id);state.routines.forEach(r=>r.exerciseIds=r.exerciseIds.filter(x=>x!==id));save();populateSelects();renderExercises();renderRoutines();toast(ex.name+" dihapus.");});};
-      document.getElementById("day-picker").onclick=e=>{const b=e.target.closest("[data-day]");if(b)b.classList.toggle("active");};
+      
+      const dayPicker = document.getElementById("day-picker");
+      dayPicker.addEventListener("click", e => {
+        const chip = e.target.closest(".day-chip");
+        if (!chip || !dayPicker.contains(chip)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        chip.classList.toggle("active");
+      });
+
       document.getElementById("builder-exercise-search").oninput=renderBuilderExercises;
       document.getElementById("builder-selected-exercises").onclick=e=>{const b=e.target.closest("button");if(!b)return;const i=selectedRoutineExercises.indexOf(b.dataset.id);if(b.classList.contains("remove-builder-exercise"))selectedRoutineExercises.splice(i,1);if(b.classList.contains("move-exercise")){const to=i+Number(b.dataset.dir);if(to>=0&&to<selectedRoutineExercises.length)[selectedRoutineExercises[i],selectedRoutineExercises[to]]=[selectedRoutineExercises[to],selectedRoutineExercises[i]];}renderBuilderExercises();};
       document.getElementById("builder-library").onclick=e=>{const b=e.target.closest(".add-builder-exercise");if(b){selectedRoutineExercises.push(b.dataset.id);renderBuilderExercises();}};
+      
       document.getElementById("routine-form").onsubmit=e=>{e.preventDefault();const name=document.getElementById("routine-name").value.trim(),id=document.getElementById("routine-id").value,chosenDays=[...document.querySelectorAll(".day-chip.active")].map(x=>x.dataset.day);if(!name){toast("Nama routine wajib diisi.");return;}if(!selectedRoutineExercises.length){toast("Tambahkan minimal satu exercise.");return;}const payload={id:id||uid(),name,description:document.getElementById("routine-description").value.trim(),days:chosenDays,exerciseIds:[...selectedRoutineExercises],createdAt:id?routineById(id).createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};if(id)state.routines=state.routines.map(r=>r.id===id?payload:r);else state.routines.push(payload);save();populateSelects();renderRoutines();renderDashboard();closeModal("routine-modal");toast("Routine berhasil disimpan.");};
       
       document.getElementById("exercise-form").onsubmit=e=>{
@@ -1002,8 +1095,10 @@
       document.getElementById("rest-skip").onclick=()=>{state.activeSession.restRemaining=0;state.activeSession.restPaused=true;save();updateTimers();};
       document.getElementById("rest-reset").onclick=()=>{state.activeSession.restRemaining=state.settings.restSeconds;state.activeSession.restPaused=true;save();updateTimers();};
       
-      window.addEventListener("online",()=>document.getElementById("offline-badge").classList.add("hidden"));window.addEventListener("offline",()=>document.getElementById("offline-badge").classList.remove("hidden"));if(!navigator.onLine)document.getElementById("offline-badge").classList.remove("hidden");
+      window.addEventListener("online",()=>document.getElementById("offline-badge").classList.add("hidden"));
+      window.addEventListener("offline",()=>document.getElementById("offline-badge").classList.remove("hidden"));
+      if(!navigator.onLine)document.getElementById("offline-badge").classList.remove("hidden");
     });
   </script>
- 
-</body></html>
+</body>
+</html>
