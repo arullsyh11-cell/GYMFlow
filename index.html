@@ -33,7 +33,7 @@
     .icon-btn { 
   width: 44px; 
   height: 44px; 
-  display: inline-flex; /* Ubah dari inline-grid jika perlu atau pertahankan */
+  display: inline-flex; 
   align-items: center; 
   justify-content: center; 
   border-radius: 12px; 
@@ -42,12 +42,11 @@
   color: var(--text); 
 }
 
-/* Khusus override tombol reset header agar icon di dalamnya sentris */
 #mobile-reset-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-}.icon-btn { width:44px; height:44px; display:inline-grid; place-items:center; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); color:var(--text); }
+}
     .nav-item { color:var(--muted); border-radius:14px; min-height:48px; display:flex; align-items:center; gap:12px; padding:0 14px; font-weight:700; }
     .nav-item.active { color:#152008; background:#bcf04a; }
     .tab { display:none; animation:fade .22s ease; }
@@ -887,8 +886,8 @@
       let sessionsToExport = [];
       const todayStr = now.toDateString();
       sessionsToExport = state.history.filter(s => new Date(s.endedAt).toDateString() === todayStr);
-      let titleText = "Laporan Progress Latihan";
-      let subtitleText = `Dicetak pada: ${now.toLocaleDateString("id-ID", {dateStyle: 'full'})}`;
+      let titleText = "Laporan Progress Harian";
+      let subtitleText = `Tanggal: ${now.toLocaleDateString("id-ID", {dateStyle: 'full'})}`;
 
       if(sessionsToExport.length === 0) {
         sessionsToExport = [state.history[0]];
@@ -899,28 +898,48 @@
       const totalSesi = sessionsToExport.length;
 
       let htmlContent = `
-        <div id="pdf-render-container" style="font-family: 'DM Sans', sans-serif; color: #17221b; padding: 24px; background: #ffffff; width: 100%; box-sizing: border-box;">
-          <div style="border-bottom: 3px solid #bcf04a; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
-            <div>
-              <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #111923;">GYMFlow PROGRESS REPORT</h1>
-              <p style="margin: 4px 0 0 0; font-size: 14px; color: #647469; font-weight: 600;">${titleText}</p>
-            </div>
-            <div style="text-align: right;">
-              <p style="margin: 0; font-size: 11px; color: #647469;">${subtitleText}</p>
-              <p style="margin: 2px 0 0 0; font-size: 11px; color: #647469;">Berat Badan: <strong>${state.settings.weight} kg</strong> | Tinggi: <strong>${state.settings.height} cm</strong></p>
-            </div>
+        <div id="pdf-render-container" style="font-family: 'DM Sans', sans-serif; color: #17221b; padding: 32px; background: #ffffff; width: 100%; box-sizing: border-box; position: relative; min-height: 1000px;">
+          
+          <!-- WATERMARK LOGO DI TENGAH -->
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5; z-index: 0; pointer-events: none; text-align: center;">
+            <img src="LOGO_WATERMARK.jpg" alt="Watermark Logo" style="width: 380px; height: 380px; object-fit: contain; filter: grayscale(100%);">
           </div>
-          <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-            <div style="flex: 1; background: #f4f7f4; padding: 12px; border-radius: 10px; border: 1px solid #d6e0d7;">
-              <span style="font-size: 10px; color: #647469; font-weight: 700; display: block;">TOTAL SESI</span>
-              <strong style="font-size: 18px; color: #17221b;">${totalSesi} Sesi</strong>
+
+          <!-- KONTEN UTAMA LAPORAN DI ATAS WATERMARK -->
+          <div style="position: relative; z-index: 1;">
+            
+            <!-- HEADER LAPORAN -->
+            <div style="border-bottom: 3px solid #bcf04a; padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <div style="width: 32px; height: 32px; background: #111923; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <img src="LOGO.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #111923; letter-spacing: -0.02em;">GYMFlow REPORT</h1>
+                </div>
+                <p style="margin: 0; font-size: 13px; color: #647469; font-weight: 600;">${titleText}</p>
+              </div>
+              <div style="text-align: right;">
+                <p style="margin: 0; font-size: 11px; color: #647469; font-weight: 500;">${subtitleText}</p>
+                <p style="margin: 3px 0 0 0; font-size: 11px; color: #17221b;">Berat: <strong>${state.settings.weight} kg</strong> &bull; Tinggi: <strong>${state.settings.height} cm</strong></p>
+              </div>
             </div>
-            <div style="flex: 1; background: #f4f7f4; padding: 12px; border-radius: 10px; border: 1px solid #d6e0d7;">
-              <span style="font-size: 10px; color: #647469; font-weight: 700; display: block;">TOTAL VOLUME</span>
-              <strong style="font-size: 18px; color: #17221b;">${fmtKg(totalVol)}</strong>
+
+            <!-- KARTU RINGKASAN METRIK -->
+            <div style="display: flex; gap: 14px; margin-bottom: 24px;">
+              <div style="flex: 1; background: #f8faf8; padding: 14px 18px; border-radius: 12px; border: 1px solid #d6e0d7; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <span style="font-size: 10px; color: #647469; font-weight: 700; display: block; letter-spacing: 0.05em;">TOTAL SESI</span>
+                <strong style="font-size: 20px; color: #17221b; display: block; margin-top: 2px;">${totalSesi} Sesi</strong>
+              </div>
+              <div style="flex: 1; background: #f8faf8; padding: 14px 18px; border-radius: 12px; border: 1px solid #d6e0d7; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <span style="font-size: 10px; color: #647469; font-weight: 700; display: block; letter-spacing: 0.05em;">TOTAL VOLUME</span>
+                <strong style="font-size: 20px; color: #17221b; display: block; margin-top: 2px;">${fmtKg(totalVol)}</strong>
+              </div>
             </div>
-          </div>
-          <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px; color: #111923;">Rincian Sesi Latihan:</h3>
+
+            <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #111923; text-transform: uppercase; letter-spacing: 0.03em;">Rincian Sesi Latihan</h3>
+
+            <!-- DAFTAR SESI -->
       `;
 
       sessionsToExport.forEach((s, idx) => {
@@ -929,10 +948,10 @@
         const dateStr = isNaN(dObj.getTime()) ? s.endedAt : dObj.toLocaleDateString("id-ID", {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'});
         
         htmlContent += `
-          <div style="margin-bottom: 14px; background: #f9faf9; border: 1px solid #d6e0d7; border-radius: 10px; padding: 12px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-              <strong style="font-size: 13px; color: #111923;">#${idx + 1} - ${esc(rName)}</strong>
-              <span style="font-size: 11px; color: #647469;">${dateStr} (${formatDuration(s.duration)})</span>
+          <div style="margin-bottom: 14px; background: #ffffff; border: 1px solid #d6e0d7; border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #edf2ed; padding-bottom: 8px;">
+              <strong style="font-size: 13px; color: #111923;">#${idx + 1} &bull; ${esc(rName)}</strong>
+              <span style="font-size: 11px; color: #647469; background: #f0f4f0; padding: 3px 8px; border-radius: 6px;">${dateStr} (${formatDuration(s.duration)})</span>
             </div>
         `;
 
@@ -941,9 +960,9 @@
           const completedSets = ex.sets.filter(st => st.completedAt);
           if(completedSets.length > 0) {
             htmlContent += `
-              <div style="font-size: 11px; margin-top: 4px; padding-left: 8px; border-left: 2px solid #bcf04a;">
-                <span style="font-weight: 700; color: #17221b;">${esc(exObj?.name || "Exercise")}</span>: 
-                <span style="color: #647469;">${completedSets.map(st => `${st.reps} reps × ${st.weight} kg`).join(" | ")}</span>
+              <div style="font-size: 12px; margin-top: 6px; padding: 6px 10px; background: #fbfcfb; border-radius: 8px; border-left: 3px solid #bcf04a; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; color: #17221b;">${esc(exObj?.name || "Exercise")}</span>
+                <span style="color: #4a5568; font-weight: 500;">${completedSets.map(st => `${st.reps} reps × ${st.weight} kg`).join(" &nbsp;|&nbsp; ")}</span>
               </div>
             `;
           }
@@ -952,8 +971,10 @@
       });
 
       htmlContent += `
-          <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            Digenerate secara otomatis oleh GYMFlow Tracker &copy; 2026
+            <!-- FOOTER LAPORAN -->
+            <div style="margin-top: 40px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+              Dokumen ini digenerate secara otomatis oleh sistem GYMFlow Tracker &copy; 2026
+            </div>
           </div>
         </div>
       `;
