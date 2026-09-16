@@ -68,8 +68,29 @@
     .modal-layer { position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.62); padding:16px; display:none; align-items:flex-end; justify-content:center; }
     .modal-layer.open { display:flex; }
     .modal { width:100%; max-width:720px; max-height:calc(92 * min(var(--vh, 1vh), 1vh)); overflow:auto; background:var(--surface); border:1px solid var(--line); border-radius:24px 24px 16px 16px; padding:20px; }
-    .toast { position:fixed; z-index:70; left:16px; right:16px; bottom:100px; max-width:480px; margin:auto; background:#eaf6d0; color:#193005; border-radius:12px; padding:12px 15px; font-weight:700; box-shadow:var(--shadow); display:none; }
-    .toast.show { display:block; animation:fade .2s ease; }
+    
+    /* Toast / Notifikasi kecil dengan BG hitam, teks putih, dan outline hijau */
+    .toast { 
+      position: fixed; 
+      z-index: 70; 
+      left: 16px; 
+      right: 16px; 
+      bottom: 90px; 
+      max-width: 300px; 
+      margin: auto; 
+      background: #152008; 
+      color: #bcf04a; 
+      border: 1.5px solid #bcf04a;
+      border-radius: 12px; 
+      padding: 9px 14px; 
+      font-size: 12.5px; 
+      font-weight: 600; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+      display: none; 
+      text-align: center; 
+    }    
+    .toast.show { display: block; animation: fade .2s ease; }
+
     .set-done { opacity:.7; border-color:rgba(188,240,74,.5)!important; background:rgba(188,240,74,.08)!important; }
     .progress-line { height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
     .progress-line > span { display:block; height:100%; border-radius:inherit; background:#bcf04a; transition:width .25s; }
@@ -591,7 +612,7 @@
    </div>
   </div>
   
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Target mingguan diperbarui secara otomatis.</div>
   
   <script>
     const KEY = "gymflow-v1";
@@ -1014,7 +1035,7 @@
       initCustomSelect("custom-muscle-filter", () => renderExercises());
       initCustomSelect("custom-profile-target", () => {
         saveProfileSettings();
-        toast("Target mingguan diperbarui otomatis.");
+        toast("Target mingguan diperbarui secara otomatis.");
       });
       initCustomSelect("custom-exercise-muscle-select", (val) => {
         document.getElementById("custom-exercise-muscle-select").dataset.value = val;
