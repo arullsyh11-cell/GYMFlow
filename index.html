@@ -109,10 +109,11 @@
       display: flex; 
       align-items: center; 
       justify-content: space-around; 
-      padding: 0 8px; 
+      padding: 0 12px; 
       box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
       z-index: 50;
     }
+    
     .mobile-nav-btn { 
       background: transparent;
       border: none;
@@ -129,27 +130,66 @@
       font-weight: 600; 
       gap: 3px; 
     }
+
     .mobile-nav-btn span { 
       display: block !important; 
       font-size: 10px;
       letter-spacing: -0.01em;
     }
+
     .mobile-nav-btn svg {
       width: 20px;
       height: 20px;
     }
-    .mobile-nav-btn.active { 
-      color: var(--lime) !important;
-      background: transparent !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
+
+    /* Style khusus untuk tombol tengah yang floating */
+    .mobile-nav-btn.center-fab-btn {
+      position: relative;
+      overflow: visible;
+    }
+
+    .mobile-nav-btn.center-fab-btn .fab-circle {
+      position: absolute;
+      top: -10px; 
+      width: 38px; 
+      height: 38px;
+      background: var(--lime);
+      color: #142009;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(188, 240, 74, 0.25);
+      border: 2px solid var(--bg); 
+      /* Transisi menyertakan transform agar pergerakannya halus */
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease;
+    }
+
+    .mobile-nav-btn.center-fab-btn .fab-circle svg {
+      width: 16px; 
+      height: 16px;
+      stroke-width: 2.2px;
+    }
+
+    .mobile-nav-btn.center-fab-btn span {
+      margin-top: 6px; 
+    }
+
+    .mobile-nav-btn.center-fab-btn:hover .fab-circle {
       transform: translateY(-2px);
+      filter: brightness(1.05);
     }
-    .mobile-nav-btn.active span {
-      font-weight: 700;
+
+    /* Efek saat tombol menu biasa aktif (berubah warna & naik dikit) */
+    .mobile-nav-btn.active:not(.center-fab-btn) { 
+      color: var(--lime) !important;
+      transform: translateY(-4px); /* Naik dikit aja saat aktif */
     }
-    .mobile-nav-btn:not(.active):hover {
-      color: var(--text);
+
+    /* Efek khusus saat tombol tengah/FAB sedang aktif (lingkarannya naik dikit) */
+    .mobile-nav-btn.center-fab-btn.active .fab-circle {
+      transform: translateY(-4px); /* Lingkaran tengah ikut naik dikit */
+      box-shadow: 0 6px 16px rgba(188, 240, 74, 0.4);
     }
 
     .sidebar { display:none; }
@@ -494,8 +534,11 @@
       <span>Exercises</span>
     </button> 
 
-    <button class="mobile-nav-btn" data-tab="routines" title="Routines">
-      <i data-lucide="repeat"></i>
+    <!-- Tombol Tengah Floating (Routines / Tambah) -->
+    <button class="mobile-nav-btn center-fab-btn" data-tab="routines" title="Routines">
+      <div class="fab-circle">
+        <i data-lucide="repeat"></i>
+      </div>
       <span>Routines</span>
     </button> 
 
