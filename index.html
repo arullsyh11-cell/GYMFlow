@@ -31,22 +31,22 @@
     .secondary-btn { background:var(--surface-2); color:var(--text); border:1px solid var(--line); min-height:44px; border-radius:12px; font-weight:700; }
     .danger-btn { background:rgba(251,113,133,.12); color:#ff98a8; border:1px solid rgba(251,113,133,.3); min-height:42px; border-radius:12px; font-weight:700; }
     .icon-btn { 
-  width: 44px; 
-  height: 44px; 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  border-radius: 12px; 
-  background: var(--surface-2); 
-  border: 1px solid var(--line); 
-  color: var(--text); 
-}
+      width: 44px; 
+      height: 44px; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      border-radius: 12px; 
+      background: var(--surface-2); 
+      border: 1px solid var(--line); 
+      color: var(--text); 
+    }
 
-#mobile-reset-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
+    #mobile-reset-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
     .nav-item { color:var(--muted); border-radius:14px; min-height:48px; display:flex; align-items:center; gap:12px; padding:0 14px; font-weight:700; }
     .nav-item.active { color:#152008; background:#bcf04a; }
     .tab { display:none; animation:fade .22s ease; }
@@ -69,7 +69,6 @@
     .modal-layer.open { display:flex; }
     .modal { width:100%; max-width:720px; max-height:calc(92 * min(var(--vh, 1vh), 1vh)); overflow:auto; background:var(--surface); border:1px solid var(--line); border-radius:24px 24px 16px 16px; padding:20px; }
     
-    /* Toast / Notifikasi kecil dengan BG hitam, teks putih, dan outline hijau */
     .toast { 
       position: fixed; 
       z-index: 70; 
@@ -142,7 +141,6 @@
       height: 20px;
     }
 
-    /* Style khusus untuk tombol tengah yang floating */
     .mobile-nav-btn.center-fab-btn {
       position: relative;
       overflow: visible;
@@ -161,7 +159,6 @@
       justify-content: center;
       box-shadow: 0 4px 12px rgba(188, 240, 74, 0.25);
       border: 2px solid var(--bg); 
-      /* Transisi menyertakan transform agar pergerakannya halus */
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease;
     }
 
@@ -180,15 +177,13 @@
       filter: brightness(1.05);
     }
 
-    /* Efek saat tombol menu biasa aktif (berubah warna & naik dikit) */
     .mobile-nav-btn.active:not(.center-fab-btn) { 
       color: var(--lime) !important;
-      transform: translateY(-4px); /* Naik dikit aja saat aktif */
+      transform: translateY(-4px);
     }
 
-    /* Efek khusus saat tombol tengah/FAB sedang aktif (lingkarannya naik dikit) */
     .mobile-nav-btn.center-fab-btn.active .fab-circle {
-      transform: translateY(-4px); /* Lingkaran tengah ikut naik dikit */
+      transform: translateY(-4px);
       box-shadow: 0 6px 16px rgba(188, 240, 74, 0.4);
     }
 
@@ -322,7 +317,7 @@
     <section id="dashboard" class="tab active" aria-label="Dashboard">
      <div class="panel p-5 md:p-7 mb-5 overflow-hidden relative">
       <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
-      <p class="text-lime-300 font-bold text-sm relative tracking-wider">SIAP BERGERAK?</p>
+      <p id="siap-bergerak-label" class="text-lime-300 font-bold text-sm relative tracking-wider">SIAP BERGERAK, <span id="profile-name-display">COYY</span>?</p>
       <h2 class="font-extrabold text-3xl md:text-4xl mt-2 max-w-xl relative">Bangun kekuatan, satu set setiap kali.</h2>
       <p id="next-workout-copy" class="muted mt-3 relative">Pilih routine dan mulai saat kamu siap.</p>
       
@@ -534,7 +529,6 @@
       <span>Exercises</span>
     </button> 
 
-    <!-- Tombol Tengah Floating (Routines / Tambah) -->
     <button class="mobile-nav-btn center-fab-btn" data-tab="routines" title="Routines">
       <div class="fab-circle">
         <i data-lucide="repeat"></i>
@@ -560,9 +554,12 @@
      <h2 id="profile-modal-title" class="font-extrabold text-xl">Profil & Target Latihan</h2>
      <button type="button" class="icon-btn close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x"></i></button>
     </div>
-    <p class="muted text-sm mb-5">Perubahan Berat Badan (BB), Tinggi Badan (TB), dan Target Mingguan akan tersimpan otomatis (autosave).</p>
+    <p class="muted text-sm mb-5">Nama, Berat Badan, Tinggi Badan, dan Target Mingguan akan tersimpan otomatis.</p>
     
-    <label class="block text-sm font-bold" for="profile-bb">Berat Badan (kg)</label>
+    <label class="block text-sm font-bold" for="profile-name-input">Nama Panggilan / Pengguna</label>
+    <input id="profile-name-input" class="field mt-2" type="text" maxlength="30" placeholder="Contoh: COYY">
+
+    <label class="block text-sm font-bold mt-4" for="profile-bb">Berat Badan (kg)</label>
     <input id="profile-bb" class="field mt-2" type="number" step="0.5" min="20" max="300" required placeholder="Contoh: 65">
 
     <label class="block text-sm font-bold mt-4" for="profile-tb">Tinggi Badan (cm)</label>
@@ -655,10 +652,13 @@
    </div>
   </div>
   
-  <div id="toast" class="toast" role="status" aria-live="polite">Target mingguan diperbarui secara otomatis.</div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Profil & target diperbarui secara otomatis.</div>
   
   <script>
-    const KEY = "gymflow-v1";
+    // Versi Key LocalStorage Baru dengan Sistem Migrasi Otomatis
+    const KEY = "gymflow-v3";
+    const LEGACY_KEYS = ["gymflow-v2", "gymflow-v1"];
+
     const muscles = ["Chest","Back","Shoulders","Legs","Arms","Core"];
     const days = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"];
     const uid = () => "gf_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
@@ -667,28 +667,82 @@
     const seedExercises = [
       ["ex_bench","Bench Press","Chest","Barbell"],["ex_incline","Incline Dumbbell Press","Chest","Dumbbell"],["ex_row","Barbell Row","Back","Barbell"],["ex_pullup","Lat Pulldown","Back","Cable"],
       ["ex_ohp","Overhead Press","Shoulders","Barbell"],["ex_lateral","Lateral Raise","Shoulders","Dumbbell"],["ex_squat","Back Squat","Legs","Barbell"],["ex_rdl","Romanian Deadlift","Legs","Barbell"],
-      ["ex_curl","Bicep Curl","Arms","Dumbbell"],["ex_pushdown","Tricep Pushdown","Arms","Cable"],["ex_plank","Plank","Core","Bodyweight"]
+      ["ex_curl","Bicep Curl","Arms","Dumbbell"],["ex_pushdown","Tricep Pushdown","Arms","Cable"],["ex_plank","Plank","Core","Bodyweight"],
+      ["ex_chest_dip","Chest Dip","Chest","Bodyweight"],
+      ["ex_cable_cross","Cable Crossover","Chest","Cable"],
+      ["ex_decline_db","Decline Dumbbell Press","Chest","Dumbbell"],
+      ["ex_tbar_row","T-Bar Row","Back","Barbell"],
+      ["ex_seated_row","Seated Cable Row","Back","Cable"],
+      ["ex_straight_pulldown","Straight-Arm Pulldown","Back","Cable"],
+      ["ex_arnold_press","Arnold Press","Shoulders","Dumbbell"],
+      ["ex_face_pull","Face Pull","Shoulders","Cable"],
+      ["ex_front_raise","Front Raise","Shoulders","Dumbbell"],
+      ["ex_bulgarian","Bulgarian Split Squat","Legs","Dumbbell"],
+      ["ex_leg_press","Leg Press","Legs","Machine"],
+      ["ex_leg_ext","Leg Extension","Legs","Machine"],
+      ["ex_leg_curl","Seated Leg Curl","Legs","Machine"],
+      ["ex_hammer_curl","Hammer Curl","Dumbbell","Dumbbell"],
+      ["ex_preacher_curl","Preacher Curl","Arms","Barbell"],
+      ["ex_skull_crusher","Skull Crusher","Arms","Barbell"],
+      ["ex_oh_tricep","Overhead Cable Triceps Extension","Arms","Cable"],
+      ["ex_hanging_leg","Hanging Leg Raise","Core","Bodyweight"],
+      ["ex_russian_twist","Russian Twist","Core","Bodyweight"],
+      ["ex_ab_wheel","Ab Wheel Rollout","Core","Bodyweight"]
     ].map(([id,name,muscle,equipment]) => ({id,name,muscle,equipment,isCustom:false}));
 
     function seedState() {
       return {
-        settings:{theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4},
+        settings:{theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4, userName:"COYY"},
         exercises:seedExercises,
         routines:[],
         activeSession:null,
         history:[]
       };
     }
+
     function loadState(){ 
       try { 
-        let loaded = JSON.parse(localStorage.getItem(KEY)) || seedState(); 
-        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4};
+        let rawData = localStorage.getItem(KEY);
+        let loaded = null;
+
+        if (rawData) {
+          loaded = JSON.parse(rawData);
+        } else {
+          // Deteksi key versi lama untuk migrasi otomatis tanpa merusak data pengguna
+          for (let oldKey of LEGACY_KEYS) {
+            let oldData = localStorage.getItem(oldKey);
+            if (oldData) {
+              try {
+                loaded = JSON.parse(oldData);
+                break;
+              } catch(err) {
+                // Abaikan jika parsing gagal
+              }
+            }
+          }
+        }
+
+        if (!loaded) {
+          loaded = seedState();
+        }
+        
+        // Pertahankan custom exercise buatan pengguna dan gabungkan dengan update exercise default terbaru
+        const existingCustoms = (loaded.exercises || []).filter(e => e.isCustom);
+        loaded.exercises = [...seedExercises, ...existingCustoms];
+
+        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4, userName:"COYY"};
         if(loaded.settings.weight === undefined) loaded.settings.weight = 65;
         if(loaded.settings.height === undefined) loaded.settings.height = 170;
         if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
+        if(loaded.settings.userName === undefined) loaded.settings.userName = "COYY";
+
+        // Simpan otomatis ke key versi baru
+        localStorage.setItem(KEY, JSON.stringify(loaded));
+
         return loaded;
       } catch(e){ return seedState(); } 
     }
+
     function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
     function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
     function fmtKg(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kg"; }
@@ -701,11 +755,16 @@
     function showConfirm(title,message,actionText,cb){ document.getElementById("confirm-title").textContent=title; document.getElementById("confirm-message").textContent=message; document.getElementById("confirm-action").textContent=actionText; confirmCallback=cb; openModal("confirm-modal"); }
 
     function saveProfileSettings() {
+      const nameVal = document.getElementById("profile-name-input").value.trim();
       const bbVal = parseFloat(document.getElementById("profile-bb").value);
       const tbVal = parseInt(document.getElementById("profile-tb").value);
       const targetVal = document.querySelector("#custom-profile-target .custom-option.selected")?.dataset.value;
       
       let updated = false;
+      if (nameVal && state.settings.userName !== nameVal) {
+        state.settings.userName = nameVal;
+        updated = true;
+      }
       if (!isNaN(bbVal) && state.settings.weight !== bbVal) {
         state.settings.weight = bbVal;
         updated = true;
@@ -774,6 +833,7 @@
     });
 
     function openProfileModal(){
+      document.getElementById("profile-name-input").value = state.settings.userName || "COYY";
       document.getElementById("profile-bb").value = state.settings.weight;
       document.getElementById("profile-tb").value = state.settings.height;
       setCustomSelectValue("custom-profile-target", state.settings.weeklyGoal);
@@ -795,6 +855,7 @@
       const h=state.history, now=Date.now(), week=h.filter(s=>now-new Date(s.endedAt).getTime()<604800000);
       const volume=week.reduce((a,s)=>a+s.totalVolume,0);
       
+      document.getElementById("profile-name-display").textContent = (state.settings.userName || "COYY").toUpperCase();
       document.getElementById("profile-bb-display").textContent = state.settings.weight + " kg";
       document.getElementById("profile-tb-display").textContent = state.settings.height + " cm";
       document.getElementById("profile-target-display").textContent = state.settings.weeklyGoal + " sesi";
@@ -964,15 +1025,12 @@
       let htmlContent = `
         <div id="pdf-render-container" style="font-family: 'DM Sans', sans-serif; color: #17221b; padding: 32px; background: #ffffff; width: 100%; box-sizing: border-box; position: relative; min-height: 1000px;">
           
-          <!-- WATERMARK LOGO DI TENGAH -->
           <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5; z-index: 0; pointer-events: none; text-align: center;">
             <img src="LOGO_WATERMARK.jpg" alt="Watermark Logo" style="width: 380px; height: 380px; object-fit: contain; filter: grayscale(100%);">
           </div>
 
-          <!-- KONTEN UTAMA LAPORAN DI ATAS WATERMARK -->
           <div style="position: relative; z-index: 1;">
             
-            <!-- HEADER LAPORAN -->
             <div style="border-bottom: 3px solid #bcf04a; padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
@@ -985,11 +1043,10 @@
               </div>
               <div style="text-align: right;">
                 <p style="margin: 0; font-size: 11px; color: #647469; font-weight: 500;">${subtitleText}</p>
-                <p style="margin: 3px 0 0 0; font-size: 11px; color: #17221b;">Berat: <strong>${state.settings.weight} kg</strong> &bull; Tinggi: <strong>${state.settings.height} cm</strong></p>
+                <p style="margin: 3px 0 0 0; font-size: 11px; color: #17221b;">Nama: <strong>${esc(state.settings.userName)}</strong> &bull; Berat: <strong>${state.settings.weight} kg</strong></p>
               </div>
             </div>
 
-            <!-- KARTU RINGKASAN METRIK -->
             <div style="display: flex; gap: 14px; margin-bottom: 24px;">
               <div style="flex: 1; background: #f8faf8; padding: 14px 18px; border-radius: 12px; border: 1px solid #d6e0d7; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                 <span style="font-size: 10px; color: #647469; font-weight: 700; display: block; letter-spacing: 0.05em;">TOTAL SESI</span>
@@ -1003,7 +1060,6 @@
 
             <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #111923; text-transform: uppercase; letter-spacing: 0.03em;">Rincian Sesi Latihan</h3>
 
-            <!-- DAFTAR SESI -->
       `;
 
       sessionsToExport.forEach((s, idx) => {
@@ -1035,7 +1091,6 @@
       });
 
       htmlContent += `
-            <!-- FOOTER LAPORAN -->
             <div style="margin-top: 40px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 14px;">
               Dokumen ini digenerate secara otomatis oleh sistem GYMFlow Tracker &copy; 2026
             </div>
@@ -1078,7 +1133,7 @@
       initCustomSelect("custom-muscle-filter", () => renderExercises());
       initCustomSelect("custom-profile-target", () => {
         saveProfileSettings();
-        toast("Target mingguan diperbarui secara otomatis.");
+        toast("Profil & target diperbarui otomatis.");
       });
       initCustomSelect("custom-exercise-muscle-select", (val) => {
         document.getElementById("custom-exercise-muscle-select").dataset.value = val;
@@ -1110,6 +1165,7 @@
       document.getElementById("open-profile-btn").onclick = openProfileModal;
       document.getElementById("export-pdf-daily").onclick = () => exportPDF();
 
+      document.getElementById("profile-name-input").oninput = () => saveProfileSettings();
       document.getElementById("profile-bb").oninput = () => saveProfileSettings();
       document.getElementById("profile-tb").oninput = () => saveProfileSettings();
 
@@ -1166,7 +1222,7 @@
 
       document.getElementById("start-workout-button").onclick=()=>{
         const selectedRoutineId = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
-        startWorkout(selectedRoutineId);
+        startWorkflow(selectedRoutineId);
       };
 
       document.getElementById("set-list").oninput=e=>{const input=e.target;if(!input.dataset.field)return;currentExercise().sets[Number(input.dataset.index)][input.dataset.field]=input.value;save();};
