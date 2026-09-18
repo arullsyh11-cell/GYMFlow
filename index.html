@@ -330,14 +330,34 @@
 
       <button id="dashboard-start" class="lime-btn px-5 mt-5 relative">Mulai Workout</button>
      </div>
-     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
-      <div class="metric">
-       <p class="muted text-xs font-bold">Streak latihan</p><strong id="streak-value" class="block text-2xl mt-1">0 hari</strong>
+
+     <!-- KALENDER BULANAN PENGGANTI STREAK -->
+     <div class="panel p-5 mb-5">
+      <div class="flex items-center justify-between mb-4">
+       <div class="flex items-center gap-2">
+        <i data-lucide="calendar" class="w-5 h-5 text-lime-300"></i>
+        <h3 id="calendar-month-title" class="font-extrabold text-lg">September 2026</h3>
+       </div>
+       <div class="flex items-center gap-1">
+        <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(-1)" aria-label="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+        <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(1)" aria-label="Bulan berikutnya"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+       </div>
       </div>
+      
+      <!-- Grid Hari -->
+      <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold muted mb-2">
+       <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+      </div>
+      <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm">
+       <!-- Dirender via JS -->
+      </div>
+     </div>
+
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-5">
       <div class="metric">
        <p class="muted text-xs font-bold">Target minggu ini</p><strong id="goal-value" class="block text-2xl mt-1">0 / 3</strong>
       </div>
-      <div class="metric col-span-2 lg:col-span-1">
+      <div class="metric">
        <p class="muted text-xs font-bold">Volume minggu ini</p><strong id="week-volume" class="block text-2xl mt-1">0 kg</strong>
       </div>
      </div>
@@ -495,15 +515,18 @@
         </div>
       </div>
      </div>
-     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
+     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
       <div class="metric">
        <p class="muted text-xs font-bold">Total sesi</p><strong id="history-session-count" class="block text-2xl mt-1">0</strong>
       </div>
       <div class="metric">
        <p class="muted text-xs font-bold">Total set</p><strong id="history-set-count" class="block text-2xl mt-1">0</strong>
       </div>
-      <div class="metric col-span-2 lg:col-span-1">
+      <div class="metric">
        <p class="muted text-xs font-bold">Total volume</p><strong id="history-volume" class="block text-2xl mt-1">0 kg</strong>
+      </div>
+      <div class="metric">
+       <p class="muted text-xs font-bold">Total kalori</p><strong id="history-calories" class="block text-2xl mt-1 text-lime-300">0 kkal</strong>
       </div>
      </div>
      <div class="panel p-5 mb-5">
@@ -655,7 +678,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite">Profil & target diperbarui secara otomatis.</div>
   
   <script>
-    // Versi Key LocalStorage Baru dengan Sistem Migrasi Otomatis
     const KEY = "gymflow-v3";
     const LEGACY_KEYS = ["gymflow-v2", "gymflow-v1"];
 
@@ -663,6 +685,7 @@
     const days = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"];
     const uid = () => "gf_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     let state, selectedRoutineExercises = [], restInterval = null, confirmCallback = null, elapsedInterval = null;
+    let currentCalendarDate = new Date();
 
     const seedExercises = [
       ["ex_bench","Bench Press","Chest","Barbell"],["ex_incline","Incline Dumbbell Press","Chest","Dumbbell"],["ex_row","Barbell Row","Back","Barbell"],["ex_pullup","Lat Pulldown","Back","Cable"],
@@ -708,16 +731,13 @@
         if (rawData) {
           loaded = JSON.parse(rawData);
         } else {
-          // Deteksi key versi lama untuk migrasi otomatis tanpa merusak data pengguna
           for (let oldKey of LEGACY_KEYS) {
             let oldData = localStorage.getItem(oldKey);
             if (oldData) {
               try {
                 loaded = JSON.parse(oldData);
                 break;
-              } catch(err) {
-                // Abaikan jika parsing gagal
-              }
+              } catch(err) {}
             }
           }
         }
@@ -726,7 +746,6 @@
           loaded = seedState();
         }
         
-        // Pertahankan custom exercise buatan pengguna dan gabungkan dengan update exercise default terbaru
         const existingCustoms = (loaded.exercises || []).filter(e => e.isCustom);
         loaded.exercises = [...seedExercises, ...existingCustoms];
 
@@ -736,7 +755,18 @@
         if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
         if(loaded.settings.userName === undefined) loaded.settings.userName = "COYY";
 
-        // Simpan otomatis ke key versi baru
+        // Kalkulasi otomatis kalori untuk riwayat/history sebelumnya yang belum memiliki data kalori
+        if (loaded.history) {
+          loaded.history = loaded.history.map(s => {
+            if (s.caloriesBurned === undefined) {
+              const durationMins = (s.duration || 0) / 60;
+              const w = loaded.settings.weight || 65;
+              s.caloriesBurned = Math.round(0.05 * w * durationMins);
+            }
+            return s;
+          });
+        }
+
         localStorage.setItem(KEY, JSON.stringify(loaded));
 
         return loaded;
@@ -746,6 +776,7 @@
     function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
     function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
     function fmtKg(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kg"; }
+    function fmtKkal(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kkal"; }
     function formatDuration(s){ s=Math.max(0,Math.floor(s||0)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
     function routineById(id){ return state.routines.find(r=>r.id===id); }
     function exerciseById(id){ return state.exercises.find(e=>e.id===id); }
@@ -851,6 +882,70 @@
       if(tab==="workout") renderWorkout(); if(tab==="history") renderHistory();
     }
     
+    // RENDER KALENDER BULANAN
+    function changeCalendarMonth(direction) {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const year = currentCalendarDate.getFullYear();
+      const month = currentCalendarDate.getMonth();
+      
+      const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      document.getElementById("calendar-month-title").textContent = `${monthNames[month]} ${year}`;
+
+      const grid = document.getElementById("calendar-days-grid");
+      grid.innerHTML = "";
+
+      const firstDayOfMonth = new Date(year, month, 1);
+      const lastDayOfMonth = new Date(year, month + 1, 0);
+      
+      let startingDay = firstDayOfMonth.getDay() - 1;
+      if (startingDay === -1) startingDay = 6; 
+
+      const totalDays = lastDayOfMonth.getDate();
+      const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+      const workoutDates = new Set(state.history.map(s => new Date(s.endedAt).toDateString()));
+
+      let html = "";
+
+      for (let i = startingDay - 1; i >= 0; i--) {
+        const d = prevMonthLastDay - i;
+        html += `<div class="py-2 text-[var(--muted)] opacity-40 text-xs">${d}</div>`;
+      }
+
+      const todayStr = new Date().toDateString();
+      for (let day = 1; day <= totalDays; day++) {
+        const thisDate = new Date(year, month, day);
+        const dateStr = thisDate.toDateString();
+        const hasWorkout = workoutDates.has(dateStr);
+        const isToday = dateStr === todayStr;
+
+        let ringClass = "";
+        let bgStyle = "";
+        if (hasWorkout) {
+          ringClass = "border border-lime-400 bg-lime-400/15 font-bold text-lime-300 rounded-full";
+        } else if (isToday) {
+          bgStyle = "border border-[var(--lime)] rounded-full font-bold";
+        }
+
+        let fireIconHtml = hasWorkout ? `<i data-lucide="flame" class="w-3 h-3 text-amber-400 absolute -bottom-1"></i>` : "";
+
+        html += `<div class="py-1.5 flex flex-col items-center justify-center relative"><span class="w-8 h-8 flex items-center justify-center text-xs ${ringClass} ${bgStyle}">${day}</span>${fireIconHtml}</div>`;
+      }
+
+      const totalCells = startingDay + totalDays;
+      const nextDaysCount = totalCells <= 35 ? (35 - totalCells) : (42 - totalCells);
+      for (let i = 1; i <= nextDaysCount; i++) {
+        html += `<div class="py-2 text-[var(--muted)] opacity-30 text-xs">${i}</div>`;
+      }
+
+      grid.innerHTML = html;
+      lucide.createIcons();
+    }
+
     function renderDashboard(){
       const h=state.history, now=Date.now(), week=h.filter(s=>now-new Date(s.endedAt).getTime()<604800000);
       const volume=week.reduce((a,s)=>a+s.totalVolume,0);
@@ -863,11 +958,8 @@
       document.getElementById("week-volume").textContent=fmtKg(volume);
       document.getElementById("goal-value").textContent=week.length+" / "+state.settings.weeklyGoal;
       
-      const dates=[...new Set(h.map(s=>new Date(s.endedAt).toDateString()))].sort((a,b)=>new Date(b)-new Date(a));
-      let streak=0, cursor=new Date(); cursor.setHours(0,0,0,0);
-      while(dates.includes(cursor.toDateString())){streak++;cursor.setDate(cursor.getDate()-1);}
-      document.getElementById("streak-value").textContent=streak+" hari";
-      
+      renderCalendar();
+
       const upcoming=state.routines[0];
       document.getElementById("next-workout-copy").textContent=upcoming ? upcoming.name+" · "+upcoming.exerciseIds.length+" exercise siap dijalankan." : "Buat routine pertama untuk mulai mencatat progress.";
       const active=state.activeSession, activeCopy=document.getElementById("active-session-copy"), resume=document.getElementById("resume-workout");
@@ -979,16 +1071,39 @@
     function endWorkout(){
       const a=state.activeSession;if(!a)return;const totalVolume=a.exercises.reduce((sum,x)=>sum+x.sets.reduce((v,s)=>v+(s.completedAt?(Number(s.reps)||0)*(Number(s.weight)||0):0),0),0);const totalSets=a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.completedAt).length,0);
       if(!totalSets){toast("Selesaikan minimal satu set sebelum mengakhiri workout.");return;}
-      const endedAt=new Date().toISOString();state.history.unshift({id:a.id,routineId:a.routineId,startedAt:a.startedAt,endedAt,duration:elapsed(),exercises:a.exercises,totalVolume});state.activeSession=null;save();renderDashboard();navigate("history");toast("Workout tersimpan ke History.");
+      
+      const durationSeconds = elapsed();
+      const durationMinutes = durationSeconds / 60;
+      const userWeight = state.settings.weight || 65;
+      const caloriesBurned = Math.round(0.05 * userWeight * durationMinutes);
+
+      const endedAt=new Date().toISOString();
+      state.history.unshift({id:a.id,routineId:a.routineId,startedAt:a.startedAt,endedAt,duration:durationSeconds,exercises:a.exercises,totalVolume,caloriesBurned});
+      state.activeSession=null;save();renderDashboard();navigate("history");toast(`Workout tersimpan. Membakar ±${caloriesBurned} kkal!`);
     }
     
     function renderHistory(){
       const filter = document.querySelector("#custom-history-filter .custom-option.selected")?.dataset.value || "";
       const sessions=state.history.filter(s=>!filter||s.routineId===filter), allSets=sessions.flatMap(s=>s.exercises.flatMap(e=>e.sets.filter(x=>x.completedAt)));
-      document.getElementById("history-session-count").textContent=sessions.length;document.getElementById("history-set-count").textContent=allSets.length;document.getElementById("history-volume").textContent=fmtKg(sessions.reduce((n,s)=>n+s.totalVolume,0));
+      
+      const totalCalories = sessions.reduce((n,s)=>n+(s.caloriesBurned||0),0);
+
+      document.getElementById("history-session-count").textContent=sessions.length;
+      document.getElementById("history-set-count").textContent=allSets.length;
+      document.getElementById("history-volume").textContent=fmtKg(sessions.reduce((n,s)=>n+s.totalVolume,0));
+      document.getElementById("history-calories").textContent=fmtKkal(totalCalories);
+      
       const list=document.getElementById("history-list"),empty=document.getElementById("history-empty");list.innerHTML="";empty.classList.toggle("hidden",sessions.length!==0);
-      sessions.forEach(s=>{const r=routineById(s.routineId);const el=document.createElement("article");el.className="panel p-4 flex flex-wrap justify-between gap-4";el.innerHTML=`<div><h3 class="font-extrabold">${esc(r?.name||"Routine dihapus")}</h3><p class="muted text-sm mt-1">${new Date(s.endedAt).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${formatDuration(s.duration)}</p></div><div class="flex gap-5"><div><p class="muted text-xs font-bold">Set</p><strong>${s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.completedAt).length,0)}</strong></div><div><p class="muted text-xs font-bold">Volume</p><strong>${fmtKg(s.totalVolume)}</strong></div></div>`;list.appendChild(el);});
+      sessions.forEach(s=>{
+        const r=routineById(s.routineId);
+        const calText = s.caloriesBurned ? `${s.caloriesBurned} kkal` : `0 kkal`;
+        const el=document.createElement("article");
+        el.className="panel p-4 flex flex-wrap justify-between gap-4";
+        el.innerHTML=`<div><h3 class="font-extrabold">${esc(r?.name||"Routine dihapus")}</h3><p class="muted text-sm mt-1">${new Date(s.endedAt).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${formatDuration(s.duration)}</p></div><div class="flex gap-4"><div><p class="muted text-xs font-bold">Set</p><strong>${s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.completedAt).length,0)}</strong></div><div><p class="muted text-xs font-bold">Volume</p><strong>${fmtKg(s.totalVolume)}</strong></div><div><p class="muted text-xs font-bold">Kalori</p><strong class="text-lime-300"><i data-lucide="flame" class="w-3 h-3 inline text-amber-400"></i> ${calText}</strong></div></div>`;
+        list.appendChild(el);
+      });
       renderChart();
+      lucide.createIcons();
     }
     
     function renderChart(){
@@ -1020,6 +1135,7 @@
       }
 
       const totalVol = sessionsToExport.reduce((acc, s) => acc + s.totalVolume, 0);
+      const totalCalories = sessionsToExport.reduce((acc, s) => acc + (s.caloriesBurned || 0), 0);
       const totalSesi = sessionsToExport.length;
 
       let htmlContent = `
@@ -1056,6 +1172,10 @@
                 <span style="font-size: 10px; color: #647469; font-weight: 700; display: block; letter-spacing: 0.05em;">TOTAL VOLUME</span>
                 <strong style="font-size: 20px; color: #17221b; display: block; margin-top: 2px;">${fmtKg(totalVol)}</strong>
               </div>
+              <div style="flex: 1; background: #f8faf8; padding: 14px 18px; border-radius: 12px; border: 1px solid #d6e0d7; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <span style="font-size: 10px; color: #647469; font-weight: 700; display: block; letter-spacing: 0.05em;">KALORI TERBAKAR</span>
+                <strong style="font-size: 20px; color: #17221b; display: block; margin-top: 2px;">${fmtKkal(totalCalories)}</strong>
+              </div>
             </div>
 
             <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #111923; text-transform: uppercase; letter-spacing: 0.03em;">Rincian Sesi Latihan</h3>
@@ -1070,7 +1190,10 @@
         htmlContent += `
           <div style="margin-bottom: 14px; background: #ffffff; border: 1px solid #d6e0d7; border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #edf2ed; padding-bottom: 8px;">
-              <strong style="font-size: 13px; color: #111923;">#${idx + 1} &bull; ${esc(rName)}</strong>
+              <div>
+                <strong style="font-size: 13px; color: #111923;">#${idx + 1} &bull; ${esc(rName)}</strong>
+                <span style="font-size: 11px; color: #647469; margin-left: 10px;">(±${s.caloriesBurned || 0} kkal)</span>
+              </div>
               <span style="font-size: 11px; color: #647469; background: #f0f4f0; padding: 3px 8px; border-radius: 6px;">${dateStr} (${formatDuration(s.duration)})</span>
             </div>
         `;
@@ -1222,7 +1345,7 @@
 
       document.getElementById("start-workout-button").onclick=()=>{
         const selectedRoutineId = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
-        startWorkflow(selectedRoutineId);
+        startWorkout(selectedRoutineId);
       };
 
       document.getElementById("set-list").oninput=e=>{const input=e.target;if(!input.dataset.field)return;currentExercise().sets[Number(input.dataset.index)][input.dataset.field]=input.value;save();};
@@ -1231,6 +1354,7 @@
       document.getElementById("exercise-notes").onchange=e=>{currentExercise().notes=e.target.value;save();};
       document.getElementById("previous-exercise").onclick=()=>{if(state.activeSession.currentExerciseIndex>0){state.activeSession.currentExerciseIndex--;save();renderWorkout();}};
       document.getElementById("next-exercise").onclick=()=>{const a=state.activeSession;if(a.currentExerciseIndex<a.exercises.length-1){a.currentExerciseIndex++;save();renderWorkout();}else showConfirm("Akhiri workout?","Set yang sudah selesai akan disimpan ke History.","Akhiri",endWorkout);};
+      document.getElementById("end-button").onclick=()=>showConfirm("Akhiri workout?","Sesi ini akan disimpan ke History.","Akhiri",endWorkout);
       document.getElementById("end-workout-button").onclick=()=>showConfirm("Akhiri workout?","Sesi ini akan disimpan ke History.","Akhiri",endWorkout);
       document.getElementById("rest-pause").onclick=()=>{state.activeSession.restPaused=!state.activeSession.restPaused;save();updateTimers();};
       document.getElementById("rest-skip").onclick=()=>{state.activeSession.restRemaining=0;state.activeSession.restPaused=true;save();updateTimers();};
