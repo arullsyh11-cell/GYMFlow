@@ -12,8 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   
   <style>
-
-/* CSS SPLASH SCREEN FULL HITAM & FULLSCREEN */
+    /* CSS SPLASH SCREEN FULL HITAM & FULLSCREEN */
     #splash-screen {
       position: fixed;
       inset: 0;
@@ -89,6 +88,26 @@
     .tab.active { display:block; }
     @keyframes fade { from { opacity:0; transform:translateY(7px) } to { opacity:1; transform:none } }
     .chip { display:inline-flex; align-items:center; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); border-radius:999px; padding:5px 9px; font-size:12px; font-weight:700; cursor: pointer; }
+    
+    /* GAYA CHIP KATEGORI HISTORI DENGAN TRANSISI HALUS & TEMA HIJAU */
+    .history-time-chip {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-color: var(--line);
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+    .history-time-chip:hover {
+      border-color: var(--lime);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .history-time-chip.active {
+      background: rgba(188, 240, 74, 0.16) !important;
+      border-color: var(--lime) !important;
+      color: var(--lime) !important;
+      box-shadow: 0 4px 14px rgba(188, 240, 74, 0.2);
+    }
+
     .day-chip.active { background:rgba(188,240,74,.16); border-color:#bcf04a; color:var(--text); }
     .field { width:100%; min-height:46px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; color:var(--text); }
     .field::placeholder { color:var(--muted); }
@@ -322,143 +341,490 @@
   </div>
 
   <div class="app-shell">
-   <aside class="sidebar" aria-label="Navigasi utama desktop">
-    <div class="flex items-center gap-3 px-3 mb-10">
-     <div class="w-10 h-10 rounded-xl overflow-hidden bg-lime-300 text-slate-950 grid place-items-center">
-      <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
-     </div><span class="font-extrabold text-xl tracking-tight">GYMFlow</span>
-    </div>
-    <nav class="space-y-2" id="desktop-nav">
-     <button class="nav-item active w-full" data-tab="dashboard"><i data-lucide="layout-grid"></i>Home</button> 
-     <button class="nav-item w-full" data-tab="exercises"><i data-lucide="book-open"></i>Exercises</button> 
-     <button class="nav-item w-full" data-tab="routines"><i data-lucide="repeat"></i>Routines</button> 
-     <button class="nav-item w-full" data-tab="workout"><i data-lucide="timer"></i>Workout</button> 
-     <button class="nav-item w-full" data-tab="history"><i data-lucide="trending-up"></i>Progress</button>
+    <aside class="sidebar" aria-label="Navigasi utama desktop">
+      <div class="flex items-center gap-3 px-3 mb-10">
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-lime-300 text-slate-950 grid place-items-center">
+          <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+        </div>
+        <span class="font-extrabold text-xl tracking-tight">GYMFlow</span>
+      </div>
+      <nav class="space-y-2" id="desktop-nav">
+        <button class="nav-item active w-full" data-tab="dashboard"><i data-lucide="layout-grid"></i>Home</button> 
+        <button class="nav-item w-full" data-tab="exercises"><i data-lucide="book-open"></i>Exercises</button> 
+        <button class="nav-item w-full" data-tab="routines"><i data-lucide="repeat"></i>Routines</button> 
+        <button class="nav-item w-full" data-tab="workout"><i data-lucide="timer"></i>Workout</button> 
+        <button class="nav-item w-full" data-tab="history"><i data-lucide="trending-up"></i>Progress</button>
+      </nav>
+      <div class="mt-auto space-y-3">
+        <button id="desktop-reset" class="secondary-btn w-full text-sm">Reset data</button>
+        <p class="muted text-xs px-2">Data tersimpan di perangkat ini.</p>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="flex items-center justify-between gap-4 mb-7">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl overflow-hidden bg-lime-300/10 border border-lime-500/20 grid place-items-center shrink-0">
+            <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h1 class="font-extrabold text-2xl tracking-tight">GYMFlow</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span> 
+          <button id="open-profile-btn" type="button" class="icon-btn text-lime-300 bg-lime-500/10 border-lime-500/20 hover:bg-lime-500/20" aria-label="Profil & Target" title="Profil & Target">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+          </button>
+          <button id="mobile-reset-btn" type="button" class="icon-btn text-rose-400 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20" aria-label="Reset data" title="Reset Data">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+          <button id="theme-toggle" type="button" class="icon-btn" aria-label="Ubah tema"><i data-lucide="sun-moon"></i></button>
+        </div>
+      </header>
+      
+      <!-- DASHBOARD TAB -->
+      <section id="dashboard" class="tab active" aria-label="Dashboard">
+        <!-- KARTU UTAMA: SAPAAN, TARGET MINGGU INI, & TOMBOL MULAI WORKOUT -->
+        <div id="weekly-target-container" class="panel p-5 mb-5 relative overflow-hidden">
+          <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
+          <p id="siap-bergerak-label" class="text-lime-300 font-bold text-sm relative tracking-wider">SELAMAT PAGI, <span id="profile-name-display">COYY</span>?</p>
+          <p id="next-workout-copy" class="muted mt-2 relative text-sm">Pilih routine dan mulai saat kamu siap.</p>
+
+          <!-- BAGIAN TARGET MINGGU INI YANG DIGABUNGKAN -->
+          <div class="mt-4 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] relative flex items-center justify-between">
+            <div>
+                
+              <p class="muted text-xs font-bold uppercase tracking-wider">Target Minggu Ini</p>
+              <div class="mt-1 flex items-baseline gap-2">
+                <strong id="goal-value" class="text-2xl font-extrabold text-lime-300">0 / 4</strong>
+                <span class="muted text-xs">sesi selesai</span>
+                
+              </div>
+            </div>
+            <i data-lucide="target" class="w-6 h-6 text-lime-300 opacity-80"></i>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
+            <span class="chip"><i data-lucide="weight" class="w-3 h-3 mr-1.5 text-lime-300"></i>BB: <strong id="profile-bb-display" class="ml-1 text-[var(--text)]">65 kg</strong></span>
+            <span class="chip"><i data-lucide="ruler" class="w-3 h-3 mr-1.5 text-lime-300"></i>TB: <strong id="profile-tb-display" class="ml-1 text-[var(--text)]">170 cm</strong></span>
+            <span class="chip"><i data-lucide="target" class="w-3 h-3 mr-1.5 text-lime-300"></i>Target Mingguan: <strong id="profile-target-display" class="ml-1 text-[var(--text)]">3 sesi</strong></span>
+            <button type="button" class="text-lime-300 font-bold underline ml-auto hover:opacity-80" onclick="openProfileModal()">Ubah Profil & Target</button>
+          </div>
+
+        </div>
+
+        <!-- KALENDER BULANAN -->
+        <div class="panel p-5 mb-5">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-5 h-5 text-lime-300"></i>
+              <h3 id="calendar-month-title" class="font-extrabold text-lg">September 2026</h3>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(-1)" aria-label="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+              <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(1)" aria-label="Bulan berikutnya"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold muted mb-2">
+            <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+          </div>
+          <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+                    <button id="dashboard-start" class="lime-btn px-5 mt-4 w-full relative">Mulai Workout</button>
+        </div>
+
+        <!-- SESI AKTIF (PINDAH KE BAWAH KALENDER) -->
+        <div class="panel p-5 mb-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <p class="muted text-xs font-bold uppercase tracking-wider">Sesi Aktif</p>
+            <i data-lucide="activity" class="w-4 h-4 text-lime-300"></i>
+          </div>
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <p id="active-session-copy" class="muted text-sm font-medium m-0">Belum ada sesi aktif.</p>
+            <button id="resume-workout" class="secondary-btn px-3 py-1.5 text-xs hidden shrink-0">Lanjutkan</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ROUTINES TAB -->
+      <section id="routines" class="tab" aria-label="Routines">
+        <div class="panel p-6 mb-6 relative overflow-hidden bg-gradient-to-r from-[var(--surface)] to-[var(--surface-2)]">
+          <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-[var(--lime)] opacity-10 blur-xl pointer-events-none"></div>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-[var(--lime)]/15 text-[var(--lime)] grid place-items-center shrink-0">
+                <i data-lucide="repeat" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-3">
+                  <h2 class="font-extrabold text-2xl md:text-3xl tracking-tight">Routines</h2>
+                  <span class="px-2.5 py-1 rounded-md bg-[var(--lime)]/15 text-[var(--lime)] text-xs font-bold uppercase tracking-wider">Workout Planner</span>
+                </div>
+                <p class="muted text-sm mt-1 max-w-lg">Atur program latihan mingguanmu, kelompokkan gerakan terbaik, dan capai target otot maksimal.</p>
+              </div>
+            </div>
+            <button id="open-routine-builder" class="lime-btn px-5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--lime)]/10 shrink-0">
+              <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i> Buat Routine Baru
+            </button>
+          </div>
+        </div>
+
+        <div id="routine-list" class="grid lg:grid-cols-2 gap-5"></div>
+        
+        <div id="routine-empty" class="panel p-12 text-center hidden flex flex-col items-center justify-center">
+          <div class="w-16 h-16 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] grid place-items-center text-[var(--lime)] mb-4 shadow-inner">
+            <i data-lucide="repeat" class="w-8 h-8 opacity-80"></i>
+          </div>
+          <h3 class="font-extrabold text-lg">Belum Ada Routine Latihan</h3>
+          <p class="muted text-sm mt-1 max-w-sm">Mulai rancang jadwal dan rangkaian gerakan latihan pertamamu sekarang.</p>
+          <button onclick="openRoutineBuilder()" class="lime-btn px-5 mt-5 text-xs">Buat Routine Sekarang</button>
+        </div>
+      </section>
+      
+      <!-- EXERCISES TAB -->
+      <section id="exercises" class="tab" aria-label="Exercise Library">
+        <div class="panel p-6 mb-6 relative overflow-hidden bg-gradient-to-r from-[var(--surface)] to-[var(--surface-2)]">
+          <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-[var(--lime)] opacity-10 blur-xl pointer-events-none"></div>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-md bg-[var(--lime)]/15 text-[var(--lime)] text-xs font-bold uppercase tracking-wider">Exercise Directory</span>
+              </div>
+              <h2 class="font-extrabold text-2xl md:text-3xl tracking-tight">Exercises</h2>
+              <p class="muted text-sm mt-1 max-w-lg">Cari exercise bawaan atau tambahkan gerakan custom sesuai kebutuhan latihanmu.</p>
+            </div>
+            <button id="open-exercise-builder" class="lime-btn px-5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--lime)]/10 shrink-0">
+              <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i> Tambah Exercise
+            </button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-[1fr_260px] gap-3 mb-6">
+          <label class="sr-only" for="exercise-search">Cari exercise</label> 
+          <input id="exercise-search" class="field" type="search" placeholder="Cari berdasarkan nama atau equipment..."> 
+          
+          <div id="custom-muscle-filter" class="custom-select-wrapper">
+            <div class="field custom-select-trigger" tabindex="0">
+              <span class="selected-label">Semua target otot</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+            </div>
+            <div class="custom-options">
+              <div class="custom-option selected" data-value="">Semua target otot</div>
+              <div class="custom-option" data-value="Cardio">Cardio</div>
+              <div class="custom-option" data-value="Chest">Chest</div>
+              <div class="custom-option" data-value="Back">Back</div>
+              <div class="custom-option" data-value="Shoulders">Shoulders</div>
+              <div class="custom-option" data-value="Legs">Legs</div>
+              <div class="custom-option" data-value="Arms">Arms</div>
+              <div class="custom-option" data-value="Core">Core</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="exercise-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        
+        <div id="exercise-empty" class="panel p-12 text-center hidden flex flex-col items-center justify-center">
+          <div class="w-16 h-16 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] grid place-items-center text-[var(--lime)] mb-4 shadow-inner">
+            <i data-lucide="search" class="w-8 h-8 opacity-80"></i>
+          </div>
+          <h3 class="font-extrabold text-lg">Exercise Tidak Ditemukan</h3>
+          <p class="muted text-sm mt-1 max-w-sm">Coba ubah kata kunci pencarian atau tambahkan exercise custom baru.</p>
+        </div>
+      </section>
+      
+      <!-- WORKOUT TAB -->
+      <section id="workout" class="tab" aria-label="Live Workout">
+        <div id="workout-start-state" class="panel p-5 md:p-6 max-w-xl mx-auto">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-[var(--lime)]/15 text-[var(--lime)] text-xs font-bold uppercase tracking-wider">Live Workout</span>
+          </div>
+          <h2 class="font-extrabold text-2xl md:text-3xl tracking-tight">Mulai sesi berikutnya.</h2>
+          <p class="muted text-sm mt-1 mb-6">Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.</p>
+          
+          <label class="block text-xs font-bold uppercase tracking-wider muted mb-2" for="custom-workout-routine">Pilih Routine</label> 
+          <div id="custom-workout-routine" class="custom-select-wrapper mb-4">
+            <div class="field custom-select-trigger" tabindex="0">
+              <span class="selected-label">Pilih routine...</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+            </div>
+            <div class="custom-options" id="workout-routine-options"></div>
+          </div> 
+          
+          <button id="start-workout-button" class="lime-btn w-full flex items-center justify-center gap-2 mt-2">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i> Mulai Sesi
+          </button>
+
+          <div class="mt-4 pt-4 border-t border-[var(--line)] text-center">
+            <button type="button" class="secondary-btn w-full text-xs py-2" onclick="openRoutineBuilder()">+ Buat Routine Baru</button>
+          </div>
+        </div>
+
+        <div id="workout-live-state" class="hidden">
+          <div class="panel p-4 mb-4 sticky top-3 z-10">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p id="workout-routine-name" class="font-extrabold"></p>
+                <p id="workout-elapsed" class="muted text-sm">00:00</p>
+              </div>
+              <div class="min-w-[150px] flex-1 max-w-xs">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Progress</span><span id="workout-progress-label">0/0 Set</span>
+                </div>
+                <div class="progress-line">
+                  <span id="workout-progress-bar"></span>
+                </div>
+              </div>
+              <button id="end-workout-button" class="danger-btn px-4">Akhiri workout</button>
+            </div>
+          </div>
+
+          <div id="rest-timer-card" class="panel p-4 mb-4 hidden border-lime-300">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-bold text-lime-300 tracking-wider">WAKTU ISTIRAHAT</p>
+                <strong id="rest-time" class="block text-3xl tracking-tight">01:30</strong>
+              </div>
+              <div class="flex gap-2">
+                <button id="rest-pause" class="secondary-btn px-3">Jeda</button> 
+                <button id="rest-skip" class="secondary-btn px-3">Lewati</button> 
+                <button id="rest-reset" class="secondary-btn px-3">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <article class="panel p-5">
+            <div class="flex justify-between gap-3 items-start">
+              <div>
+                <p id="exercise-position" class="text-lime-300 text-sm font-bold"></p>
+                <h2 id="active-exercise-name" class="font-extrabold text-2xl mt-1"></h2>
+                <p id="previous-performance" class="muted text-sm mt-1"></p>
+              </div>
+              <span id="active-exercise-muscle" class="chip"></span>
+            </div>
+            
+            <label class="block mt-5 text-sm font-bold" for="exercise-notes">Catatan</label> 
+            <textarea id="exercise-notes" class="field mt-2 min-h-20" placeholder="Contoh: jaga tempo saat turun"></textarea>
+            
+            <div class="grid grid-cols-[44px_1fr_1fr_122px] gap-2 text-xs muted font-bold mt-6 mb-2">
+              <span>Set</span><span>Reps</span><span>Weight (kg)</span><span>Status</span>
+            </div>
+            
+            <div id="set-list" class="space-y-2"></div>
+            
+            <button id="add-set-button" class="secondary-btn px-4 mt-4"><i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>Tambah Set</button>
+            
+            <div class="flex justify-between gap-3 mt-6">
+              <button id="previous-exercise" class="secondary-btn px-4">← Sebelumnya</button> 
+              <button id="next-exercise" class="lime-btn px-4">Exercise berikutnya →</button>
+            </div>
+          </article>
+        </div>
+      </section>
+      
+      <!-- HISTORY TAB -->
+      <section id="history" class="tab" aria-label="Workout History">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
+          <div>
+            <h2 class="font-extrabold text-2xl">Progress</h2>
+            <p class="muted text-sm mt-1">Pantau konsistensi dan perkembangan latihanmu.</p>
+          </div>
+          <div class="flex items-center">
+            <button id="export-pdf-daily" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
+              <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-3 mb-5">
+          <div id="custom-history-filter" class="custom-select-wrapper">
+            <div class="field custom-select-trigger" tabindex="0">
+              <span class="selected-label">Semua routine</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+            </div>
+            <div class="custom-options" id="history-routine-options">
+              <div class="custom-option selected" data-value="">Semua routine</div>
+            </div>
+          </div> 
+
+          <div id="custom-chart-exercise" class="custom-select-wrapper">
+            <div class="field custom-select-trigger" tabindex="0">
+              <span class="selected-label">Pilih exercise untuk melihat tren</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+            </div>
+            <div class="custom-options" id="chart-exercise-options">
+              <div class="custom-option selected" data-value="">Pilih exercise untuk melihat tren</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          <div class="metric">
+            <p class="muted text-xs font-bold">Total sesi</p>
+            <strong id="history-session-count" class="block text-2xl mt-1">0</strong>
+          </div>
+          <div class="metric">
+            <p class="muted text-xs font-bold">Total set</p>
+            <strong id="history-set-count" class="block text-2xl mt-1">0</strong>
+          </div>
+          <div class="metric">
+            <p class="muted text-xs font-bold">Total kalori</p>
+            <strong id="history-calories" class="block text-2xl mt-1 text-lime-300">0 kkal</strong>
+          </div>
+        </div>
+
+        <div class="panel p-5 mb-5">
+          <h3 class="font-extrabold text-lg">Tren Weight</h3>
+          <p id="chart-caption" class="muted text-sm mt-1"></p>
+          <div id="chart-area" class="mt-4 h-48"></div>
+        </div>
+
+        <!-- KATEGORI HISTORI (FILTER WAKTU DENGAN TRANSISI HALUS & WARNA HIJAU) -->
+        <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+          <button type="button" class="chip history-time-chip active" data-time="all">Semua Riwayat</button>
+          <button type="button" class="chip history-time-chip" data-time="today">Hari Ini</button>
+          <button type="button" class="chip history-time-chip" data-time="week">Seminggu Terakhir</button>
+        </div>
+
+        <div id="history-list" class="space-y-3"></div>
+        
+        <div id="history-empty" class="panel p-8 text-center hidden">
+          <p class="muted">Belum ada history. Selesaikan workout untuk melihat progress di sini.</p>
+        </div>
+      </section>
+    </main>
+    
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" aria-label="Bottom Navigation">
+      <button class="mobile-nav-btn active" data-tab="dashboard" title="Home">
+        <i data-lucide="layout-grid"></i>
+        <span>Home</span>
+      </button> 
+      <button class="mobile-nav-btn" data-tab="exercises" title="Exercises">
+        <i data-lucide="book-open"></i>
+        <span>Exercises</span>
+      </button> 
+      <button class="mobile-nav-btn center-fab-btn" data-tab="routines" title="Routines">
+        <div class="fab-circle">
+          <i data-lucide="repeat"></i>
+        </div>
+        <span>Routines</span>
+      </button> 
+      <button class="mobile-nav-btn" data-tab="workout" title="Workout">
+        <i data-lucide="timer"></i>
+        <span>Workout</span>
+      </button> 
+      <button class="mobile-nav-btn" data-tab="history" title="Progress">
+        <i data-lucide="trending-up"></i>
+        <span>Progress</span>
+      </button>
     </nav>
-    <div class="mt-auto space-y-3"><button id="desktop-reset" class="secondary-btn w-full text-sm">Reset data</button>
-     <p class="muted text-xs px-2">Data tersimpan di perangkat ini.</p>
-    </div>
-   </aside>
-   <main class="main-area">
-    <header class="flex items-center justify-between gap-4 mb-7">
-     <div class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-2xl overflow-hidden bg-lime-300/10 border border-lime-500/20 grid place-items-center shrink-0">
-       <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+  </div>
+
+  <!-- MODALS -->
+  <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <form id="profile-form" class="modal max-w-md">
+      <div class="flex justify-between gap-3 items-center mb-5">
+        <h2 id="profile-modal-title" class="font-extrabold text-xl">Profil & Target Latihan</h2>
+        <button type="button" class="icon-btn close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x"></i></button>
       </div>
-      <div>
-       <h1 class="font-extrabold text-2xl tracking-tight">GYMFlow</h1>
-      </div>
-     </div>
-     <div class="flex items-center gap-2">
-      <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span> 
-      <button id="open-profile-btn" type="button" class="icon-btn text-lime-300 bg-lime-500/10 border-lime-500/20 hover:bg-lime-500/20" aria-label="Profil & Target" title="Profil & Target">
-        <i data-lucide="user-cog" class="w-4 h-4"></i>
-      </button>
-      <button id="mobile-reset-btn" type="button" class="icon-btn text-rose-400 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20" aria-label="Reset data" title="Reset Data">
-        <i data-lucide="trash-2" class="w-4 h-4"></i>
-      </button>
-      <button id="theme-toggle" type="button" class="icon-btn" aria-label="Ubah tema"><i data-lucide="sun-moon"></i></button>
-     </div>
-    </header>
-    
-    <section id="dashboard" class="tab active" aria-label="Dashboard">
-     <div class="panel p-5 md:p-7 mb-5 overflow-hidden relative">
-      <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
-      <p id="siap-bergerak-label" class="text-lime-300 font-bold text-sm relative tracking-wider">SIAP BERGERAK, <span id="profile-name-display">COYY</span>?</p>
-      <h2 class="font-extrabold text-3xl md:text-4xl mt-2 max-w-xl relative">Bangun kekuatan, satu set setiap kali.</h2>
-      <p id="next-workout-copy" class="muted mt-3 relative">Pilih routine dan mulai saat kamu siap.</p>
+      <p class="muted text-sm mb-5">Nama, Berat Badan, Tinggi Badan, dan Target Mingguan akan tersimpan otomatis.</p>
       
-      <div class="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
-        <span class="chip"><i data-lucide="weight" class="w-3 h-3 mr-1.5 text-lime-300"></i>BB: <strong id="profile-bb-display" class="ml-1 text-[var(--text)]">65 kg</strong></span>
-        <span class="chip"><i data-lucide="ruler" class="w-3 h-3 mr-1.5 text-lime-300"></i>TB: <strong id="profile-tb-display" class="ml-1 text-[var(--text)]">170 cm</strong></span>
-        <span class="chip"><i data-lucide="target" class="w-3 h-3 mr-1.5 text-lime-300"></i>Target Mingguan: <strong id="profile-target-display" class="ml-1 text-[var(--text)]">3 sesi</strong></span>
-        <button type="button" class="text-lime-300 font-bold underline ml-auto hover:opacity-80" onclick="openProfileModal()">Ubah Profil & Target</button>
-      </div>
+      <label class="block text-sm font-bold" for="profile-name-input">Nama Panggilan / Pengguna</label>
+      <input id="profile-name-input" class="field mt-2" type="text" maxlength="30" placeholder="Contoh: COYY">
 
-      <button id="dashboard-start" class="lime-btn px-5 mt-5 relative">Mulai Workout</button>
-     </div>
+      <label class="block text-sm font-bold mt-4" for="profile-bb">Berat Badan (kg)</label>
+      <input id="profile-bb" class="field mt-2" type="number" step="0.5" min="20" max="300" required placeholder="Contoh: 65">
 
-     <!-- KALENDER BULANAN PENGGANTI STREAK -->
-     <div class="panel p-5 mb-4">
-      <div class="flex items-center justify-between mb-4">
-       <div class="flex items-center gap-2">
-        <i data-lucide="calendar" class="w-5 h-5 text-lime-300"></i>
-        <h3 id="calendar-month-title" class="font-extrabold text-lg">September 2026</h3>
-       </div>
-       <div class="flex items-center gap-1">
-        <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(-1)" aria-label="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-        <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(1)" aria-label="Bulan berikutnya"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-       </div>
-      </div>
-      
-      <!-- Grid Hari -->
-      <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold muted mb-2">
-       <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
-      </div>
-      <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm">
-       <!-- Dirender via JS -->
-      </div>
-     </div>
+      <label class="block text-sm font-bold mt-4" for="profile-tb">Tinggi Badan (cm)</label>
+      <input id="profile-tb" class="field mt-2" type="number" min="50" max="250" required placeholder="Contoh: 170">
 
-     <!-- GRID RAPI: TARGET MINGGU INI & SESI AKTIF BERDAMPINGAN/TERSUSUN STABIL -->
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-      <!-- Panel Target Minggu Ini -->
-      <div class="panel p-5 flex flex-col justify-between">
-       <div class="flex items-center justify-between">
-        <p class="muted text-xs font-bold uppercase tracking-wider">Target Minggu Ini</p>
-        <i data-lucide="target" class="w-4 h-4 text-lime-300"></i>
-       </div>
-       <div class="mt-3 flex items-baseline gap-2">
-        <strong id="goal-value" class="text-3xl font-extrabold text-lime-300">0 / 4</strong>
-        <span class="muted text-xs">sesi selesai</span>
-       </div>
-      </div>
-
-      <!-- Panel Sesi Aktif -->
-      <div class="panel p-5 flex flex-col justify-between">
-       <div class="flex items-center justify-between">
-        <p class="muted text-xs font-bold uppercase tracking-wider">Sesi Aktif</p>
-        <i data-lucide="activity" class="w-4 h-4 text-lime-300"></i>
-       </div>
-       <div class="mt-3 flex items-center justify-between gap-2">
-        <p id="active-session-copy" class="muted text-sm font-medium m-0">Belum ada sesi aktif.</p>
-        <button id="resume-workout" class="secondary-btn px-3 py-1.5 text-xs hidden shrink-0">Lanjutkan</button>
-       </div>
-      </div>
-     </div>
-    </section>
-    
-    <section id="routines" class="tab" aria-label="Routines">
-     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
-      <div>
-       <h2 class="font-extrabold text-2xl">Routines</h2>
-       <p class="muted text-sm mt-1">Bangun alur latihan yang sesuai dengan targetmu.</p>
-      </div><button id="open-routine-builder" class="lime-btn px-4">Buat Routine</button>
-     </div>
-     <div id="routine-list" class="grid lg:grid-cols-2 gap-4"></div>
-     <div id="routine-empty" class="panel p-8 text-center hidden">
-      <p class="muted">Belum ada routine. Buat routine pertama untuk mulai workout.</p>
-     </div>
-    </section>
-    
-    <section id="exercises" class="tab" aria-label="Exercise Library">
-     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
-      <div>
-       <h2 class="font-extrabold text-2xl">Exercises</h2>
-       <p class="muted text-sm mt-1">Cari exercise bawaan atau tambahkan gerakan custom.</p>
-      </div><button id="open-exercise-builder" class="lime-btn px-4">Tambah Exercise</button>
-     </div>
-     <div class="grid md:grid-cols-[1fr_220px] gap-3 mb-4">
-      <label class="sr-only" for="exercise-search">Cari exercise</label> 
-      <input id="exercise-search" class="field" type="search" placeholder="Cari exercise..."> 
-      
-      <div id="custom-muscle-filter" class="custom-select-wrapper">
+      <label class="block text-sm font-bold mt-4">Target Olahraga Mingguan (Sesi)</label>
+      <div id="custom-profile-target" class="custom-select-wrapper mt-2">
         <div class="field custom-select-trigger" tabindex="0">
-          <span class="selected-label">Semua target otot</span>
+          <span class="selected-label">3-5 Sesi / minggu (4)</span>
           <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
         </div>
         <div class="custom-options">
-          <div class="custom-option selected" data-value="">Semua target otot</div>
+          <div class="custom-option" data-value="2">1-3 Sesi / minggu (2)</div>
+          <div class="custom-option selected" data-value="4">3-5 Sesi / minggu (4)</div>
+          <div class="custom-option" data-value="6">6-7 Sesi / minggu (6)</div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="profile-modal">Tutup</button>
+        <button class="lime-btn px-4" type="submit">Selesai</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="routine-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
+    <form id="routine-form" class="modal max-w-xl">
+      <div class="flex justify-between gap-3 items-center pb-4 mb-5 border-b border-[var(--line)]">
+        <div>
+          <h2 id="routine-modal-title" class="font-extrabold text-xl">Routine Builder</h2>
+          <p class="muted text-xs mt-0.5">Rancang alur latihan dan pilih gerakan terbaikmu.</p>
+        </div>
+        <button type="button" class="icon-btn close-modal" data-close="routine-modal" aria-label="Tutup builder routine"><i data-lucide="x"></i></button>
+      </div>
+
+      <input id="routine-id" type="hidden"> 
+
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider muted mb-1.5" for="routine-name">Nama Routine</label>
+          <input id="routine-name" class="field" required="" maxlength="50" placeholder="Contoh: Upper Body Hypertrophy">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider muted mb-1.5" for="routine-description">Deskripsi Singkat <span class="font-normal normal-case">(opsional)</span></label>
+          <textarea id="routine-description" class="field min-h-[70px]" maxlength="140" placeholder="Fokus dan tujuan dari routine ini..."></textarea>
+        </div>
+      </div>
+
+      <div class="mb-6 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+        <label class="block text-xs font-bold uppercase tracking-wider muted mb-2.5">Jadwal Hari Latihan</label>
+        <div id="day-picker" class="grid grid-cols-7 gap-1.5"></div>
+      </div>
+
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2.5">
+          <label class="block text-xs font-bold uppercase tracking-wider muted">Daftar Exercise <span id="selected-count" class="ml-1 px-2 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--line)] text-xs font-bold text-[var(--lime)]">0 dipilih</span></label>
+        </div>
+        <div id="builder-selected-exercises" class="space-y-2 max-h-56 overflow-auto p-1"></div>
+      </div>
+
+      <div class="pt-4 border-t border-[var(--line)] mb-6">
+        <label class="block text-xs font-bold uppercase tracking-wider muted mb-2">Tambah dari Library</label>
+        <input id="builder-exercise-search" class="field mb-2.5" type="search" placeholder="Cari nama exercise...">
+        <div id="builder-library" class="max-h-48 overflow-auto space-y-1.5 pr-1"></div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-[var(--line)]">
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="routine-modal">Batal</button>
+        <button class="lime-btn px-5" type="submit">Simpan Routine</button>
+      </div>
+    </form>
+  </div>
+  
+  <div id="exercise-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
+    <form id="exercise-form" class="modal max-w-md">
+      <div class="flex justify-between gap-3 items-center mb-5">
+        <h2 id="exercise-modal-title" class="font-extrabold text-xl">Tambah Exercise Custom</h2>
+        <button type="button" class="icon-btn close-modal" data-close="exercise-modal" aria-label="Tutup form exercise"><i data-lucide="x"></i></button>
+      </div>
+      
+      <label class="block text-sm font-bold" for="custom-exercise-name">Nama exercise</label>
+      <input id="custom-exercise-name" class="field mt-2" required="" maxlength="60" placeholder="Contoh: Cable Fly"> 
+      
+      <label class="block text-sm font-bold mt-4">Target otot</label>
+      <div id="custom-exercise-muscle-select" class="custom-select-wrapper mt-2">
+        <div class="field custom-select-trigger" tabindex="0">
+          <span class="selected-label">Pilih target otot</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        </div>
+        <div class="custom-options">
+          <div class="custom-option selected" data-value="">Pilih target otot</div>
           <div class="custom-option" data-value="Cardio">Cardio</div>
           <div class="custom-option" data-value="Chest">Chest</div>
           <div class="custom-option" data-value="Back">Back</div>
@@ -467,272 +833,32 @@
           <div class="custom-option" data-value="Arms">Arms</div>
           <div class="custom-option" data-value="Core">Core</div>
         </div>
-      </div>
-     </div>
-     <div id="exercise-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
-     <div id="exercise-empty" class="panel p-8 text-center hidden">
-      <p class="muted">Exercise tidak ditemukan. Ubah pencarian atau tambahkan exercise custom.</p>
-     </div>
-    </section>
-    
-    <section id="workout" class="tab" aria-label="Live Workout">
-     <div id="workout-start-state" class="panel p-6 max-w-2xl">
-      <p class="text-lime-300 font-bold text-sm tracking-wider">LIVE WORKOUT</p>
-      <h2 class="font-extrabold text-3xl mt-2">Mulai sesi berikutnya.</h2>
-      <p class="muted mt-2">Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.</p>
-      
-      <label class="block mt-6 text-sm font-bold mb-2">Pilih routine</label> 
-      <div id="custom-workout-routine" class="custom-select-wrapper mb-4">
-        <div class="field custom-select-trigger" tabindex="0">
-          <span class="selected-label">Pilih routine...</span>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-        </div>
-        <div class="custom-options" id="workout-routine-options"></div>
-      </div> 
-      
-      <button id="start-workout-button" class="lime-btn px-5 mt-2">Mulai Sesi</button>
-
-      <div class="mt-4">
-        <button type="button" class="secondary-btn text-xs px-3 py-2" onclick="openRoutineBuilder()">+ Buat Routine Baru</button>
-      </div>
-     </div>
-     <div id="workout-live-state" class="hidden">
-      <div class="panel p-4 mb-4 sticky top-3 z-10">
-       <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-         <p id="workout-routine-name" class="font-extrabold"></p>
-         <p id="workout-elapsed" class="muted text-sm">00:00</p>
-        </div>
-        <div class="min-w-[150px] flex-1 max-w-xs">
-         <div class="flex justify-between text-xs mb-1">
-          <span>Progress</span><span id="workout-progress-label">0/0 Set</span>
-         </div>
-         <div class="progress-line">
-          <span id="workout-progress-bar"></span>
-         </div>
-        </div><button id="end-workout-button" class="danger-btn px-4">Akhiri workout</button>
-       </div>
-      </div>
-      <div id="rest-timer-card" class="panel p-4 mb-4 hidden border-lime-300">
-       <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-         <p class="text-sm font-bold text-lime-300 tracking-wider">WAKTU ISTIRAHAT</p><strong id="rest-time" class="block text-3xl tracking-tight">01:30</strong>
-        </div>
-        <div class="flex gap-2"><button id="rest-pause" class="secondary-btn px-3">Jeda</button> <button id="rest-skip" class="secondary-btn px-3">Lewati</button> <button id="rest-reset" class="secondary-btn px-3">Reset</button>
-        </div>
-       </div>
-      </div>
-      <article class="panel p-5">
-       <div class="flex justify-between gap-3 items-start">
-        <div>
-         <p id="exercise-position" class="text-lime-300 text-sm font-bold"></p>
-         <h2 id="active-exercise-name" class="font-extrabold text-2xl mt-1"></h2>
-         <p id="previous-performance" class="muted text-sm mt-1"></p>
-        </div><span id="active-exercise-muscle" class="chip"></span>
-       </div><label class="block mt-5 text-sm font-bold" for="exercise-notes">Catatan</label> <textarea id="exercise-notes" class="field mt-2 min-h-20" placeholder="Contoh: jaga tempo saat turun"></textarea>
-       <div class="grid grid-cols-[44px_1fr_1fr_122px] gap-2 text-xs muted font-bold mt-6 mb-2">
-        <span>Set</span><span>Reps</span><span>Weight (kg)</span><span>Status</span>
-       </div>
-       <div id="set-list" class="space-y-2"></div><button id="add-set-button" class="secondary-btn px-4 mt-4"><i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>Tambah Set</button>
-       <div class="flex justify-between gap-3 mt-6"><button id="previous-exercise" class="secondary-btn px-4">← Sebelumnya</button> <button id="next-exercise" class="lime-btn px-4">Exercise berikutnya →</button>
-       </div>
-      </article>
-     </div>
-    </section>
-    
-    <section id="history" class="tab" aria-label="Workout History">
-     <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
-      <div>
-       <h2 class="font-extrabold text-2xl">Progress</h2>
-       <p class="muted text-sm mt-1">Pantau konsistensi dan perkembangan latihanmu.</p>
-      </div>
-      <div class="flex items-center">
-       <button id="export-pdf-daily" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
-         <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF
-       </button>
-      </div>
-     </div>
-     <div class="grid md:grid-cols-2 gap-3 mb-5">
-      <div id="custom-history-filter" class="custom-select-wrapper">
-        <div class="field custom-select-trigger" tabindex="0">
-          <span class="selected-label">Semua routine</span>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-        </div>
-        <div class="custom-options" id="history-routine-options">
-          <div class="custom-option selected" data-value="">Semua routine</div>
-        </div>
       </div> 
 
-      <div id="custom-chart-exercise" class="custom-select-wrapper">
-        <div class="field custom-select-trigger" tabindex="0">
-          <span class="selected-label">Pilih exercise untuk melihat tren</span>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-        </div>
-        <div class="custom-options" id="chart-exercise-options">
-          <div class="custom-option selected" data-value="">Pilih exercise untuk melihat tren</div>
-        </div>
+      <label class="block text-sm font-bold mt-4" for="custom-exercise-equipment">Equipment</label>
+      <input id="custom-exercise-equipment" class="field mt-2" required="" maxlength="40" placeholder="Contoh: Cable machine">
+      
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="exercise-modal">Batal</button>
+        <button class="lime-btn px-4" type="submit">Simpan Exercise</button>
       </div>
-     </div>
-     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-      <div class="metric">
-       <p class="muted text-xs font-bold">Total sesi</p><strong id="history-session-count" class="block text-2xl mt-1">0</strong>
-      </div>
-      <div class="metric">
-       <p class="muted text-xs font-bold">Total set</p><strong id="history-set-count" class="block text-2xl mt-1">0</strong>
-      </div>
-      <div class="metric">
-       <p class="muted text-xs font-bold">Total kalori</p><strong id="history-calories" class="block text-2xl mt-1 text-lime-300">0 kkal</strong>
-      </div>
-     </div>
-     <div class="panel p-5 mb-5">
-      <h3 class="font-extrabold text-lg">Tren Weight</h3>
-      <p id="chart-caption" class="muted text-sm mt-1"></p>
-      <div id="chart-area" class="mt-4 h-48"></div>
-     </div>
-     <div id="history-list" class="space-y-3"></div>
-     <div id="history-empty" class="panel p-8 text-center hidden">
-      <p class="muted">Belum ada history. Selesaikan workout untuk melihat progress di sini.</p>
-     </div>
-    </section>
-   </main>
-   
-   <nav class="bottom-nav" aria-label="Bottom Navigation">
-    <button class="mobile-nav-btn active" data-tab="dashboard" title="Home">
-      <i data-lucide="layout-grid"></i>
-      <span>Home</span>
-    </button> 
-
-    <button class="mobile-nav-btn" data-tab="exercises" title="Exercises">
-      <i data-lucide="book-open"></i>
-      <span>Exercises</span>
-    </button> 
-
-    <button class="mobile-nav-btn center-fab-btn" data-tab="routines" title="Routines">
-      <div class="fab-circle">
-        <i data-lucide="repeat"></i>
-      </div>
-      <span>Routines</span>
-    </button> 
-
-    <button class="mobile-nav-btn" data-tab="workout" title="Workout">
-      <i data-lucide="timer"></i>
-      <span>Workout</span>
-    </button> 
-
-    <button class="mobile-nav-btn" data-tab="history" title="Progress">
-      <i data-lucide="trending-up"></i>
-      <span>Progress</span>
-    </button>
-   </nav>
-  </div>
-
-  <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
-   <form id="profile-form" class="modal max-w-md">
-    <div class="flex justify-between gap-3 items-center mb-5">
-     <h2 id="profile-modal-title" class="font-extrabold text-xl">Profil & Target Latihan</h2>
-     <button type="button" class="icon-btn close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x"></i></button>
-    </div>
-    <p class="muted text-sm mb-5">Nama, Berat Badan, Tinggi Badan, dan Target Mingguan akan tersimpan otomatis.</p>
-    
-    <label class="block text-sm font-bold" for="profile-name-input">Nama Panggilan / Pengguna</label>
-    <input id="profile-name-input" class="field mt-2" type="text" maxlength="30" placeholder="Contoh: COYY">
-
-    <label class="block text-sm font-bold mt-4" for="profile-bb">Berat Badan (kg)</label>
-    <input id="profile-bb" class="field mt-2" type="number" step="0.5" min="20" max="300" required placeholder="Contoh: 65">
-
-    <label class="block text-sm font-bold mt-4" for="profile-tb">Tinggi Badan (cm)</label>
-    <input id="profile-tb" class="field mt-2" type="number" min="50" max="250" required placeholder="Contoh: 170">
-
-    <label class="block text-sm font-bold mt-4">Target Olahraga Mingguan (Sesi)</label>
-    <div id="custom-profile-target" class="custom-select-wrapper mt-2">
-      <div class="field custom-select-trigger" tabindex="0">
-        <span class="selected-label">3-5 Sesi / minggu (4)</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-      </div>
-      <div class="custom-options">
-        <div class="custom-option" data-value="2">1-3 Sesi / minggu (2)</div>
-        <div class="custom-option selected" data-value="4">3-5 Sesi / minggu (4)</div>
-        <div class="custom-option" data-value="6">6-7 Sesi / minggu (6)</div>
-      </div>
-    </div>
-
-    <div class="flex justify-end gap-2 mt-6">
-     <button type="button" class="secondary-btn px-4 close-modal" data-close="profile-modal">Tutup</button>
-     <button class="lime-btn px-4" type="submit">Selesai</button>
-    </div>
-   </form>
-  </div>
-
-  <div id="routine-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
-   <form id="routine-form" class="modal">
-    <div class="flex justify-between gap-3 items-center mb-5">
-     <h2 id="routine-modal-title" class="font-extrabold text-xl">Routine Builder</h2><button type="button" class="icon-btn close-modal" data-close="routine-modal" aria-label="Tutup builder routine"><i data-lucide="x"></i></button>
-    </div>
-    <p class="muted text-sm mb-5">Contoh alur: beri nama routine, pilih hari latihan, lalu pilih dan urutkan exercise dari library.</p><input id="routine-id" type="hidden"> <label class="block text-sm font-bold" for="routine-name">Nama routine</label><input id="routine-name" class="field mt-2" required="" maxlength="50" placeholder="Contoh: Upper Body"> <label class="block text-sm font-bold mt-4" for="routine-description">Deskripsi singkat <span class="muted font-normal">(opsional)</span></label><textarea id="routine-description" class="field mt-2 min-h-20" maxlength="140" placeholder="Fokus dan tujuan latihan"></textarea>
-    <fieldset class="mt-5">
-     <legend class="text-sm font-bold">Hari latihan</legend>
-     <div id="day-picker" class="flex flex-wrap gap-2 mt-3"></div>
-    </fieldset>
-    <div class="mt-6 flex justify-between items-center gap-3">
-     <div>
-      <h3 class="font-extrabold">Daftar exercise</h3>
-      <p class="muted text-xs mt-1">Pilih dari library, lalu atur urutannya.</p>
-     </div><span id="selected-count" class="chip">0 dipilih</span>
-    </div>
-    <div id="builder-selected-exercises" class="space-y-2 mt-3"></div>
-    <div class="border-t border-slate-700/50 mt-5 pt-5">
-     <label class="block text-sm font-bold" for="builder-exercise-search">Tambah dari library</label><input id="builder-exercise-search" class="field mt-2" type="search" placeholder="Cari exercise untuk routine...">
-     <div id="builder-library" class="max-h-48 overflow-auto mt-2 space-y-2"></div>
-    </div>
-    <div class="flex justify-end gap-2 mt-6">
-     <button type="button" class="secondary-btn px-4 close-modal" data-close="routine-modal">Batal</button><button class="lime-btn px-4" type="submit">Simpan Routine</button>
-    </div>
-   </form>
-  </div>
-  
-  <div id="exercise-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
-   <form id="exercise-form" class="modal max-w-md">
-    <div class="flex justify-between gap-3 items-center mb-5">
-     <h2 id="exercise-modal-title" class="font-extrabold text-xl">Tambah Exercise Custom</h2><button type="button" class="icon-btn close-modal" data-close="exercise-modal" aria-label="Tutup form exercise"><i data-lucide="x"></i></button>
-    </div><label class="block text-sm font-bold" for="custom-exercise-name">Nama exercise</label><input id="custom-exercise-name" class="field mt-2" required="" maxlength="60" placeholder="Contoh: Cable Fly"> 
-    
-    <label class="block text-sm font-bold mt-4">Target otot</label>
-    <div id="custom-exercise-muscle-select" class="custom-select-wrapper mt-2">
-      <div class="field custom-select-trigger" tabindex="0">
-        <span class="selected-label">Pilih target otot</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-      </div>
-      <div class="custom-options">
-        <div class="custom-option selected" data-value="">Pilih target otot</div>
-        <div class="custom-option" data-value="Cardio">Cardio</div>
-        <div class="custom-option" data-value="Chest">Chest</div>
-        <div class="custom-option" data-value="Back">Back</div>
-        <div class="custom-option" data-value="Shoulders">Shoulders</div>
-        <div class="custom-option" data-value="Legs">Legs</div>
-        <div class="custom-option" data-value="Arms">Arms</div>
-        <div class="custom-option" data-value="Core">Core</div>
-      </div>
-    </div> 
-
-    <label class="block text-sm font-bold mt-4" for="custom-exercise-equipment">Equipment</label><input id="custom-exercise-equipment" class="field mt-2" required="" maxlength="40" placeholder="Contoh: Cable machine">
-    <div class="flex justify-end gap-2 mt-6">
-     <button type="button" class="secondary-btn px-4 close-modal" data-close="exercise-modal">Batal</button><button class="lime-btn px-4" type="submit">Simpan Exercise</button>
-    </div>
-   </form>
+    </form>
   </div>
   
   <div id="confirm-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
-   <div class="modal max-w-md">
-    <h2 id="confirm-title" class="font-extrabold text-xl">Konfirmasi tindakan</h2>
-    <p id="confirm-message" class="muted mt-2"></p>
-    <div class="flex justify-end gap-2 mt-6">
-     <button id="confirm-cancel" class="secondary-btn px-4">Batal</button><button id="confirm-action" class="danger-btn px-4">Hapus</button>
+    <div class="modal max-w-md">
+      <h2 id="confirm-title" class="font-extrabold text-xl">Konfirmasi tindakan</h2>
+      <p id="confirm-message" class="muted mt-2"></p>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="confirm-cancel" class="secondary-btn px-4">Batal</button>
+        <button id="confirm-action" class="danger-btn px-4">Hapus</button>
+      </div>
     </div>
-   </div>
   </div>
   
   <div id="toast" class="toast" role="status" aria-live="polite">Profil & target diperbarui secara otomatis.</div>
   
+  <!-- SCRIPT -->
   <script>
     const KEY = "gymflow-v3";
     const LEGACY_KEYS = ["gymflow-v2", "gymflow-v1"];
@@ -948,7 +1074,7 @@
     function navigate(tab){
       document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",el.id===tab));
       document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
-      if(tab==="workout") renderWorkout(); if(tab==="history") renderHistory();
+      if(tab==="workout") renderWorkout(); if(tab==="history") renderHistory(); if(tab==="routines") renderRoutines();
     }
     
     function changeCalendarMonth(direction) {
@@ -1017,12 +1143,21 @@
     function renderDashboard(){
       const h=state.history, now=Date.now(), week=h.filter(s=>now-new Date(s.endedAt).getTime()<604800000);
       
-      document.getElementById("profile-name-display").textContent = (state.settings.userName || "COYY").toUpperCase();
+      const currentHour = new Date().getHours();
+      let greeting = "SELAMAT MALAM";
+      if (currentHour >= 3 && currentHour < 11) {
+        greeting = "SELAMAT PAGI";
+      } else if (currentHour >= 11 && currentHour < 15) {
+        greeting = "SELAMAT SIANG";
+      } else if (currentHour >= 15 && currentHour < 18) {
+        greeting = "SELAMAT SORE";
+      }
+
+      document.getElementById("siap-bergerak-label").innerHTML = `${greeting}, <span id="profile-name-display">${esc((state.settings.userName || "COYY").toUpperCase())}</span>`;
       document.getElementById("profile-bb-display").textContent = state.settings.weight + " kg";
       document.getElementById("profile-tb-display").textContent = state.settings.height + " cm";
       document.getElementById("profile-target-display").textContent = state.settings.weeklyGoal + " sesi";
 
-      // DIPERBAIKI: Urutan format target mingguan (Sesi Selesai / Target)
       document.getElementById("goal-value").textContent = week.length + " / " + state.settings.weeklyGoal;
       
       renderCalendar();
@@ -1036,13 +1171,55 @@
     
     function renderRoutines(){
       const list=document.getElementById("routine-list"), empty=document.getElementById("routine-empty");
-      list.innerHTML=""; empty.classList.toggle("hidden",state.routines.length!==0);
-      state.routines.forEach(r=>{
-        const el=document.createElement("article"); el.className="panel p-5";
-        el.innerHTML=`<div class="flex justify-between gap-3"><div><h3 class="font-extrabold text-xl">${esc(r.name)}</h3><p class="muted text-sm mt-1">${esc(r.description||"Tanpa deskripsi")}</p></div><button class="icon-btn edit-routine" data-id="${r.id}" aria-label="Edit ${esc(r.name)}"><i data-lucide="pencil"></i></button></div>
-        <div class="flex flex-wrap gap-2 mt-4">${r.days.map(d=>`<span class="chip">${d}</span>`).join("")}</div>
-        <p class="muted text-sm mt-4">${r.exerciseIds.length} exercise dalam routine</p>
-        <div class="flex gap-2 mt-4"><button class="lime-btn px-4 flex-1 start-routine" data-id="${r.id}">Mulai</button><button class="danger-btn px-3 delete-routine" data-id="${r.id}" aria-label="Hapus ${esc(r.name)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+      list.innerHTML=""; 
+      empty.classList.toggle("hidden", state.routines.length !== 0);
+      
+      state.routines.forEach(r => {
+        const el = document.createElement("article"); 
+        el.className = "panel p-6 flex flex-col justify-between transition-all duration-200 hover:border-[var(--lime)]/50 group";
+        
+        const previewExercises = r.exerciseIds.slice(0, 3).map(id => {
+          const ex = exerciseById(id);
+          return ex ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-2)] text-xs font-medium text-[var(--text)] border border-[var(--line)]"><i data-lucide="dumbbell" class="w-3 h-3 text-[var(--lime)]"></i>${esc(ex.name)}</span>` : "";
+        }).join("");
+        
+        const remainingCount = r.exerciseIds.length > 3 ? `<span class="inline-flex items-center px-2 py-1 rounded-lg bg-[var(--surface-2)] text-xs font-medium muted">+${r.exerciseIds.length - 3} lainnya</span>` : "";
+
+        el.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <h3 class="font-extrabold text-xl tracking-tight group-hover:text-[var(--lime)] transition-colors">${esc(r.name)}</h3>
+                <p class="muted text-sm mt-1 leading-relaxed">${esc(r.description || "Tidak ada deskripsi rutin.")}</p>
+              </div>
+              <button class="icon-btn edit-routine shrink-0 hover:bg-[var(--surface-2)] hover:border-[var(--lime)]/40 transition-colors" data-id="${r.id}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 my-4">
+              ${r.days.map(d => `<span class="px-2.5 py-1 rounded-md bg-[var(--lime)]/10 text-[var(--lime)] border border-[var(--lime)]/20 text-xs font-bold">${d}</span>`).join("")}
+              ${!r.days.length ? `<span class="muted text-xs italic">Belum ada hari dijadwalkan</span>` : ""}
+            </div>
+
+            <div class="pt-3 border-t border-[var(--line)]">
+              <p class="text-xs font-bold uppercase tracking-wider muted mb-2">Daftar Gerakan (${r.exerciseIds.length})</p>
+              <div class="flex flex-wrap gap-1.5">
+                ${previewExercises || `<span class="muted text-xs italic">Belum ada exercise</span>`}
+                ${remainingCount}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 mt-6 pt-4 border-t border-[var(--line)]">
+            <button class="lime-btn px-4 flex-1 flex items-center justify-center gap-2 start-routine" data-id="${r.id}">
+              <i data-lucide="play" class="w-4 h-4 fill-current"></i> Mulai Latihan
+            </button>
+            <button class="danger-btn px-3 flex items-center justify-center delete-routine hover:bg-rose-500/20 transition-colors" data-id="${r.id}" aria-label="Hapus ${esc(r.name)}" title="Hapus Routine">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
         list.appendChild(el);
       });
       lucide.createIcons();
@@ -1054,8 +1231,30 @@
       const m = wrapper.querySelector('.custom-option.selected')?.dataset.value || "";
       
       const filtered=state.exercises.filter(e=>(!m||e.muscle===m)&&(`${e.name} ${e.equipment} ${e.muscle}`).toLowerCase().includes(q));
-      const list=document.getElementById("exercise-list"), empty=document.getElementById("exercise-empty"); list.innerHTML=""; empty.classList.toggle("hidden",filtered.length!==0);
-      filtered.forEach(e=>{const el=document.createElement("article");el.className="panel p-4";el.innerHTML=`<div class="flex justify-between gap-3"><div><h3 class="font-bold">${esc(e.name)}</h3><p class="muted text-sm mt-1">${esc(e.equipment)}</p></div>${e.isCustom?`<button class="icon-btn delete-exercise" data-id="${e.id}" aria-label="Hapus ${esc(e.name)}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:""}</div><span class="chip mt-3">${esc(e.muscle)}${e.isCustom?" · Custom":""}</span>`;list.appendChild(el);});
+      const list=document.getElementById("exercise-list"), empty=document.getElementById("exercise-empty"); 
+      list.innerHTML=""; 
+      empty.classList.toggle("hidden",filtered.length!==0);
+      
+      filtered.forEach(e=>{
+        const el=document.createElement("article");
+        el.className="panel p-5 flex flex-col justify-between transition-all duration-200 hover:border-[var(--lime)]/50 group";
+        el.innerHTML=`
+          <div>
+            <div class="flex justify-between items-start gap-3">
+              <div>
+                <h3 class="font-extrabold text-base group-hover:text-[var(--lime)] transition-colors">${esc(e.name)}</h3>
+                <p class="muted text-xs mt-1 flex items-center gap-1.5"><i data-lucide="wrench" class="w-3 h-3 text-[var(--lime)]"></i>${esc(e.equipment)}</p>
+              </div>
+              ${e.isCustom ? `<button class="icon-btn delete-exercise shrink-0 text-rose-400 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 transition-colors" data-id="${e.id}" aria-label="Hapus ${esc(e.name)}" title="Hapus Exercise"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ""}
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--line)]">
+            <span class="chip text-xs font-bold text-[var(--lime)] bg-[var(--lime)]/10 border-[var(--lime)]/20">${esc(e.muscle)}</span>
+            ${e.isCustom ? `<span class="chip text-xs font-bold text-amber-400 bg-amber-500/10 border-amber-500/20 ml-auto">Custom</span>` : ""}
+          </div>
+        `;
+        list.appendChild(el);
+      });
       lucide.createIcons();
     }
     
@@ -1151,8 +1350,22 @@
     
     function renderHistory(){
       const filter = document.querySelector("#custom-history-filter .custom-option.selected")?.dataset.value || "";
-      const sessions=state.history.filter(s=>!filter||s.routineId===filter), allSets=sessions.flatMap(s=>s.exercises.flatMap(e=>e.sets.filter(x=>x.completedAt)));
-      
+      const activeTimeChip = document.querySelector(".history-time-chip.active");
+      const timeFilter = activeTimeChip ? activeTimeChip.dataset.time : "all";
+
+      let sessions = state.history.filter(s => !filter || s.routineId === filter);
+
+      const now = new Date();
+      const todayStr = now.toDateString();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      if (timeFilter === "today") {
+        sessions = sessions.filter(s => new Date(s.endedAt).toDateString() === todayStr);
+      } else if (timeFilter === "week") {
+        sessions = sessions.filter(s => new Date(s.endedAt) >= oneWeekAgo);
+      }
+
+      const allSets=sessions.flatMap(s=>s.exercises.flatMap(e=>e.sets.filter(x=>x.completedAt)));
       const totalCalories = sessions.reduce((n,s)=>n+(s.caloriesBurned||0),0);
 
       document.getElementById("history-session-count").textContent=sessions.length;
@@ -1405,77 +1618,71 @@
         });
       };
 
-      document.getElementById("exercise-list").onclick=e=>{const b=e.target.closest(".delete-exercise");if(!b)return;const id=b.dataset.id,ex=exerciseById(id);showConfirm("Hapus exercise custom?","Exercise akan dihapus dari library dan routine terkait.","Hapus",()=>{state.exercises=state.exercises.filter(x=>x.id!==id);state.routines.forEach(r=>r.exerciseIds=r.exerciseIds.filter(x=>x!==id));save();populateSelects();renderExercises();renderRoutines();toast(ex.name+" dihapus.");});};
-      
-      const dayPicker = document.getElementById("day-picker");
-      dayPicker.addEventListener("click", e => {
-        const chip = e.target.closest(".day-chip");
-        if (!chip || !dayPicker.contains(chip)) return;
-        e.preventDefault();
-        e.stopPropagation();
-        chip.classList.toggle("active");
+      // EVENT LISTENER UNTUK CHIP KATEGORI WAKTU HISTORI DENGAN EFEK AKTIF HIJAU
+      document.querySelectorAll(".history-time-chip").forEach(chip => {
+        chip.onclick = (e) => {
+          document.querySelectorAll(".history-time-chip").forEach(c => c.classList.remove("active"));
+          e.currentTarget.classList.add("active");
+          renderHistory();
+        };
       });
 
-      document.getElementById("builder-exercise-search").oninput=renderBuilderExercises;
-      document.getElementById("builder-selected-exercises").onclick=e=>{const b=e.target.closest("button");if(!b)return;const i=selectedRoutineExercises.indexOf(b.dataset.id);if(b.classList.contains("remove-builder-exercise"))selectedRoutineExercises.splice(i,1);if(b.classList.contains("move-exercise")){const to=i+Number(b.dataset.dir);if(to>=0&&to<selectedRoutineExercises.length)[selectedRoutineExercises[i],selectedRoutineExercises[to]]=[selectedRoutineExercises[to],selectedRoutineExercises[i]];}renderBuilderExercises();};
-      document.getElementById("builder-library").onclick=e=>{const b=e.target.closest(".add-builder-exercise");if(b){selectedRoutineExercises.push(b.dataset.id);renderBuilderExercises();}};
-      
-      document.getElementById("routine-form").onsubmit=e=>{e.preventDefault();const name=document.getElementById("routine-name").value.trim(),id=document.getElementById("routine-id").value,chosenDays=[...document.querySelectorAll(".day-chip.active")].map(x=>x.dataset.day);if(!name){toast("Nama routine wajib diisi.");return;}if(!selectedRoutineExercises.length){toast("Tambahkan minimal satu exercise.");return;}const payload={id:id||uid(),name,description:document.getElementById("routine-description").value.trim(),days:chosenDays,exerciseIds:[...selectedRoutineExercises],createdAt:id?routineById(id).createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};if(id)state.routines=state.routines.routes=state.routines.map(r=>r.id===id?payload:r);else state.routines.push(payload);save();populateSelects();renderRoutines();renderDashboard();closeModal("routine-modal");toast("Routine berhasil disimpan.");};
-      
+      document.getElementById("exercise-list").onclick=e=>{
+        const b=e.target.closest("button");
+        if(!b) return;
+        const id=b.dataset.id;
+        if(b.classList.contains("delete-exercise")) {
+          showConfirm("Hapus exercise custom?", "Exercise ini akan dihapus dari daftar.", "Hapus", () => {
+            state.exercises=state.exercises.filter(x=>x.id!==id);
+            save();
+            renderExercises();
+            populateSelects();
+            toast("Exercise berhasil dihapus.");
+          });
+        }
+      };
+
       document.getElementById("exercise-form").onsubmit=e=>{
         e.preventDefault();
         const name=document.getElementById("custom-exercise-name").value.trim();
-        const muscle=document.querySelector("#custom-exercise-muscle-select .custom-option.selected")?.dataset.value || "";
+        const muscle=document.querySelector("#custom-exercise-muscle-select .custom-option.selected")?.dataset.value;
         const equipment=document.getElementById("custom-exercise-equipment").value.trim();
-        
-        if(!name||!muscle||!equipment){toast("Lengkapi semua field exercise.");return;}
+        if(!name||!muscle||!equipment){toast("Mohon lengkapi semua field exercise.");return;}
         state.exercises.push({id:uid(),name,muscle,equipment,isCustom:true});
-        save();
-        populateSelects();
-        renderExercises();
-        e.target.reset();
-        setCustomSelectValue("custom-exercise-muscle-select", "");
-        closeModal("exercise-modal");
-        toast("Exercise custom ditambahkan.");
+        save();renderExercises();populateSelects();closeModal("exercise-modal");document.getElementById("exercise-form").reset();
+        toast("Exercise custom berhasil ditambahkan.");
       };
 
-      document.getElementById("start-workout-button").onclick=()=>{
-        const selectedRoutineId = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
-        startWorkout(selectedRoutineId);
+      document.getElementById("day-picker").onclick=e=>{const b=e.target.closest("button");if(!b)return;b.classList.toggle("active");};
+      
+      document.getElementById("routine-form").onsubmit=e=>{
+        e.preventDefault();
+        const id=document.getElementById("routine-id").value, name=document.getElementById("routine-name").value.trim(), description=document.getElementById("routine-description").value.trim();
+        const daysArr=[...document.querySelectorAll("#day-picker .day-chip.active")].map(b=>b.dataset.day);
+        if(!name){toast("Nama routine wajib diisi.");return;}
+        if(!selectedRoutineExercises.length){toast("Pilih minimal satu exercise untuk routine ini.");return;}
+        if(id){const r=routineById(id);if(r){r.name=name;r.description=description;r.days=daysArr;r.exerciseIds=[...selectedRoutineExercises];}}
+        else{state.routines.push({id:uid(),name,description,days:daysArr,exerciseIds:[...selectedRoutineExercises]});}
+        save();renderRoutines();populateSelects();renderDashboard();closeModal("routine-modal");toast("Routine berhasil disimpan.");
       };
 
-      document.getElementById("set-list").oninput=e=>{const input=e.target;if(!input.dataset.field)return;currentExercise().sets[Number(input.dataset.index)][input.dataset.field]=input.value;save();};
-      document.getElementById("set-list").onclick=e=>{const b=e.target.closest(".complete-set");if(!b)return;const set=currentExercise().sets[Number(b.dataset.index)];if(!(Number(set.reps)>0)||Number(set.weight)<0){toast("Isi Reps dan Weight terlebih dahulu.");return;}set.completedAt=new Date().toISOString();state.activeSession.restRemaining=state.settings.restSeconds;state.activeSession.restPaused=false;save();renderWorkout();};
+      document.getElementById("builder-exercise-search").oninput=renderBuilderExercises;
+      document.getElementById("builder-library").onclick=e=>{const b=e.target.closest("button");if(!b)return;selectedRoutineExercises.push(b.dataset.id);renderBuilderExercises();};
+      document.getElementById("builder-selected-exercises").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.id;if(b.classList.contains("remove-builder-exercise")){selectedRoutineExercises=selectedRoutineExercises.filter(x=>x!==id);}if(b.classList.contains("move-exercise")){const idx=selectedRoutineExercises.indexOf(id),dir=parseInt(b.dataset.dir);const target=idx+dir;if(target>=0&&target<selectedRoutineExercises.length){const tmp=selectedRoutineExercises[idx];selectedRoutineExercises[idx]=selectedRoutineExercises[target];selectedRoutineExercises[target]=tmp;}}renderBuilderExercises();};
+      
+      document.getElementById("start-workout-button").onclick=()=>{const rId=document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;startWorkout(rId);};
+      document.getElementById("end-workout-button").onclick=()=>showConfirm("Akhiri workout?","Sesi latihan akan disimpan ke progress riwayat.","Akhiri",endWorkout);
+      
+      document.getElementById("set-list").onclick=e=>{const b=e.target.closest("button");if(!b||!b.classList.contains("complete-set"))return;const i=parseInt(b.dataset.index),ex=currentExercise(),set=ex.sets[i];const rInput=document.getElementById(`reps-${i}`),wInput=document.getElementById(`weight-${i}`);if(!rInput.value||!wInput.value){toast("Isi reps dan weight terlebih dahulu.");return;}set.reps=rInput.value;set.weight=wInput.value;set.completedAt=new Date().toISOString();if(i===ex.sets.length-1){ex.sets.push({reps:"",weight:"",completedAt:null});}state.activeSession.restRemaining=state.settings.restSeconds;state.activeSession.restPaused=false;save();renderWorkout();toast("Set selesai! Istirahat dimulai.");};
       document.getElementById("add-set-button").onclick=()=>{currentExercise().sets.push({reps:"",weight:"",completedAt:null});save();renderWorkout();};
-      document.getElementById("exercise-notes").onchange=e=>{currentExercise().notes=e.target.value;save();};
+      
       document.getElementById("previous-exercise").onclick=()=>{if(state.activeSession.currentExerciseIndex>0){state.activeSession.currentExerciseIndex--;save();renderWorkout();}};
-      document.getElementById("next-exercise").onclick=()=>{const a=state.activeSession;if(a.currentExerciseIndex<a.exercises.length-1){a.currentExerciseIndex++;save();renderWorkout();}else showConfirm("Akhiri workout?","Set yang sudah selesai akan disimpan ke History.","Akhiri",endWorkout);};
-      document.getElementById("end-workout-button").onclick=()=>showConfirm("Akhiri workout?","Sesi ini akan disimpan ke History.","Akhiri",endWorkout);
+      document.getElementById("next-exercise").onclick=()=>{const a=state.activeSession;if(a.currentExerciseIndex<a.exercises.length-1){a.currentExerciseIndex++;save();renderWorkout();}else{endWorkout();}};
       
-      document.getElementById("rest-pause").onclick=()=>{
-        if(!state.activeSession) return;
-        state.activeSession.restPaused=!state.activeSession.restPaused;
-        save();
-        updateTimers();
-      };
-      document.getElementById("rest-skip").onclick=()=>{
-        if(!state.activeSession) return;
-        state.activeSession.restRemaining=0;
-        state.activeSession.restPaused=true;
-        save();
-        updateTimers();
-      };
-      document.getElementById("rest-reset").onclick=()=>{
-        if(!state.activeSession) return;
-        state.activeSession.restRemaining=state.settings.restSeconds;
-        state.activeSession.restPaused=true;
-        save();
-        updateTimers();
-      };
-      
-      window.addEventListener("online",()=>document.getElementById("offline-badge").classList.add("hidden"));
-      window.addEventListener("online",()=>document.getElementById("offline-badge").classList.remove("hidden"));
-      if(!navigator.onLine)document.getElementById("offline-badge").classList.remove("hidden");
+      document.getElementById("rest-pause").onclick=()=>{const a=state.activeSession;if(!a)return;a.restPaused=!a.restPaused;save();updateTimers();};
+      document.getElementById("rest-skip").onclick=()=>{const a=state.activeSession;if(!a)return;a.restRemaining=0;a.restPaused=true;save();updateTimers();toast("Waktu istirahat dilewati.");};
+      document.getElementById("rest-reset").onclick=()=>{const a=state.activeSession;if(!a)return;a.restRemaining=state.settings.restSeconds;save();updateTimers();};
+      document.getElementById("exercise-notes").oninput=e=>{const ex=currentExercise();if(ex){ex.notes=e.target.value;save();}};
     });
   </script>
 </body>
