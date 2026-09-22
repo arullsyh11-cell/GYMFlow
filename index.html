@@ -46,14 +46,53 @@
       background: #000000;
     }
 
-    :root {
-      --bg: #090d13; --surface: #111923; --surface-2: #182331; --line: #293846;
-      --text: #edf5f1; --muted: #90a2ac; --lime: #bcf04a; --lime-dark: #8abb23;
-      --danger: #fb7185; --warning: #f6c453; --shadow: 0 16px 42px rgba(0,0,0,.23);
-    }
-    body.light { --bg:#f4f7f4; --surface:#ffffff; --surface-2:#edf3ed; --line:#d6e0d7; --text:#17221b; --muted:#647469; --shadow:0 14px 34px rgba(22,34,27,.10); }
-    * { box-sizing:border-box; }
-    body { margin:0; background:#000000 !important; color:var(--text); font-family:"DM Sans",sans-serif; transition:background .25s,color .25s; }
+:root {
+  /* Palette Dark Mode (Default) */
+  --bg: #090d13; 
+  --surface: #141815; 
+  --surface-2: #1b201c; 
+  --line: #374629;
+  --text: #edf5f1; 
+  --muted: #90a2ac; 
+  --lime: #bcf04a; 
+  --lime-dark: #8abb23;
+  --danger: #fb7185; 
+  --warning: #f6c453; 
+  --shadow: 0 16px 42px rgba(0,0,0,.23);
+}
+body.light {
+  /* Palette Light Mode */
+  --bg: #f4f7f4; 
+  --surface: #ffffff; 
+  --surface-2: #edf3ed; 
+  --line: #d6e0d7; 
+  --text: #17221b; 
+  --muted: #647469; 
+  --lime: #bcf04a; 
+  --lime-dark: #5c8114; /* Dibuat lebih gelap agar kontras di latar putih */
+  --shadow: 0 14px 34px rgba(22,34,27,.10);
+}
+
+/* Override Class Tailwind agar menyesuaikan saat Light Mode aktif */
+body.light .text-lime-300 { color: var(--lime-dark) !important; }
+body.light .border-lime-500\/20 { border-color: rgba(92, 129, 20, 0.4) !important; }
+body.light .bg-lime-300\/10 { background-color: rgba(188, 240, 74, 0.3) !important; }
+body.light .text-slate-950 { color: #ffffff !important; }
+
+/* Hapus !important warna hitam statis dari HTML dan Body */
+html {
+  background: var(--bg) !important; 
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0; 
+  background: var(--bg) !important; 
+  color: var(--text); 
+  font-family: "DM Sans", sans-serif; 
+  transition: background .25s, color .25s; 
+  letter-spacing: -.01em;
+}
     button, input, select, textarea { font:inherit; }
     button { cursor:pointer; }
     button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:3px solid rgba(188,240,74,.5); outline-offset:2px; }
@@ -89,7 +128,6 @@
     @keyframes fade { from { opacity:0; transform:translateY(7px) } to { opacity:1; transform:none } }
     .chip { display:inline-flex; align-items:center; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); border-radius:999px; padding:5px 9px; font-size:12px; font-weight:700; cursor: pointer; }
     
-    /* GAYA CHIP KATEGORI HISTORI DENGAN TRANSISI HALUS & TEMA HIJAU */
     .history-time-chip {
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       border-color: var(--line);
@@ -108,6 +146,21 @@
       box-shadow: 0 4px 14px rgba(188, 240, 74, 0.2);
     }
 
+    /* Target Pill Styling Aktif/Nonaktif */
+    .target-pill {
+      transition: all 0.2s ease;
+      background: var(--surface-2);
+      border-color: var(--line);
+      color: var(--muted);
+    }
+    .target-pill.active {
+      background: var(--lime) !important;
+      border-color: var(--lime) !important;
+      color: #142009 !important;
+      font-weight: 800 !important;
+      box-shadow: 0 4px 14px rgba(188, 240, 74, 0.25);
+    }
+
     .day-chip.active { background:rgba(188,240,74,.16); border-color:#bcf04a; color:var(--text); }
     .field { width:100%; min-height:46px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; color:var(--text); }
     .field::placeholder { color:var(--muted); }
@@ -120,9 +173,9 @@
     .custom-option:hover { background: var(--surface-2); color: var(--lime); }
     .custom-option.selected { background: rgba(188,240,74,0.12); color: var(--lime); font-weight: 700; }
 
-    .modal-layer { position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.62); padding:16px; display:none; align-items:flex-end; justify-content:center; }
+    .modal-layer { position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.62); padding:16px; display:none; align-items:flex-start; justify-content:center; overflow-y:auto; }
     .modal-layer.open { display:flex; }
-    .modal { width:100%; max-width:720px; max-height:calc(92 * min(var(--vh, 1vh), 1vh)); overflow:auto; background:var(--surface); border:1px solid var(--line); border-radius:24px 24px 16px 16px; padding:20px; }
+    .modal { width:100%; max-width:480px; margin: 40px auto; background:var(--surface); border:1px solid var(--line); border-radius:24px; padding:24px; }
     
     .toast { 
       position: fixed; 
@@ -133,6 +186,9 @@
       max-width: 300px; 
       margin: auto; 
       background: #152008; 
+      background: var(--surface-2); 
+      color: var(--lime-dark); 
+      border: 1.5px solid var(--lime-dark);
       color: #bcf04a; 
       border: 1.5px solid #bcf04a;
       border-radius: 12px; 
@@ -242,6 +298,31 @@
       box-shadow: 0 6px 16px rgba(188, 240, 74, 0.4);
     }
 
+    .set-circle-btn {
+      width: 34px !important;
+      height: 34px !important;
+      min-height: unset !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      transition: all 0.2s ease;
+    }
+    .set-circle-btn:hover {
+      border-color: var(--lime);
+      color: var(--text);
+      transform: scale(1.05);
+    }
+    .set-circle-btn.completed {
+      background: var(--lime) !important;
+      border-color: var(--lime) !important;
+      color: #142009 !important;
+    }
+
     .sidebar { display:none; }
     @media (min-width: 900px) {
       .sidebar { display:flex; position:fixed; inset:0 auto 0 0; width:244px; flex-direction:column; padding:24px 16px; border-right:1px solid var(--line); background:var(--surface); }
@@ -249,22 +330,9 @@
       .bottom-nav { display:none; }
       .toast { bottom:24px; }
       .modal-layer { align-items:center; }
-      .modal { border-radius:24px; }
     }
-    @media (max-width: 899px) { .main-area { padding:16px 16px 110px; } }
+    @media (max-width: 899px) { .main-area { padding:14px 14px 96px; } }
 
-    :root{
-      --bg:#f6f7f5;--surface:#fff;--surface-2:#f0f2ef;--line:#e4e7e2;
-      --text:#171a18;--muted:#747b75;--lime:#b8e94d;--lime-dark:#83a92b;
-      --danger:#dc5d6f;--warning:#d79d28;
-    }
-    body:not(.light){
-      --bg:#0c0f0d;--surface:#141815;--surface-2:#1b201c;--line:#292f2a;
-      --text:#f2f5f1;--muted:#8f9890;--lime:#b8e94d;--lime-dark:#8eaf35;
-      --danger:#f17889;--warning:#e0ad4a;
-    }
-    html{background:#000000!important;scroll-behavior:smooth}
-    body{background:#000000!important;color:var(--text);font-family:"DM Sans",system-ui,sans-serif;letter-spacing:-.01em}
     
     .sidebar .flex.items-center.gap-3.px-3.mb-10{padding:4px 10px!important;margin-bottom:28px!important}
     .sidebar .w-10.h-10{width:34px!important;height:34px!important;border-radius:10px!important}
@@ -286,6 +354,26 @@
     .main-area>header .w-12.h-12{display:grid !important; width:40px !important; height:40px !important;}
     .main-area>header h1{font-size:20px!important;letter-spacing:-.04em!important}
     .main-area>header .flex.items-center.gap-2 button{width:38px!important;height:38px!important;border-radius:10px!important;border:1px solid var(--line)!important;background:transparent!important}
+
+    /* Style Override Khusus Tombol Profil Pojok Kanan Atas Agar Tidak Gelap/Hitam Transparan */
+    #open-profile-btn {
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 9999px !important;
+      background: #b8e94d !important;
+      color: #0f172a !important;
+      border: none !important;
+      font-weight: 800 !important;
+      font-size: 16px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-transform: uppercase !important;
+      box-shadow: 0 4px 12px rgba(184, 233, 77, 0.3) !important;
+    }
+    #open-profile-btn:hover {
+      filter: brightness(1.08) !important;
+    }
     
     #mobile-reset-btn{display:inline-flex !important;}
 
@@ -302,16 +390,19 @@
       background:var(--surface-2)!important;border:1px solid var(--line)!important;
       color:var(--muted)!important;border-radius:8px!important;padding:5px 8px!important;
       font-size:11px!important;font-weight:600!important;cursor:pointer;
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 10;
     }
     .day-chip{pointer-events:auto!important;position:relative;z-index:2;}
     .day-chip.active{background:rgba(188,240,74,.18)!important;border-color:#bcf04a!important;color:var(--text)!important;}
     .lime-btn{
-      min-height:42px!important;border-radius:9px!important;background:var(--lime)!important;
+      min-height:42px!important;border-radius:99px!important;background:var(--lime)!important;
       color:#18200e!important;font-size:13px!important;font-weight:700!important;
       box-shadow:none!important;border:0!important;padding-left:15px!important;padding-right:15px!important;
     }
     
-    .secondary-btn,.danger-btn{min-height:40px!important;border-radius:9px!important;font-size:13px!important;box-shadow:none!important;}
+    .secondary-btn,.danger-btn{min-height:40px!important;border-radius:99px!important;font-size:13px!important;box-shadow:none!important;}
     .secondary-btn{background:var(--surface-2)!important;color:var(--text)!important;border:1px solid var(--line)!important}
     .danger-btn{background:transparent!important;color:var(--danger)!important;border:1px solid color-mix(in srgb,var(--danger) 28%,var(--line))!important}
     .icon-btn{width:38px!important;height:38px!important;border-radius:9px!important;background:var(--surface-2)!important;border:1px solid var(--line)!important}
@@ -328,9 +419,9 @@
     }
   </style>
 </head>
-<body class="w-full" style="background: #000000 !important;">
+<body class="w-full">
 
-  <!-- ANIMASI SPLASH SCREEN (VIDEO FULL HITAM ATAS BAWAH) -->
+  <!-- ANIMASI SPLASH SCREEN -->
   <div id="splash-screen">
     <div class="video-crop-container">
       <video id="splash-video" autoplay muted playsinline>
@@ -373,45 +464,43 @@
         </div>
         <div class="flex items-center gap-2">
           <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span> 
-          <button id="open-profile-btn" type="button" class="icon-btn text-lime-300 bg-lime-500/10 border-lime-500/20 hover:bg-lime-500/20" aria-label="Profil & Target" title="Profil & Target">
-            <i data-lucide="user-cog" class="w-4 h-4"></i>
-          </button>
-          <button id="mobile-reset-btn" type="button" class="icon-btn text-rose-400 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20" aria-label="Reset data" title="Reset Data">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
-          <button id="theme-toggle" type="button" class="icon-btn" aria-label="Ubah tema"><i data-lucide="sun-moon"></i></button>
+          <button id="open-profile-btn" type="button" aria-label="Profil & Target" title="Profil & Target">A</button>
         </div>
       </header>
       
       <!-- DASHBOARD TAB -->
       <section id="dashboard" class="tab active" aria-label="Dashboard">
-        <!-- KARTU UTAMA: SAPAAN, TARGET MINGGU INI, & TOMBOL MULAI WORKOUT -->
         <div id="weekly-target-container" class="panel p-5 mb-5 relative overflow-hidden">
           <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
           <p id="siap-bergerak-label" class="text-lime-300 font-bold text-sm relative tracking-wider">SELAMAT PAGI, <span id="profile-name-display">COYY</span>?</p>
           <p id="next-workout-copy" class="muted mt-2 relative text-sm">Pilih routine dan mulai saat kamu siap.</p>
 
-          <!-- BAGIAN TARGET MINGGU INI YANG DIGABUNGKAN -->
-          <div class="mt-4 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] relative flex items-center justify-between">
+          <!-- KARTU TARGET MINGGUAN MODERN (THIS WEEK) -->
+          <div class="mt-4 p-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] relative">
+            <!-- Header: Judul & Pill Badge -->
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-extrabold text-lg tracking-tight">This Week</h3>
+              <span id="weekly-pill-count" class="px-3 py-1 rounded-full bg-[var(--lime)] text-[#142009] font-extrabold text-xs">0/4</span>
+            </div>
+
+            <!-- Baris Hari Mingguan (Mon - Sun) -->
+            <div id="weekly-days-bar" class="grid grid-cols-7 gap-1 text-center mb-4"></div>
+
+            <!-- Progress Bar & Persentase -->
             <div>
-                
-              <p class="muted text-xs font-bold uppercase tracking-wider">Target Minggu Ini</p>
-              <div class="mt-1 flex items-baseline gap-2">
-                <strong id="goal-value" class="text-2xl font-extrabold text-lime-300">0 / 4</strong>
-                <span class="muted text-xs">sesi selesai</span>
-                
+              <div class="flex justify-between text-xs font-bold muted mb-1.5">
+                <span>Weekly target progress</span>
+                <span id="weekly-progress-percent" class="text-[var(--text)]">0%</span>
+              </div>
+              <div class="progress-line">
+                <span id="weekly-progress-bar-fill" style="width: 0%"></span>
               </div>
             </div>
-            <i data-lucide="target" class="w-6 h-6 text-lime-300 opacity-80"></i>
           </div>
 
-          <div class="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
-            <span class="chip"><i data-lucide="weight" class="w-3 h-3 mr-1.5 text-lime-300"></i>BB: <strong id="profile-bb-display" class="ml-1 text-[var(--text)]">65 kg</strong></span>
-            <span class="chip"><i data-lucide="ruler" class="w-3 h-3 mr-1.5 text-lime-300"></i>TB: <strong id="profile-tb-display" class="ml-1 text-[var(--text)]">170 cm</strong></span>
-            <span class="chip"><i data-lucide="target" class="w-3 h-3 mr-1.5 text-lime-300"></i>Target Mingguan: <strong id="profile-target-display" class="ml-1 text-[var(--text)]">3 sesi</strong></span>
-            <button type="button" class="text-lime-300 font-bold underline ml-auto hover:opacity-80" onclick="openProfileModal()">Ubah Profil & Target</button>
+          <div class="mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
+            <button id="dashboard-start" class="lime-btn px-5 w-full relative">Mulai Workout</button>
           </div>
-
         </div>
 
         <!-- KALENDER BULANAN -->
@@ -431,10 +520,9 @@
             <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
           </div>
           <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
-                    <button id="dashboard-start" class="lime-btn px-5 mt-4 w-full relative">Mulai Workout</button>
         </div>
 
-        <!-- SESI AKTIF (PINDAH KE BAWAH KALENDER) -->
+        <!-- SESI AKTIF -->
         <div class="panel p-5 mb-5 flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <p class="muted text-xs font-bold uppercase tracking-wider">Sesi Aktif</p>
@@ -606,8 +694,11 @@
             <label class="block mt-5 text-sm font-bold" for="exercise-notes">Catatan</label> 
             <textarea id="exercise-notes" class="field mt-2 min-h-20" placeholder="Contoh: jaga tempo saat turun"></textarea>
             
-            <div class="grid grid-cols-[44px_1fr_1fr_122px] gap-2 text-xs muted font-bold mt-6 mb-2">
-              <span>Set</span><span>Reps</span><span>Weight (kg)</span><span>Status</span>
+            <div id="set-table-header" class="grid grid-cols-[44px_1fr_1fr_44px] gap-2 px-2 mb-2 text-xs font-semibold text-[var(--muted)]">
+              <span class="text-center">Set</span>
+              <span id="col-header-1">Reps</span>
+              <span id="col-header-2">Weight (kg)</span>
+              <span class="text-center">Status</span>
             </div>
             
             <div id="set-list" class="space-y-2"></div>
@@ -622,74 +713,129 @@
         </div>
       </section>
       
-      <!-- HISTORY TAB -->
+      <!-- HISTORY TAB (PROGRESS) -->
       <section id="history" class="tab" aria-label="Workout History">
+        <!-- Header Progress & Tombol Export -->
         <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
           <div>
             <h2 class="font-extrabold text-2xl">Progress</h2>
-            <p class="muted text-sm mt-1">Pantau konsistensi dan perkembangan latihanmu.</p>
+            <p id="workouts-logged-count" class="muted text-sm mt-1">0 workouts logged</p>
           </div>
           <div class="flex items-center">
-            <button id="export-pdf-daily" class="secondary-btn px-3 text-xs flex items-center gap-1.5">
-              <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Download PDF
+            <button id="export-pdf-daily" class="secondary-btn px-4 text-xs flex items-center gap-1.5 font-bold">
+              <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Export
             </button>
           </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-3 mb-5">
-          <div id="custom-history-filter" class="custom-select-wrapper">
-            <div class="field custom-select-trigger" tabindex="0">
-              <span class="selected-label">Semua routine</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-            </div>
-            <div class="custom-options" id="history-routine-options">
-              <div class="custom-option selected" data-value="">Semua routine</div>
-            </div>
-          </div> 
+        <!-- Filter Tab Pill Interaktif (Overview | Weight | History) -->
+        <div class="flex items-center p-1 bg-[var(--surface-2)] border border-[var(--line)] rounded-xl mb-5">
+          <button type="button" id="tab-overview-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg bg-[var(--surface)] text-[var(--text)] shadow-sm transition-all" onclick="switchProgressTab('overview')">Overview</button>
+          <button type="button" id="tab-weight-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('weight')">Weight</button>
+          <button type="button" id="tab-history-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('history')">History</button>
+        </div>
 
-          <div id="custom-chart-exercise" class="custom-select-wrapper">
-            <div class="field custom-select-trigger" tabindex="0">
-              <span class="selected-label">Pilih exercise untuk melihat tren</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        <!-- KONTEN TAB OVERVIEW -->
+        <div id="progress-overview-content" class="space-y-5">
+          <!-- Kotak Metrik 2x2 Berdampingan (Grid 2 Kolom) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-amber-400"><i data-lucide="flame" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-session-count" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0</strong>
+                <p class="muted text-xs font-bold mt-0.5">Total Workouts</p>
+              </div>
             </div>
-            <div class="custom-options" id="chart-exercise-options">
-              <div class="custom-option selected" data-value="">Pilih exercise untuk melihat tren</div>
+
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-orange-400"><i data-lucide="flame" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-calories" class="block text-2xl md:text-3xl font-extrabold tracking-tight text-lime-300">0 kkal</strong>
+                <p class="muted text-xs font-bold mt-0.5">Total Calories</p>
+              </div>
+            </div>
+
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-indigo-400"><i data-lucide="timer" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-total-time" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong>
+                <p class="muted text-xs font-bold mt-0.5">Total Time</p>
+              </div>
+            </div>
+
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-cyan-400"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-avg-duration" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong>
+                <p class="muted text-xs font-bold mt-0.5">Avg Duration</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grafik Workouts per Week -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-4">Workouts per Week</h3>
+            <div id="workouts-per-week-chart" class="h-48 w-full"></div>
+          </div>
+
+          <!-- Grafik Calories per Workout -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-4">Calories per Workout</h3>
+            <div id="calories-per-workout-chart" class="h-48 w-full"></div>
+          </div>
+        </div>
+
+        <!-- KONTEN TAB WEIGHT (BERSIH DARI DATA DUMMY) -->
+        <div id="progress-weight-content" class="space-y-4 hidden">
+          <!-- Current Weight Card -->
+          <div class="panel p-5 flex items-center justify-between">
+            <div>
+              <p class="muted text-xs font-bold uppercase tracking-wider">Current Weight</p>
+              <div class="mt-1 flex items-baseline gap-1.5">
+                <strong id="current-weight-display" class="text-3xl font-extrabold tracking-tight">65</strong>
+                <span class="muted text-sm font-bold">kg</span>
+              </div>
+            </div>
+            <button type="button" class="lime-btn px-4 text-xs" onclick="openWeightModal()">Log Weight</button>
+          </div>
+
+          <!-- Weight Trend Chart -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-4">Weight Trend</h3>
+            <div id="weight-chart-area" class="h-48 w-full"></div>
+          </div>
+
+          <!-- Log List -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-3">Log</h3>
+            <div id="weight-log-list" class="divide-y divide-[var(--line)]"></div>
+            <div id="weight-log-empty" class="text-center py-6 hidden">
+              <p class="muted text-xs">Belum ada riwayat berat badan.</p>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-          <div class="metric">
-            <p class="muted text-xs font-bold">Total sesi</p>
-            <strong id="history-session-count" class="block text-2xl mt-1">0</strong>
+        <!-- KONTEN TAB HISTORY (DAFTAR RIWAYAT KARTU) -->
+        <div id="progress-history-content" class="space-y-4 hidden">
+          <div class="flex items-center gap-2 mb-2 overflow-x-auto pb-1">
+            <button type="button" class="chip history-time-chip active" data-time="all">Semua Riwayat</button>
+            <button type="button" class="chip history-time-chip" data-time="today">Hari Ini</button>
+            <button type="button" class="chip history-time-chip" data-time="week">Seminggu Terakhir</button>
           </div>
-          <div class="metric">
-            <p class="muted text-xs font-bold">Total set</p>
-            <strong id="history-set-count" class="block text-2xl mt-1">0</strong>
+
+          <div id="history-list" class="space-y-3"></div>
+          
+          <div id="history-empty" class="panel p-8 text-center hidden">
+            <p class="muted">Belum ada history. Selesaikan workout untuk melihat progress di sini.</p>
           </div>
-          <div class="metric">
-            <p class="muted text-xs font-bold">Total kalori</p>
-            <strong id="history-calories" class="block text-2xl mt-1 text-lime-300">0 kkal</strong>
-          </div>
-        </div>
-
-        <div class="panel p-5 mb-5">
-          <h3 class="font-extrabold text-lg">Tren Weight</h3>
-          <p id="chart-caption" class="muted text-sm mt-1"></p>
-          <div id="chart-area" class="mt-4 h-48"></div>
-        </div>
-
-        <!-- KATEGORI HISTORI (FILTER WAKTU DENGAN TRANSISI HALUS & WARNA HIJAU) -->
-        <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
-          <button type="button" class="chip history-time-chip active" data-time="all">Semua Riwayat</button>
-          <button type="button" class="chip history-time-chip" data-time="today">Hari Ini</button>
-          <button type="button" class="chip history-time-chip" data-time="week">Seminggu Terakhir</button>
-        </div>
-
-        <div id="history-list" class="space-y-3"></div>
-        
-        <div id="history-empty" class="panel p-8 text-center hidden">
-          <p class="muted">Belum ada history. Selesaikan workout untuk melihat progress di sini.</p>
         </div>
       </section>
     </main>
@@ -722,41 +868,135 @@
   </div>
 
   <!-- MODALS -->
-  <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
-    <form id="profile-form" class="modal max-w-md">
+  <div id="weight-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="weight-modal-title">
+    <form id="weight-form" class="modal max-w-md">
       <div class="flex justify-between gap-3 items-center mb-5">
-        <h2 id="profile-modal-title" class="font-extrabold text-xl">Profil & Target Latihan</h2>
-        <button type="button" class="icon-btn close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x"></i></button>
+        <h2 id="weight-modal-title" class="font-extrabold text-xl">Catat Berat Badan</h2>
+        <button type="button" class="icon-btn close-modal" data-close="weight-modal" aria-label="Tutup form berat badan"><i data-lucide="x"></i></button>
       </div>
-      <p class="muted text-sm mb-5">Nama, Berat Badan, Tinggi Badan, dan Target Mingguan akan tersimpan otomatis.</p>
       
-      <label class="block text-sm font-bold" for="profile-name-input">Nama Panggilan / Pengguna</label>
-      <input id="profile-name-input" class="field mt-2" type="text" maxlength="30" placeholder="Contoh: COYY">
+      <label class="block text-sm font-bold" for="weight-input-val">Berat Badan (kg)</label>
+      <input id="weight-input-val" class="field mt-2" type="number" step="0.1" min="20" max="300" required placeholder="Contoh: 65.0"> 
 
-      <label class="block text-sm font-bold mt-4" for="profile-bb">Berat Badan (kg)</label>
-      <input id="profile-bb" class="field mt-2" type="number" step="0.5" min="20" max="300" required placeholder="Contoh: 65">
-
-      <label class="block text-sm font-bold mt-4" for="profile-tb">Tinggi Badan (cm)</label>
-      <input id="profile-tb" class="field mt-2" type="number" min="50" max="250" required placeholder="Contoh: 170">
-
-      <label class="block text-sm font-bold mt-4">Target Olahraga Mingguan (Sesi)</label>
-      <div id="custom-profile-target" class="custom-select-wrapper mt-2">
-        <div class="field custom-select-trigger" tabindex="0">
-          <span class="selected-label">3-5 Sesi / minggu (4)</span>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
-        </div>
-        <div class="custom-options">
-          <div class="custom-option" data-value="2">1-3 Sesi / minggu (2)</div>
-          <div class="custom-option selected" data-value="4">3-5 Sesi / minggu (4)</div>
-          <div class="custom-option" data-value="6">6-7 Sesi / minggu (6)</div>
-        </div>
-      </div>
+      <label class="block text-sm font-bold mt-4" for="weight-date-val">Tanggal</label>
+      <input id="weight-date-val" class="field mt-2" type="date" required> 
 
       <div class="flex justify-end gap-2 mt-6">
-        <button type="button" class="secondary-btn px-4 close-modal" data-close="profile-modal">Tutup</button>
-        <button class="lime-btn px-4" type="submit">Selesai</button>
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="weight-modal">Batal</button>
+        <button class="lime-btn px-4" type="submit">Simpan</button>
       </div>
     </form>
+  </div>
+
+  <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal">
+      <div class="flex justify-end mb-1">
+        <button type="button" class="icon-btn !w-8 !h-8 close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      
+      <!-- Kartu Header Profil -->
+      <div class="panel p-4 mb-5 flex items-center gap-4 bg-[var(--surface-2)] border-[var(--line)]">
+        <div id="profile-avatar-initial" class="w-14 h-14 rounded-2xl bg-lime-300 text-slate-950 font-extrabold text-2xl grid place-items-center shrink-0">A</div>
+        <div>
+          <h2 id="profile-header-name" class="font-extrabold text-xl tracking-tight">COYY</h2>
+          <p id="profile-header-stats" class="muted text-xs mt-0.5">13 workouts · 4,250 kkal</p>
+          <span id="profile-header-target-badge" class="inline-block mt-1 text-[11px] font-bold text-lime-300">4x/week target</span>
+        </div>
+      </div>
+
+      <form id="profile-form" class="space-y-5">
+        <!-- Personal Data Section -->
+        <div class="space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider muted">Personal Data</h3>
+          
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-name-input">Name</label>
+            <input id="profile-name-input" class="field" type="text" maxlength="30" placeholder="Contoh: COYY" required>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-age-input">Age</label>
+            <input id="profile-age-input" class="field" type="number" min="10" max="120" placeholder="Contoh: 28">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 items-end">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-tb">Height (<span id="height-unit-label">cm</span>)</label>
+              <input id="profile-tb" class="field" type="number" min="50" max="250" required placeholder="178">
+            </div>
+            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)]">
+              <button type="button" id="unit-cm" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" onclick="setHeightUnit('cm')">cm</button>
+              <button type="button" id="unit-ft" class="flex-1 py-2 text-xs font-bold rounded-lg muted transition-all" onclick="setHeightUnit('ft')">ft</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 items-end">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-bb">Weight (<span id="weight-unit-label">kg</span>)</label>
+              <input id="profile-bb" class="field" type="number" step="0.5" min="20" max="300" required placeholder="78">
+            </div>
+            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)]">
+              <button type="button" id="unit-kg" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" onclick="setWeightUnit('kg')">kg</button>
+              <button type="button" id="unit-lbs" class="flex-1 py-2 text-xs font-bold rounded-lg muted transition-all" onclick="setWeightUnit('lbs')">lbs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Target Section -->
+        <div class="space-y-2 pt-2 border-t border-[var(--line)]">
+          <h3 class="text-xs font-bold uppercase tracking-wider muted">Weekly Target</h3>
+          <p class="muted text-xs">How many workouts per week are you aiming for?</p>
+          <div id="weekly-target-pills" class="grid grid-cols-6 gap-1.5 pt-1">
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="2">2</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="3">3</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill active" data-val="4">4</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="5">5</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="6">6</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="7">7</button>
+          </div>
+        </div>
+
+        <!-- Tombol Save Profile -->
+        <button class="lime-btn w-full mt-4" type="submit">Save Profile</button>
+      </form>
+
+      <!-- Appearance Section -->
+      <div class="space-y-3 pt-4 mt-4 border-t border-[var(--line)]">
+        <h3 class="text-xs font-bold uppercase tracking-wider muted">Appearance</h3>
+        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+          <div>
+            <p class="font-bold text-sm">Dark Mode</p>
+            <p id="dark-mode-desc" class="muted text-xs">Currently dark</p>
+          </div>
+          <button type="button" id="profile-dark-toggle" class="w-12 h-6 rounded-full bg-lime-300 p-1 transition-colors relative" onclick="toggleProfileDarkMode()">
+            <div id="dark-mode-thumb" class="w-4 h-4 rounded-full bg-slate-950 transition-transform translate-x-6"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Data & Storage Section -->
+      <div class="space-y-3 pt-4 mt-4 border-t border-[var(--line)]">
+        <h3 class="text-xs font-bold uppercase tracking-wider muted">Data & Storage</h3>
+        <div class="space-y-2 text-xs p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+          <div class="flex justify-between"><span class="muted">Workout sessions</span><strong id="storage-sessions-count">0</strong></div>
+          <div class="flex justify-between"><span class="muted">Weight entries</span><strong id="storage-weights-count">0</strong></div>
+          <div class="flex justify-between"><span class="muted">Routines</span><strong id="storage-routines-count">0</strong></div>
+          <div class="flex justify-between"><span class="muted">Custom exercises</span><strong id="storage-customs-count">0</strong></div>
+          <div class="flex justify-between pt-2 border-t border-[var(--line)]"><span class="muted">Storage</span><strong class="text-lime-300">Local device</strong></div>
+        </div>
+        <button type="button" class="danger-btn w-full text-xs py-2.5" onclick="triggerProfileReset()">Reset All Data</button>
+      </div>
+
+      <!-- App Info Footer -->
+      <div class="mt-5 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-lime-300 text-slate-950 font-extrabold grid place-items-center shrink-0">G</div>
+        <div>
+          <p class="font-extrabold text-xs">GYMFlow</p>
+          <p class="muted text-[10px]">Version 1.0.0</p>
+        </div>
+      </div>
+      <p class="muted text-[10px] text-center mt-2 px-2 leading-relaxed">All data is stored locally on your device. No account required. Your workouts, routines, and progress stay private.</p>
+    </div>
   </div>
 
   <div id="routine-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
@@ -876,7 +1116,7 @@
       ["ex_chest_press","Chest Press","Chest","Machine"],
       ["ex_bench","Bench Press","Chest","Barbell"],
       ["ex_incline","Incline Dumbbell Press","Chest","Dumbbell"],
-      ["ex_sumo_squat","Sumo Squat","Legs","Barbell"],
+      ["ex_sumo_squat","SumoSquat","Legs","Barbell"],
       ["ex_hip_abduction","Hip Abduction","Legs","Machine"],
       ["ex_squat","Back Squat","Legs","Barbell"],
       ["ex_rdl","Romanian Deadlift","Legs","Barbell"],
@@ -911,11 +1151,12 @@
 
     function seedState() {
       return {
-        settings:{theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4, userName:"COYY"},
+        settings:{theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY"},
         exercises:seedExercises,
         routines:[],
         activeSession:null,
-        history:[]
+        history:[],
+        weightHistory:[]
       };
     }
 
@@ -945,11 +1186,18 @@
         const existingCustoms = (loaded.exercises || []).filter(e => e.isCustom);
         loaded.exercises = [...seedExercises, ...existingCustoms];
 
-        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, weeklyGoal:4, userName:"COYY"};
+        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY"};
         if(loaded.settings.weight === undefined) loaded.settings.weight = 65;
         if(loaded.settings.height === undefined) loaded.settings.height = 170;
+        if(loaded.settings.age === undefined) loaded.settings.age = 25;
+        if(loaded.settings.heightUnit === undefined) loaded.settings.heightUnit = "cm";
+        if(loaded.settings.weightUnit === undefined) loaded.settings.weightUnit = "kg";
         if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
         if(loaded.settings.userName === undefined) loaded.settings.userName = "COYY";
+
+        if(!loaded.weightHistory) {
+          loaded.weightHistory = [];
+        }
 
         if (loaded.history) {
           loaded.history = loaded.history.map(s => {
@@ -963,7 +1211,6 @@
         }
 
         localStorage.setItem(KEY, JSON.stringify(loaded));
-
         return loaded;
       } catch(e){ return seedState(); } 
     }
@@ -973,6 +1220,14 @@
     function fmtKg(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kg"; }
     function fmtKkal(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kkal"; }
     function formatDuration(s){ s=Math.max(0,Math.floor(s||0)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+    function formatTimeDetailed(totalSeconds) {
+      const hours = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      if (hours > 0) {
+        return `${hours}h ${mins}m`;
+      }
+      return `${mins}m`;
+    }
     function routineById(id){ return state.routines.find(r=>r.id===id); }
     function exerciseById(id){ return state.exercises.find(e=>e.id===id); }
     function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove("show"),3200); }
@@ -980,35 +1235,102 @@
     function closeModal(id){ document.getElementById(id).classList.remove("open"); }
     function showConfirm(title,message,actionText,cb){ document.getElementById("confirm-title").textContent=title; document.getElementById("confirm-message").textContent=message; document.getElementById("confirm-action").textContent=actionText; confirmCallback=cb; openModal("confirm-modal"); }
 
-    function saveProfileSettings() {
-      const nameVal = document.getElementById("profile-name-input").value.trim();
-      const bbVal = parseFloat(document.getElementById("profile-bb").value);
-      const tbVal = parseInt(document.getElementById("profile-tb").value);
-      const targetVal = document.querySelector("#custom-profile-target .custom-option.selected")?.dataset.value;
-      
-      let updated = false;
-      if (nameVal && state.settings.userName !== nameVal) {
-        state.settings.userName = nameVal;
-        updated = true;
-      }
-      if (!isNaN(bbVal) && state.settings.weight !== bbVal) {
-        state.settings.weight = bbVal;
-        updated = true;
-      }
-      if (!isNaN(tbVal) && state.settings.height !== tbVal) {
-        state.settings.height = tbVal;
-        updated = true;
-      }
-      const parsedTarget = parseInt(targetVal);
-      if (!isNaN(parsedTarget) && state.settings.weeklyGoal !== parsedTarget) {
-        state.settings.weeklyGoal = parsedTarget;
-        updated = true;
-      }
+    function setHeightUnit(unit) {
+      state.settings.heightUnit = unit;
+      document.getElementById("height-unit-label").textContent = unit;
+      document.getElementById("unit-cm").className = unit === 'cm' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
+      document.getElementById("unit-ft").className = unit === 'ft' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
+    }
 
-      if (updated) {
-        save();
-        renderDashboard();
+    function setWeightUnit(unit) {
+      state.settings.weightUnit = unit;
+      document.getElementById("weight-unit-label").textContent = unit;
+      document.getElementById("unit-kg").className = unit === 'kg' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
+      document.getElementById("unit-lbs").className = unit === 'lbs' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
+    }
+
+    function toggleProfileDarkMode() {
+      state.settings.theme = state.settings.theme === "dark" ? "light" : "dark";
+      save();
+      setTheme();
+      renderProfileModal();
+    }
+
+    function updateHeaderInitial() {
+      const name = (state && state.settings && state.settings.userName) ? state.settings.userName : "COYY";
+      const profileBtn = document.getElementById("open-profile-btn");
+      if (profileBtn) {
+        profileBtn.textContent = name.charAt(0).toUpperCase();
       }
+    }
+
+    function renderProfileModal() {
+      const name = state.settings.userName || "COYY";
+      const totalWorkouts = state.history.length;
+      const totalCals = state.history.reduce((acc, s) => acc + (s.caloriesBurned || 0), 0);
+
+      document.getElementById("profile-avatar-initial").textContent = name.charAt(0).toUpperCase();
+      document.getElementById("profile-header-name").textContent = name;
+      document.getElementById("profile-header-stats").textContent = `${totalWorkouts} workouts · ${new Intl.NumberFormat("id-ID").format(totalCals)} kkal`;
+      document.getElementById("profile-header-target-badge").textContent = `${state.settings.weeklyGoal}x/week target`;
+
+      document.getElementById("profile-name-input").value = name;
+      document.getElementById("profile-age-input").value = state.settings.age || 25;
+      document.getElementById("profile-tb").value = state.settings.height || 178;
+      document.getElementById("profile-bb").value = state.settings.weight || 78;
+
+      setHeightUnit(state.settings.heightUnit || "cm");
+      setWeightUnit(state.settings.weightUnit || "kg");
+
+      // Render weekly target pills interaktif
+      document.querySelectorAll(".target-pill").forEach(p => {
+        const val = parseInt(p.dataset.val);
+        p.classList.toggle("active", val === state.settings.weeklyGoal);
+      });
+
+      // Dark mode status
+      const isDark = state.settings.theme !== "light";
+      document.getElementById("dark-mode-desc").textContent = isDark ? "Currently dark" : "Currently light";
+      const thumb = document.getElementById("dark-mode-thumb");
+      const toggleBtn = document.getElementById("profile-dark-toggle");
+      if(isDark) {
+        toggleBtn.style.background = "var(--lime)";
+        thumb.style.transform = "translateX(24px)";
+      } else {
+        toggleBtn.style.background = "var(--line)";
+        thumb.style.transform = "translateX(2px)";
+      }
+      
+      updateHeaderInitial();
+
+      // Storage stats
+      document.getElementById("storage-sessions-count").textContent = state.history.length;
+      document.getElementById("storage-weights-count").textContent = (state.weightHistory || []).length;
+      document.getElementById("storage-routines-count").textContent = state.routines.length;
+      document.getElementById("storage-customs-count").textContent = state.exercises.filter(e => e.isCustom).length;
+    }
+
+    function openProfileModalCustom() {
+      renderProfileModal();
+      openModal("profile-modal");
+    }
+
+    function triggerProfileReset() {
+      showConfirm("Reset all data?","Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
+        state = seedState();
+        save();
+        setTheme();
+        populateSelects();
+        renderDashboard();
+        renderRoutines();
+        renderExercises();
+        renderWorkout();
+        renderHistory();
+        renderWeightTab();
+        updateHeaderInitial();
+        closeModal("profile-modal");
+        toast("Data berhasil direset.");
+      });
     }
 
     function initCustomSelect(wrapperId, onSelectCb) {
@@ -1041,30 +1363,285 @@
       };
     }
 
-    function setCustomSelectValue(wrapperId, val) {
-      const wrapper = document.getElementById(wrapperId);
-      if(!wrapper) return;
-      const optionsContainer = wrapper.querySelector('.custom-options');
-      const label = wrapper.querySelector('.selected-label');
-      const targetOption = optionsContainer.querySelector(`.custom-option[data-value="${val}"]`);
-      if(targetOption) {
-        optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-        targetOption.classList.add('selected');
-        label.textContent = targetOption.textContent;
+    // --- SWITCH PROGRESS TAB (Overview | Weight | History) ---
+    function switchProgressTab(tabName) {
+      const overviewContent = document.getElementById("progress-overview-content");
+      const weightContent = document.getElementById("progress-weight-content");
+      const historyContent = document.getElementById("progress-history-content");
+
+      const overviewBtn = document.getElementById("tab-overview-btn");
+      const weightBtn = document.getElementById("tab-weight-btn");
+      const historyBtn = document.getElementById("tab-history-btn");
+
+      // Hide all
+      overviewContent.classList.add("hidden");
+      weightContent.classList.add("hidden");
+      historyContent.classList.add("hidden");
+
+      // Reset button styles
+      overviewBtn.className = "flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all";
+      weightBtn.className = "flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all";
+      historyBtn.className = "flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all";
+
+      if (tabName === "overview") {
+        overviewContent.classList.remove("hidden");
+        overviewBtn.className = "flex-1 py-2 text-xs font-bold text-center rounded-lg bg-[var(--surface)] text-[var(--text)] shadow-sm transition-all";
+        renderOverviewCharts();
+      } else if (tabName === "weight") {
+        weightContent.classList.remove("hidden");
+        weightBtn.className = "flex-1 py-2 text-xs font-bold text-center rounded-lg bg-[var(--surface)] text-[var(--text)] shadow-sm transition-all";
+        renderWeightTab();
+      } else if (tabName === "history") {
+        historyContent.classList.remove("hidden");
+        historyBtn.className = "flex-1 py-2 text-xs font-bold text-center rounded-lg bg-[var(--surface)] text-[var(--text)] shadow-sm transition-all";
+        renderHistory();
       }
+    }
+
+    function openWeightModal() {
+      document.getElementById("weight-input-val").value = state.settings.weight || 65;
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById("weight-date-val").value = today;
+      openModal("weight-modal");
+    }
+
+    function renderWeightTab() {
+      const currentWeight = state.settings.weight || 65;
+      document.getElementById("current-weight-display").textContent = currentWeight;
+
+      const sortedWeight = [...(state.weightHistory || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+      const logList = document.getElementById("weight-log-list");
+      const emptyLog = document.getElementById("weight-log-empty");
+      
+      logList.innerHTML = "";
+      emptyLog.classList.toggle("hidden", sortedWeight.length !== 0);
+
+      if (sortedWeight.length === 0) {
+        logList.innerHTML = `<div class="text-center py-6 muted text-xs italic">Belum ada riwayat berat badan. Klik "Log Weight" untuk mencatat.</div>`;
+      } else {
+        sortedWeight.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "py-3 flex items-center justify-between";
+          div.innerHTML = `
+            <span class="muted text-sm">${esc(item.date)}</span>
+            <strong class="text-sm font-extrabold">${item.weight} kg</strong>
+          `;
+          logList.appendChild(div);
+        });
+      }
+
+      renderWeightChart();
+      lucide.createIcons();
+    }
+
+    function renderWeightChart() {
+      const area = document.getElementById("weight-chart-area");
+      const history = [...(state.weightHistory || [])].sort((a,b) => new Date(a.date) - new Date(b.date));
+      
+      if(history.length === 0) {
+        area.innerHTML = '<div class="h-full grid place-items-center muted text-sm text-center px-4">Belum ada data berat badan. Silakan catat melalui tombol Log Weight di atas.</div>';
+        return;
+      }
+
+      const vals = history.map(h => h.weight);
+      const max = Math.max(...vals), min = Math.min(...vals), range = max - min || 1;
+      const w = 600, h = 170;
+
+      const coords = history.map((p, i) => `${history.length === 1 ? w/2 : 25 + i * (w - 50) / (history.length - 1)},${h - 25 - (p.weight - min) / range * (h - 55)}`).join(" ");
+      
+      area.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik Berat Badan">
+          <line x1="25" y1="${h-25}" x2="${w-25}" y2="${h-25}" stroke="var(--line)"/>
+          <polyline fill="none" stroke="#bcf04a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>
+          ${history.map((p, i) => {
+            const x = history.length === 1 ? w/2 : 25 + i * (w - 50) / (history.length - 1);
+            const y = h - 25 - (p.weight - min) / range * (h - 55);
+            return `<circle cx="${x}" cy="${y}" r="5" fill="#bcf04a"/><text x="${x}" y="${h-7}" text-anchor="middle" fill="var(--muted)" font-size="10">${p.date.slice(5)}</text>`;
+          }).join("")}
+        </svg>
+      `;
+    }
+
+    // --- ROUTINE BUILDER DENGAN PENYESUAIAN CARDIO (MENIT & KM) ---
+    function openRoutineBuilder(routineId = null) {
+      const isEdit = routineId !== null;
+      document.getElementById("routine-modal-title").textContent = isEdit ? "Edit Routine" : "Routine Builder";
+      document.getElementById("routine-id").value = routineId || "";
+      
+      selectedRoutineExercises = [];
+      
+      if (isEdit) {
+        const routine = routineById(routineId);
+        if (routine) {
+          document.getElementById("routine-name").value = routine.name;
+          document.getElementById("routine-description").value = routine.description || "";
+          
+          selectedRoutineExercises = (routine.exercises || routine.exerciseIds.map(id => ({
+            id: id,
+            sets: [{ reps: 10, weight: 0 }, { reps: 10, weight: 0 }, { reps: 10, weight: 0 }]
+          }))).map(item => {
+            const ex = exerciseById(item.id || item);
+            const isCardio = ex && ex.muscle === "Cardio";
+            return {
+              id: item.id || item,
+              sets: item.sets && item.sets.length > 0 ? [...item.sets] : (isCardio ? [{ reps: 15, weight: 2 }] : [{ reps: 10, weight: 0 }])
+            };
+          });
+
+          document.querySelectorAll("#day-picker .day-chip").forEach(chip => {
+            chip.classList.toggle("active", routine.days.includes(chip.dataset.day));
+          });
+        }
+      } else {
+        document.getElementById("routine-name").value = "";
+        document.getElementById("routine-description").value = "";
+        document.querySelectorAll("#day-picker .day-chip").forEach(chip => chip.classList.remove("active"));
+        document.getElementById("day-picker").innerHTML = days.map(d => `<button type="button" class="chip day-chip" data-day="${d}">${d}</button>`).join("");
+      }
+      
+      renderBuilderSelectedExercises();
+      renderBuilderLibrary();
+      openModal("routine-modal");
+    }
+
+    function renderBuilderSelectedExercises() {
+      const container = document.getElementById("builder-selected-exercises");
+      const countLabel = document.getElementById("selected-count");
+      container.innerHTML = "";
+      countLabel.textContent = selectedRoutineExercises.length + " dipilih";
+
+      if (selectedRoutineExercises.length === 0) {
+        container.innerHTML = `<p class="muted text-xs italic text-center py-4">Belum ada exercise dipilih. Tambahkan dari library di bawah.</p>`;
+        return;
+      }
+
+      selectedRoutineExercises.forEach((item, index) => {
+        const ex = exerciseById(item.id);
+        if (!ex) return;
+
+        const isCardio = ex.muscle === "Cardio";
+        const label1 = isCardio ? "Target Menit" : "Target Reps";
+        const label2 = isCardio ? "Target KM" : "Target Weight (kg)";
+
+        const div = document.createElement("div");
+        div.className = "p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] mb-3";
+        
+        let setsHtml = "";
+        item.sets.forEach((set, sIdx) => {
+          setsHtml += `
+            <div class="grid grid-cols-[30px_1fr_1fr_32px] gap-2 items-center mb-1.5">
+              <span class="text-xs font-bold muted text-center">${sIdx + 1}</span>
+              <input type="number" min="1" max="999" class="field !text-xs !py-1 !min-h-[32px] builder-set-reps" data-ex="${index}" data-set="${sIdx}" value="${set.reps || ''}" placeholder="${isCardio ? 'Menit' : 'Reps'}">
+              <input type="number" step="0.1" min="0" max="999" class="field !text-xs !py-1 !min-h-[32px] builder-set-weight" data-ex="${index}" data-set="${sIdx}" value="${set.weight || ''}" placeholder="${isCardio ? 'KM' : 'Weight (kg)'}">
+              <button type="button" class="icon-btn !w-8 !h-8 text-rose-400 hover:bg-rose-500/10" onclick="removeSetFromBuilder(${index}, ${sIdx})" title="Hapus Set">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          `;
+        });
+
+        div.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <strong class="text-sm font-bold">${esc(ex.name)}</strong>
+              <span class="ml-2 chip !py-0.5 !px-2 !text-[10px]">${esc(ex.muscle)}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" class="secondary-btn !px-2 !py-1 !text-xs" onclick="addSetToBuilder(${index})">+ Set</button>
+              <button type="button" class="icon-btn !w-8 !h-8 text-rose-400 hover:bg-rose-500/10" onclick="removeExerciseFromBuilder(${index})" title="Hapus Exercise">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-[30px_1fr_1fr_32px] gap-2 text-[10px] font-bold muted px-1 mb-1">
+            <span class="text-center">Set</span>
+            <span>${label1}</span>
+            <span>${label2}</span>
+            <span></span>
+          </div>
+          <div class="space-y-1">${setsHtml}</div>
+        `;
+        container.appendChild(div);
+      });
+
+      container.querySelectorAll(".builder-set-reps, .builder-set-weight").forEach(input => {
+        input.oninput = (e) => {
+          const exIdx = parseInt(e.target.dataset.ex);
+          const setIdx = parseInt(e.target.dataset.set);
+          const val = parseFloat(e.target.value) || 0;
+          if (e.target.classList.contains("builder-set-reps")) {
+            selectedRoutineExercises[exIdx].sets[setIdx].reps = val;
+          } else {
+            selectedRoutineExercises[exIdx].sets[setIdx].weight = val;
+          }
+        };
+      });
+
+      if(window.lucide) lucide.createIcons();
+    }
+
+    function renderBuilderLibrary() {
+      const q = document.getElementById("builder-exercise-search").value.toLowerCase();
+      const lib = document.getElementById("builder-library");
+      const addedIds = selectedRoutineExercises.map(item => item.id);
+      
+      const filtered = state.exercises.filter(e => e.name.toLowerCase().includes(q) && !addedIds.includes(e.id));
+      
+      lib.innerHTML = filtered.map(e => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] hover:bg-[var(--surface-2)] transition-colors">
+          <div>
+            <strong class="text-xs font-bold">${esc(e.name)}</strong>
+            <span class="muted text-[10px] block">${esc(e.muscle)} · ${esc(e.equipment)}</span>
+          </div>
+          <button type="button" class="lime-btn !min-h-[32px] !py-1 !px-3 !text-xs" onclick="addExerciseToBuilder('${e.id}')">+ Tambah</button>
+        </div>
+      `).join("") || '<p class="muted text-xs italic text-center py-3">Exercise tidak ditemukan.</p>';
+      if(window.lucide) lucide.createIcons();
+    }
+    
+
+    function addExerciseToBuilder(id) {
+      if (selectedRoutineExercises.some(item => item.id === id)) return;
+      const ex = exerciseById(id);
+      const isCardio = ex && ex.muscle === "Cardio";
+      selectedRoutineExercises.push({
+        id: id,
+        sets: isCardio ? [
+          { reps: 15, weight: 2 }
+        ] : [
+          { reps: 12, weight: 0 },
+          { reps: 10, weight: 0 },
+          { reps: 8, weight: 0 }
+        ]
+      });
+      renderBuilderSelectedExercises();
+      renderBuilderLibrary();
+    }
+
+    function removeExerciseFromBuilder(index) {
+      selectedRoutineExercises.splice(index, 1);
+      renderBuilderSelectedExercises();
+      renderBuilderLibrary();
+    }
+
+    function addSetToBuilder(exIndex) {
+      const lastSet = selectedRoutineExercises[exIndex].sets.slice(-1)[0] || { reps: 10, weight: 0 };
+      selectedRoutineExercises[exIndex].sets.push({ reps: lastSet.reps, weight: lastSet.weight });
+      renderBuilderSelectedExercises();
+    }
+
+    function removeSetFromBuilder(exIndex, setIndex) {
+      if (selectedRoutineExercises[exIndex].sets.length <= 1) {
+        toast("Minimal harus ada 1 set!");
+        return;
+      }
+      selectedRoutineExercises[exIndex].sets.splice(setIndex, 1);
+      renderBuilderSelectedExercises();
     }
 
     window.addEventListener('click', () => {
       document.querySelectorAll('.custom-select-wrapper.open').forEach(w => w.classList.remove('open'));
     });
-
-    function openProfileModal(){
-      document.getElementById("profile-name-input").value = state.settings.userName || "COYY";
-      document.getElementById("profile-bb").value = state.settings.weight;
-      document.getElementById("profile-tb").value = state.settings.height;
-      setCustomSelectValue("custom-profile-target", state.settings.weeklyGoal);
-      openModal("profile-modal");
-    }
 
     function setTheme(){
       document.body.classList.toggle("light",state.settings.theme==="light");
@@ -1074,7 +1651,12 @@
     function navigate(tab){
       document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",el.id===tab));
       document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
-      if(tab==="workout") renderWorkout(); if(tab==="history") renderHistory(); if(tab==="routines") renderRoutines();
+      if(tab==="workout") renderWorkout(); 
+      if(tab==="history") {
+        renderHistory();
+        renderOverviewMetrics();
+      } 
+      if(tab==="routines") renderRoutines();
     }
     
     function changeCalendarMonth(direction) {
@@ -1140,9 +1722,79 @@
       lucide.createIcons();
     }
 
-    function renderDashboard(){
-      const h=state.history, now=Date.now(), week=h.filter(s=>now-new Date(s.endedAt).getTime()<604800000);
+    function renderWeeklyTargetCard() {
+      const h = state.history;
+      const now = new Date();
       
+      // Cari hari Senin di minggu berjalan
+      const currentDay = now.getDay();
+      const distanceToMon = currentDay === 0 ? -6 : 1 - currentDay;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() + distanceToMon);
+      monday.setHours(0,0,0,0);
+
+      const workoutDates = new Set(
+        h.map(s => new Date(s.endedAt).toDateString())
+      );
+
+      let weekCount = 0;
+      const weekDates = [];
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const dateStr = d.toDateString();
+        const hasWorkout = workoutDates.has(dateStr);
+        
+        if (hasWorkout) weekCount++;
+        
+        weekDates.push({
+          dateNum: d.getDate(),
+          isToday: dateStr === now.toDateString(),
+          hasWorkout: hasWorkout
+        });
+      }
+
+      const goal = state.settings.weeklyGoal || 4;
+      const percent = Math.min(100, Math.round((weekCount / goal) * 100));
+
+      // Update Badge & Progress Bar
+      const pill = document.getElementById("weekly-pill-count");
+      if (pill) pill.textContent = `${weekCount}/${goal}`;
+
+      const pctLabel = document.getElementById("weekly-progress-percent");
+      if (pctLabel) pctLabel.textContent = `${percent}%`;
+
+      const barFill = document.getElementById("weekly-progress-bar-fill");
+      if (barFill) barFill.style.width = `${percent}%`;
+
+      // Render Baris Hari (Mon - Sun)
+      const daysBar = document.getElementById("weekly-days-bar");
+      if (daysBar) {
+        const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        daysBar.innerHTML = weekDates.map((item, idx) => {
+          let circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-medium text-[var(--muted)]";
+          let indicatorStyle = "h-1 w-full rounded-full bg-[var(--line)] mb-2";
+
+          if (item.hasWorkout) {
+            circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-extrabold bg-[var(--lime)] text-[#142009] shadow-sm";
+            indicatorStyle = "h-1 w-full rounded-full bg-[var(--lime)] mb-2";
+          } else if (item.isToday) {
+            circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-extrabold border-2 border-[var(--lime)] text-[var(--lime)]";
+          }
+
+          return `
+            <div class="flex flex-col items-center">
+              <span class="text-[11px] font-bold muted mb-1.5">${dayNames[idx]}</span>
+              <div class="${indicatorStyle}"></div>
+              <div class="${circleStyle}">${item.dateNum}</div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    function renderDashboard(){
       const currentHour = new Date().getHours();
       let greeting = "SELAMAT MALAM";
       if (currentHour >= 3 && currentHour < 11) {
@@ -1154,13 +1806,10 @@
       }
 
       document.getElementById("siap-bergerak-label").innerHTML = `${greeting}, <span id="profile-name-display">${esc((state.settings.userName || "COYY").toUpperCase())}</span>`;
-      document.getElementById("profile-bb-display").textContent = state.settings.weight + " kg";
-      document.getElementById("profile-tb-display").textContent = state.settings.height + " cm";
-      document.getElementById("profile-target-display").textContent = state.settings.weeklyGoal + " sesi";
-
-      document.getElementById("goal-value").textContent = week.length + " / " + state.settings.weeklyGoal;
       
+      updateHeaderInitial();
       renderCalendar();
+      renderWeeklyTargetCard();
 
       const upcoming=state.routines[0];
       document.getElementById("next-workout-copy").textContent=upcoming ? upcoming.name+" · "+upcoming.exerciseIds.length+" exercise siap dijalankan." : "Buat routine pertama untuk mulai mencatat progress.";
@@ -1271,71 +1920,159 @@
         document.querySelector("#custom-workout-routine .selected-label").textContent = "Pilih routine...";
       }
 
-      const historyOptsContainer = document.getElementById("history-routine-options");
-      historyOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Semua routine</div>';
-      state.routines.forEach(r => {
-        historyOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${r.id}">${esc(r.name)}</div>`);
-      });
-      document.querySelector("#custom-history-filter .selected-label").textContent = "Semua routine";
-
-      const chartOptsContainer = document.getElementById("chart-exercise-options");
-      chartOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Pilih exercise untuk melihat tren</div>';
-      state.exercises.forEach(e => {
-        chartOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${e.id}">${esc(e.name)}</div>`);
-      });
-      document.querySelector("#custom-chart-exercise .selected-label").textContent = "Pilih exercise untuk melihat tren";
-      
-      initCustomSelect("custom-history-filter", () => renderHistory());
-      initCustomSelect("custom-chart-exercise", () => renderChart());
       initCustomSelect("custom-workout-routine");
     }
 
-    function openRoutineBuilder(id){
-      const r=id?routineById(id):null; document.getElementById("routine-id").value=r?.id||"";document.getElementById("routine-name").value=r?.name||"";document.getElementById("routine-description").value=r?.description||"";selectedRoutineExercises=[...(r?.exerciseIds||[])];
-      document.getElementById("day-picker").innerHTML=days.map(d=>`<button type="button" class="chip day-chip ${(r?.days||[]).includes(d)?"active":""}" data-day="${d}">${d}</button>`).join("");
-      renderBuilderExercises(); openModal("routine-modal"); document.getElementById("routine-name").focus();
-    }
-    
-    function renderBuilderExercises(){
-      const holder=document.getElementById("builder-selected-exercises"), q=document.getElementById("builder-exercise-search").value.toLowerCase();
-      document.getElementById("selected-count").textContent=selectedRoutineExercises.length+" dipilih";
-      holder.innerHTML=selectedRoutineExercises.length?selectedRoutineExercises.map((id,i)=>{const e=exerciseById(id); return e?`<div class="flex items-center gap-2 bg-[var(--surface-2)] border border-[var(--line)] p-2 rounded-xl"><span class="w-7 text-center muted text-sm">${i+1}</span><span class="flex-1 font-bold text-sm">${esc(e.name)}</span><button type="button" class="icon-btn move-exercise" data-id="${id}" data-dir="-1" aria-label="Naikkan exercise"><i data-lucide="chevron-up"></i></button><button type="button" class="icon-btn move-exercise" data-id="${id}" data-dir="1" aria-label="Turunkan exercise"><i data-lucide="chevron-down"></i></button><button type="button" class="icon-btn remove-builder-exercise" data-id="${id}" aria-label="Hapus dari routine"><i data-lucide="x"></i></button></div>`:"";}).join(""):'<p class="muted text-sm py-3">Belum ada exercise. Cari dan pilih exercise di bawah.</p>';
-      document.getElementById("builder-library").innerHTML=state.exercises.filter(e=>e.name.toLowerCase().includes(q)&&!selectedRoutineExercises.includes(e.id)).map(e=>`<button type="button" class="w-full flex justify-between gap-2 text-left p-3 rounded-xl border border-[var(--line)] hover:bg-[var(--surface-2)] add-builder-exercise" data-id="${e.id}"><span class="font-bold text-sm">${esc(e.name)}</span><span class="muted text-xs">${e.muscle}</span></button>`).join("") || '<p class="muted text-sm py-3">Exercise tidak ditemukan.</p>';
-      lucide.createIcons();
-    }
+    // --- MULAI WORKOUT DENGAN PEMISAHAN CARDIO (MENIT & KM) & BEBAN ---
+    function startWorkout(routineId) {
+      const routine = routineById(routineId);
+      if (!routine) return;
 
-    function startWorkout(routineId){
-      if(!routineId){toast("Pilih routine terlebih dahulu.");return;}
-      const r=routineById(routineId); if(!r){toast("Pilih routine terlebih dahulu.");return;} if(!r.exerciseIds.length){toast("Routine ini belum memiliki exercise.");return;}
-      state.activeSession={id:uid(),routineId:r.id,startedAt:new Date().toISOString(),pausedSeconds:0,pauseStartedAt:null,currentExerciseIndex:0,restRemaining:0,restPaused:true,exercises:r.exerciseIds.map(id=>({exerciseId:id,sets:[{reps:"",weight:"",completedAt:null}],notes:""}))};save(); navigate("workout"); renderDashboard(); toast("Workout dimulai. Semangat!");
+      const exercisesData = routine.exercises || routine.exerciseIds.map(id => {
+        const ex = exerciseById(id);
+        const isCardio = ex && ex.muscle === "Cardio";
+        return {
+          id: id,
+          sets: isCardio ? [{ reps: 15, weight: 2 }] : [{ reps: 10, weight: 0 }, { reps: 10, weight: 0 }, { reps: 10, weight: 0 }]
+        };
+      });
+
+      state.activeSession = {
+        id: uid(),
+        routineId: routine.id,
+        startedAt: new Date().toISOString(),
+        elapsedSeconds: 0,
+        pausedSeconds: 0,
+        currentExerciseIndex: 0,
+        exercises: exercisesData.map(item => {
+          const ex = exerciseById(item.id);
+          const isCardio = ex && ex.muscle === "Cardio";
+          return {
+            exerciseId: item.id,
+            notes: "",
+            sets: item.sets.map(s => ({
+              reps: s.reps || (isCardio ? 15 : 10),
+              weight: s.weight || (isCardio ? 2 : 0),
+              completedAt: null
+            }))
+          };
+        })
+      };
+
+      save();
+      navigate("workout");
     }
     
     function currentExercise(){ return state.activeSession?.exercises[state.activeSession.currentExerciseIndex]; }
     
     function renderWorkout(){
-      const active=state.activeSession;document.getElementById("workout-start-state").classList.toggle("hidden",!!active);document.getElementById("workout-live-state").classList.toggle("hidden",!active);
+      const active=state.activeSession;
+      document.getElementById("workout-start-state").classList.toggle("hidden",!!active);
+      document.getElementById("workout-live-state").classList.toggle("hidden",!active);
       if(!active){populateSelects();return;}
+      
       const r=routineById(active.routineId), ex=currentExercise(), e=exerciseById(ex.exerciseId);
+      const isCardio = e && e.muscle === "Cardio";
+
       document.getElementById("workout-routine-name").textContent=r?.name||"Workout";
       document.getElementById("exercise-position").textContent=`EXERCISE ${active.currentExerciseIndex+1} DARI ${active.exercises.length}`;
       document.getElementById("active-exercise-name").textContent=e?.name||"Exercise";
       document.getElementById("active-exercise-muscle").textContent=e?.muscle||"";
+      
+      document.getElementById("col-header-1").textContent = isCardio ? "Menit" : "Reps";
+      document.getElementById("col-header-2").textContent = isCardio ? "KM" : "Weight (kg)";
+
       const previous=[...state.history].reverse().flatMap(s=>s.exercises).find(x=>x.exerciseId===e?.id&&x.sets.some(s=>s.completedAt));
-      document.getElementById("previous-performance").textContent=previous?"Sebelumnya: "+previous.sets.filter(s=>s.completedAt).map(s=>`${s.reps}×${s.weight}kg`).join(" · "):"Belum ada catatan performance sebelumnya.";
+      document.getElementById("previous-performance").textContent=previous?"Sebelumnya: "+previous.sets.filter(s=>s.completedAt).map(s=>isCardio ? `${s.reps} mnt · ${s.weight} km` : `${s.reps}×${s.weight}kg`).join(" · "):"Belum ada catatan performance sebelumnya.";
       document.getElementById("exercise-notes").value=ex.notes||"";
-      const list=document.getElementById("set-list");list.innerHTML="";
-      ex.sets.forEach((set,i)=>{const row=document.createElement("div");row.className="grid grid-cols-[44px_1fr_1fr_122px] gap-2 items-center border border-[var(--line)] rounded-xl p-2 "+(set.completedAt?"set-done":"");row.innerHTML=`<span class="text-center font-bold">${i+1}</span><label class="sr-only" for="reps-${i}">Reps set ${i+1}</label><input id="reps-${i}" data-field="reps" data-index="${i}" inputmode="numeric" type="number" min="0" class="field !min-h-[42px]" value="${esc(set.reps)}" ${set.completedAt?"disabled":""}><label class="sr-only" for="weight-${i}">Weight set ${i+1}</label><input id="weight-${i}" data-field="weight" data-index="${i}" inputmode="decimal" type="number" min="0" step="0.5" class="field !min-h-[42px]" value="${esc(set.weight)}" ${set.completedAt?"disabled":""}><button class="${set.completedAt?"secondary-btn":"lime-btn"} complete-set px-2 !min-h-[42px] text-sm" data-index="${i}" ${set.completedAt?"disabled":""}>${set.completedAt?"✓ Selesai":"Selesai Set"}</button>`;list.appendChild(row);});
-      const all=active.exercises.flatMap(x=>x.sets), done=all.filter(s=>s.completedAt).length; document.getElementById("workout-progress-label").textContent=done+"/"+all.length+" Set";document.getElementById("workout-progress-bar").style.width=(all.length?done/all.length*100:0)+"%";
-      document.getElementById("previous-exercise").disabled=active.currentExerciseIndex===0; document.getElementById("next-exercise").textContent=active.currentExerciseIndex===active.exercises.length-1?"Selesai workout →":"Exercise berikutnya →";
-      updateTimers(); lucide.createIcons();
+
+      const list = document.getElementById("set-list");
+      list.innerHTML = "";
+
+      ex.sets.forEach((set, i) => {
+        const row = document.createElement("div");
+        row.className = "grid grid-cols-[44px_1fr_1fr_44px] gap-2 items-center border border-[var(--line)] rounded-xl p-2 " + (set.completedAt ? "set-done" : "");
+        
+        row.innerHTML = `
+          <span class="text-center font-bold text-xs">${i + 1}</span>
+          <input data-field="reps" data-index="${i}" inputmode="numeric" type="number" min="0" class="field !min-h-[40px] !text-xs workout-set-field" value="${esc(set.reps)}" ${set.completedAt ? "disabled" : ""}>
+          <input data-field="weight" data-index="${i}" inputmode="decimal" type="number" min="0" step="0.1" class="field !min-h-[40px] !text-xs workout-set-field" value="${esc(set.weight)}" ${set.completedAt ? "disabled" : ""}>
+          <button type="button" class="set-circle-btn complete-set ${set.completedAt ? "completed" : ""}" data-index="${i}" title="${set.completedAt ? "Selesai" : "Tandai Selesai"}">
+            <i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>
+          </button>
+        `;
+        list.appendChild(row);
+      });
+
+      list.querySelectorAll(".workout-set-field").forEach(input => {
+        input.oninput = (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          ex.sets[idx][field] = parseFloat(e.target.value) || 0;
+          save();
+        };
+      });
+
+      list.querySelectorAll(".complete-set").forEach(btn => {
+        btn.onclick = (e) => {
+          const idx = parseInt(e.currentTarget.dataset.index);
+          const targetSet = ex.sets[idx];
+          if (targetSet.completedAt) {
+            targetSet.completedAt = null;
+          } else {
+            targetSet.completedAt = new Date().toISOString();
+            active.restRemaining = state.settings.restSeconds || 90;
+            active.restPaused = false;
+          }
+          save();
+          renderWorkout();
+        };
+      });
+
+      const all=active.exercises.flatMap(x=>x.sets), done=all.filter(s=>s.completedAt).length; 
+      document.getElementById("workout-progress-label").textContent=done+"/"+all.length+" Set";
+      document.getElementById("workout-progress-bar").style.width=(all.length?done/all.length*100:0)+"%";
+      document.getElementById("previous-exercise").disabled=active.currentExerciseIndex===0; 
+      document.getElementById("next-exercise").textContent=active.currentExerciseIndex===active.exercises.length-1?"Selesai workout →":"Exercise berikutnya →";
+      
+      updateTimers(); 
+      lucide.createIcons();
     }
     
-    function elapsed(){const a=state.activeSession;if(!a)return 0;const end=a.pauseStartedAt?new Date(a.pauseStartedAt).getTime():Date.now();return Math.floor((end-new Date(a.startedAt).getTime())/1000)-a.pausedSeconds;}
-    function updateTimers(){if(!state.activeSession)return;document.getElementById("workout-elapsed").textContent=formatDuration(elapsed());const a=state.activeSession,card=document.getElementById("rest-timer-card");card.classList.toggle("hidden",!a.restRemaining);document.getElementById("rest-time").textContent=formatDuration(a.restRemaining);document.getElementById("rest-pause").textContent=a.restPaused?"Lanjut":"Jeda";}
-    function tick(){const a=state.activeSession;if(!a)return; if(a.restRemaining&&!a.restPaused){a.restRemaining--;if(a.restRemaining<=0){a.restRemaining=0;a.restPaused=true;toast("Waktu istirahat selesai. Siap set berikutnya!");}save();}updateTimers();}
+    function elapsed(){
+      const a=state.activeSession;
+      if(!a)return 0;
+      return Math.floor((Date.now()-new Date(a.startedAt).getTime())/1000)-(a.pausedSeconds||0);
+    }
+    
+    function updateTimers(){
+      if(!state.activeSession)return;
+      document.getElementById("workout-elapsed").textContent=formatDuration(elapsed());
+      const a=state.activeSession, card=document.getElementById("rest-timer-card");
+      card.classList.toggle("hidden",!a.restRemaining);
+      document.getElementById("rest-time").textContent=formatDuration(a.restRemaining);
+      document.getElementById("rest-pause").textContent=a.restPaused?"Lanjut":"Jeda";
+    }
+    
+    function tick(){
+      const a=state.activeSession;
+      if(!a)return; 
+      if(a.restRemaining && !a.restPaused){
+        a.restRemaining--;
+        if(a.restRemaining<=0){
+          a.restRemaining=0;
+          a.restPaused=true;
+          toast("Waktu istirahat selesai. Siap set berikutnya!");
+        }
+        save();
+      }
+      updateTimers();
+    }
     
     function endWorkout(){
-      const a=state.activeSession;if(!a)return;const totalSets=a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.completedAt).length,0);
+      const a=state.activeSession;
+      if(!a)return;
+      const totalSets=a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.completedAt).length,0);
       if(!totalSets){toast("Selesaikan minimal satu set sebelum mengakhiri workout.");return;}
       
       const durationSeconds = elapsed();
@@ -1345,15 +2082,34 @@
 
       const endedAt=new Date().toISOString();
       state.history.unshift({id:a.id,routineId:a.routineId,startedAt:a.startedAt,endedAt,duration:durationSeconds,exercises:a.exercises,caloriesBurned});
-      state.activeSession=null;save();renderDashboard();navigate("history");toast(`Workout tersimpan. Membakar ±${caloriesBurned} kkal!`);
+      state.activeSession=null;
+      save();
+      renderDashboard();
+      navigate("history");
+      toast(`Workout tersimpan. Membakar ±${caloriesBurned} kkal!`);
+    }
+
+    function renderOverviewMetrics(){
+      let sessions = state.history;
+
+      const totalCalories = sessions.reduce((n,s)=>n+(s.caloriesBurned||0),0);
+      const totalSeconds = sessions.reduce((n,s)=>n+(s.duration||0),0);
+      const avgSeconds = sessions.length > 0 ? Math.round(totalSeconds / sessions.length) : 0;
+
+      document.getElementById("history-session-count").textContent = sessions.length;
+      document.getElementById("history-calories").textContent = fmtKkal(totalCalories);
+      document.getElementById("history-total-time").textContent = formatTimeDetailed(totalSeconds);
+      document.getElementById("history-avg-duration").textContent = formatTimeDetailed(avgSeconds);
+      document.getElementById("workouts-logged-count").textContent = state.history.length + " workouts logged";
+      
+      renderOverviewCharts();
     }
     
     function renderHistory(){
-      const filter = document.querySelector("#custom-history-filter .custom-option.selected")?.dataset.value || "";
       const activeTimeChip = document.querySelector(".history-time-chip.active");
       const timeFilter = activeTimeChip ? activeTimeChip.dataset.time : "all";
 
-      let sessions = state.history.filter(s => !filter || s.routineId === filter);
+      let sessions = state.history;
 
       const now = new Date();
       const todayStr = now.toDateString();
@@ -1365,26 +2121,29 @@
         sessions = sessions.filter(s => new Date(s.endedAt) >= oneWeekAgo);
       }
 
-      const allSets=sessions.flatMap(s=>s.exercises.flatMap(e=>e.sets.filter(x=>x.completedAt)));
-      const totalCalories = sessions.reduce((n,s)=>n+(s.caloriesBurned||0),0);
-
-      document.getElementById("history-session-count").textContent=sessions.length;
-      document.getElementById("history-set-count").textContent=allSets.length;
-      document.getElementById("history-calories").textContent=fmtKkal(totalCalories);
+      document.getElementById("workouts-logged-count").textContent = state.history.length + " workouts logged";
       
-      const list=document.getElementById("history-list"),empty=document.getElementById("history-empty");list.innerHTML="";empty.classList.toggle("hidden",sessions.length!==0);
+      const list=document.getElementById("history-list"),empty=document.getElementById("history-empty");
+      list.innerHTML="";
+      empty.classList.toggle("hidden",sessions.length!==0);
+      
       sessions.forEach(s=>{
         const r=routineById(s.routineId);
         const calText = s.caloriesBurned ? `${s.caloriesBurned} kkal` : `0 kkal`;
+        const setTotal = s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.completedAt).length,0);
+        
+        const dObj = new Date(s.endedAt);
+        const dateStr = isNaN(dObj.getTime()) ? s.endedAt : dObj.toLocaleDateString("id-ID", {day: 'numeric', month: 'long', year: 'numeric'}) + " · " + formatDuration(s.duration);
+
         const el=document.createElement("article");
         el.className="panel p-4 flex items-center justify-between gap-4";
         el.innerHTML=`
           <div>
-            <h3 class="font-extrabold">${esc(r?.name||"Routine dihapus")}</h3>
-            <p class="muted text-sm mt-1">${new Date(s.endedAt).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${formatDuration(s.duration)}</p>
-            <div class="flex items-center gap-4 mt-3">
-              <div><p class="muted text-xs font-bold">Set</p><strong>${s.exercises.reduce((n,e)=>n+e.sets.filter(x=>x.completedAt).length,0)}</strong></div>
-              <div><p class="muted text-xs font-bold">Kalori</p><strong class="text-lime-300"><i data-lucide="flame" class="w-3 h-3 inline text-amber-400"></i> ${calText}</strong></div>
+            <h3 class="font-extrabold text-base">${esc(r?.name||"Routine dihapus")}</h3>
+            <p class="muted text-xs mt-0.5">${dateStr}</p>
+            <div class="flex items-center gap-6 mt-3">
+              <div><p class="muted text-[10px] font-bold uppercase tracking-wider">Set</p><strong class="text-sm">${setTotal}</strong></div>
+              <div><p class="muted text-[10px] font-bold uppercase tracking-wider">Kalori</p><strong class="text-sm text-lime-300"><i data-lucide="flame" class="w-3 h-3 inline text-amber-400"></i> ${calText}</strong></div>
             </div>
           </div>
           <div>
@@ -1393,18 +2152,132 @@
         `;
         list.appendChild(el);
       });
-      renderChart();
+      renderOverviewMetrics();
       lucide.createIcons();
     }
     
-    function renderChart(){
-      const id = document.querySelector("#custom-chart-exercise .custom-option.selected")?.dataset.value || "";
-      const area=document.getElementById("chart-area"),caption=document.getElementById("chart-caption");if(!id){area.innerHTML='<div class="h-full grid place-items-center muted text-sm">Pilih exercise untuk melihat perkembangan weight.</div>';caption.textContent="Gunakan data sesi yang sudah selesai.";return;}
-      const points=state.history.slice().reverse().flatMap(s=>{const ex=s.exercises.find(x=>x.exerciseId===id);if(!ex)return [];const ws=ex.sets.filter(x=>x.completedAt).map(x=>Number(x.weight)||0);return ws.length?[{date:new Date(s.endedAt),weight:Math.max(...ws)}]:[];});
-      caption.textContent=points.length?"Berat set tertinggi dari setiap sesi.":"Belum ada data set selesai untuk exercise ini.";if(!points.length){area.innerHTML='<div class="h-full grid place-items-center muted text-sm">Selesaikan workout untuk membangun grafik progress.</div>';return;}
-      const max=Math.max(...points.map(p=>p.weight)),min=Math.min(...points.map(p=>p.weight)),range=max-min||1,w=600,h=170;
-      const coords=points.map((p,i)=>`${points.length===1?w/2:25+i*(w-50)/(points.length-1)},${h-25-(p.weight-min)/range*(h-55)}`).join(" ");
-      area.innerHTML=`<svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik perkembangan weight"><line x1="25" y1="${h-25}" x2="${w-25}" y2="${h-25}" stroke="var(--line)"/><polyline fill="none" stroke="#bcf04a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>${points.map((p,i)=>{const x=points.length===1?w/2:25+i*(w-50)/(points.length-1),y=h-25-(p.weight-min)/range*(h-55);return `<circle cx="${x}" cy="${y}" r="5" fill="#bcf04a"/><text x="${x}" y="${h-7}" text-anchor="middle" fill="var(--muted)" font-size="11">${p.weight}kg</text>`}).join("")}</svg>`;
+    function renderOverviewCharts() {
+      renderWorkoutsPerWeekChart();
+      renderCaloriesPerWorkoutChart();
+    }
+
+    function renderWorkoutsPerWeekChart() {
+      const area = document.getElementById("workouts-per-week-chart");
+      const history = state.history;
+
+      if(history.length === 0) {
+        area.innerHTML = '<div class="h-full grid place-items-center muted text-sm text-center px-4">Belum ada riwayat workout untuk ditampilkan di grafik mingguan.</div>';
+        return;
+      }
+
+      const weeksMap = {};
+      history.forEach(s => {
+        const d = new Date(s.endedAt);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.setDate(diff));
+        const key = monday.toISOString().slice(0, 10);
+        
+        if(!weeksMap[key]) {
+          weeksMap[key] = { date: new Date(monday), count: 0 };
+        }
+        weeksMap[key].count++;
+      });
+
+      const sortedWeeks = Object.values(weeksMap).sort((a,b) => a.date - b.date).slice(-5);
+
+      if(sortedWeeks.length === 0) {
+        area.innerHTML = '<div class="h-full grid place-items-center muted text-sm text-center px-4">Belum ada data mingguan.</div>';
+        return;
+      }
+
+      const counts = sortedWeeks.map(w => w.count);
+      const maxCount = Math.max(...counts, 4);
+      const w = 600, h = 170;
+      const barWidth = 45;
+      const gap = (w - 60 - (sortedWeeks.length * barWidth)) / Math.max(1, sortedWeeks.length - 1);
+
+      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
+      let svgContent = `
+        <svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik Workouts per Week">
+          <line x1="30" y1="${h-25}" x2="${w-30}" y2="${h-25}" stroke="var(--line)"/>
+          <text x="20" y="25" fill="var(--muted)" font-size="10">${maxCount}</text>
+          <text x="20" y="${(h-25)/2}" fill="var(--muted)" font-size="10">${Math.round(maxCount/2)}</text>
+          <text x="20" y="${h-30}" fill="var(--muted)" font-size="10">0</text>
+      `;
+
+      sortedWeeks.forEach((item, i) => {
+        const x = 40 + i * (barWidth + gap);
+        const barHeight = (item.count / maxCount) * (h - 55);
+        const y = (h - 25) - barHeight;
+        const label = `${item.date.getDate()} ${monthNamesShort[item.date.getMonth()]}`;
+
+        svgContent += `
+          <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="6" fill="#bcf04a"/>
+          <text x="${x + barWidth/2}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="10">${label}</text>
+        `;
+      });
+
+      svgContent += `</svg>`;
+      area.innerHTML = svgContent;
+    }
+
+    function renderCaloriesPerWorkoutChart() {
+      const area = document.getElementById("calories-per-workout-chart");
+      const history = [...state.history].sort((a,b) => new Date(a.endedAt) - new Date(b.endedAt)).slice(-8);
+
+      if(history.length === 0) {
+        area.innerHTML = '<div class="h-full grid place-items-center muted text-sm text-center px-4">Belum ada data kalori workout.</div>';
+        return;
+      }
+
+      const cals = history.map(s => s.caloriesBurned || 0);
+      const maxCal = Math.max(...cals, 600);
+      const minCal = 0;
+      const w = 600, h = 170;
+
+      const points = history.map((s, i) => {
+        const x = history.length === 1 ? w/2 : 30 + i * (w - 60) / (history.length - 1);
+        const y = (h - 25) - ((s.caloriesBurned || 0) - minCal) / (maxCal - minCal || 1) * (h - 50);
+        return { x, y, cal: s.caloriesBurned || 0, date: new Date(s.endedAt) };
+      });
+
+      const coords = points.map(p => `${p.x},${p.y}`).join(" ");
+      const firstX = points[0].x;
+      const lastX = points[points.length - 1].x;
+      const bottomY = h - 25;
+      const areaCoords = `${firstX},${bottomY} ${coords} ${lastX},${bottomY}`;
+
+      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
+      let svgContent = `
+        <svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik Calories per Workout">
+          <defs>
+            <linearGradient id="calGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#bcf04a" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#bcf04a" stop-opacity="0.0"/>
+            </linearGradient>
+          </defs>
+          <line x1="30" y1="${h-25}" x2="${w-30}" y2="${h-25}" stroke="var(--line)"/>
+          <text x="15" y="25" fill="var(--muted)" font-size="10">${maxCal}</text>
+          <text x="15" y="${(h-25)/2}" fill="var(--muted)" font-size="10">${Math.round(maxCal/2)}</text>
+          <text x="15" y="${h-30}" fill="var(--muted)" font-size="10">0</text>
+          
+          <polygon points="${areaCoords}" fill="url(#calGradient)"/>
+          <polyline fill="none" stroke="#bcf04a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>
+      `;
+
+      points.forEach(p => {
+        const label = `${p.date.getDate()} ${monthNamesShort[p.date.getMonth()]}`;
+        svgContent += `
+          <circle cx="${p.x}" cy="${p.y}" r="4" fill="#bcf04a"/>
+          <text x="${p.x}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="9">${label}</text>
+        `;
+      });
+
+      svgContent += `</svg>`;
+      area.innerHTML = svgContent;
     }
 
     function exportPDF() {
@@ -1430,13 +2303,10 @@
 
       let htmlContent = `
         <div id="pdf-render-container" style="font-family: 'DM Sans', sans-serif; color: #17221b; padding: 32px; background: #ffffff; width: 100%; box-sizing: border-box; position: relative; min-height: 1000px;">
-          
           <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5; z-index: 0; pointer-events: none; text-align: center;">
             <img src="LOGO_WATERMARK.jpg" alt="Watermark Logo" style="width: 380px; height: 380px; object-fit: contain; filter: grayscale(100%);">
           </div>
-
           <div style="position: relative; z-index: 1;">
-            
             <div style="border-bottom: 3px solid #bcf04a; padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
@@ -1449,7 +2319,7 @@
               </div>
               <div style="text-align: right;">
                 <p style="margin: 0; font-size: 11px; color: #647469; font-weight: 500;">${subtitleText}</p>
-                <p style="margin: 3px 0 0 0; font-size: 11px; color: #17221b;">Nama: <strong>${esc(state.settings.userName)}</strong> &bull; Berat: <strong>${state.settings.weight} kg</strong></p>
+                <p style="margin: 3px 0 0 0; font-size: 11px; color: #17221b;">Nama: <strong>${esc(state.settings.userName)}</strong> &bull; Berat: <strong>${state.settings.weight} ${state.settings.weightUnit}</strong></p>
               </div>
             </div>
 
@@ -1465,7 +2335,6 @@
             </div>
 
             <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #111923; text-transform: uppercase; letter-spacing: 0.03em;">Rincian Sesi Latihan</h3>
-
       `;
 
       sessionsToExport.forEach((s, idx) => {
@@ -1486,12 +2355,13 @@
 
         s.exercises.forEach(ex => {
           const exObj = exerciseById(ex.exerciseId);
+          const isCardio = exObj && exObj.muscle === "Cardio";
           const completedSets = ex.sets.filter(st => st.completedAt);
           if(completedSets.length > 0) {
             htmlContent += `
               <div style="font-size: 12px; margin-top: 6px; padding: 6px 10px; background: #fbfcfb; border-radius: 8px; border-left: 3px solid #bcf04a; display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-weight: 700; color: #17221b;">${esc(exObj?.name || "Exercise")}</span>
-                <span style="color: #4a5568; font-weight: 500;">${completedSets.map(st => `${st.reps} reps × ${st.weight} kg`).join(" &nbsp;|&nbsp; ")}</span>
+                <span style="color: #4a5568; font-weight: 500;">${completedSets.map(st => isCardio ? `${st.reps} mnt · ${st.weight} km` : `${st.reps} reps × ${st.weight} kg`).join(" &nbsp;|&nbsp; ")}</span>
               </div>
             `;
           }
@@ -1535,7 +2405,9 @@
       }, 100);
     }
 
-    state=loadState();setTheme();
+    state=loadState();
+    setTheme();
+
     document.addEventListener("DOMContentLoaded",()=>{
       setTimeout(() => {
         const splash = document.getElementById("splash-screen");
@@ -1548,15 +2420,19 @@
       populateSelects();
       
       initCustomSelect("custom-muscle-filter", () => renderExercises());
-      initCustomSelect("custom-profile-target", () => {
-        saveProfileSettings();
-        toast("Profil & target diperbarui otomatis.");
-      });
       initCustomSelect("custom-exercise-muscle-select", (val) => {
         document.getElementById("custom-exercise-muscle-select").dataset.value = val;
       });
 
-      renderDashboard();renderRoutines();renderExercises();renderWorkout();renderHistory();lucide.createIcons();
+      renderDashboard();
+      renderRoutines();
+      renderExercises();
+      renderWorkout();
+      renderHistory();
+      renderWeightTab();
+      updateHeaderInitial();
+      lucide.createIcons();
+
       elapsedInterval=setInterval(tick,1000);
       restInterval=setInterval(tick,1000);
       
@@ -1570,28 +2446,86 @@
       document.querySelectorAll("[data-tab]").forEach(b => {
         b.addEventListener("click", () => handleTabNavigation(b.dataset.tab));
       });
-
-      document.getElementById("theme-toggle").onclick=()=>{state.settings.theme=state.settings.theme==="dark"?"light":"dark";save();setTheme();};
       
       const triggerReset = () => {
         showConfirm("Reset data?","Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
-          state=seedState();save();setTheme();populateSelects();renderDashboard();renderRoutines();renderExercises();renderWorkout();renderHistory();toast("Data berhasil direset.");
+          state=seedState();
+          save();
+          setTheme();
+          populateSelects();
+          renderDashboard();
+          renderRoutines();
+          renderExercises();
+          renderWorkout();
+          renderHistory();
+          renderWeightTab();
+          updateHeaderInitial();
+          toast("Data berhasil direset.");
         });
       };
+
       document.getElementById("desktop-reset").onclick = triggerReset;
-      document.getElementById("mobile-reset-btn").onclick = triggerReset;
-      document.getElementById("open-profile-btn").onclick = openProfileModal;
+      document.getElementById("open-profile-btn").onclick = openProfileModalCustom;
       document.getElementById("export-pdf-daily").onclick = () => exportPDF();
 
-      document.getElementById("profile-name-input").oninput = () => saveProfileSettings();
-      document.getElementById("profile-bb").oninput = () => saveProfileSettings();
-      document.getElementById("profile-tb").oninput = () => saveProfileSettings();
+      document.querySelectorAll(".target-pill").forEach(pill => {
+        pill.onclick = (e) => {
+          const val = parseInt(e.currentTarget.dataset.val);
+          state.settings.weeklyGoal = val;
+          renderProfileModal();
+        };
+      });
 
       document.getElementById("profile-form").onsubmit = e => {
         e.preventDefault();
-        saveProfileSettings();
+        const nameVal = document.getElementById("profile-name-input").value.trim();
+        const ageVal = parseInt(document.getElementById("profile-age-input").value);
+        const heightVal = parseFloat(document.getElementById("profile-tb").value);
+        const weightVal = parseFloat(document.getElementById("profile-bb").value);
+
+        if(!nameVal) {
+          toast("Nama wajib diisi!");
+          return;
+        }
+
+        state.settings.userName = nameVal;
+        if(!isNaN(ageVal)) state.settings.age = ageVal;
+        if(!isNaN(heightVal)) state.settings.height = heightVal;
+        if(!isNaN(weightVal)) {
+          state.settings.weight = weightVal;
+        }
+
+        save();
         closeModal("profile-modal");
-        toast("Profil & target tersimpan.");
+        renderDashboard();
+        updateHeaderInitial();
+        toast("Profil berhasil disimpan!");
+      };
+
+      document.getElementById("weight-form").onsubmit = e => {
+        e.preventDefault();
+        const wVal = parseFloat(document.getElementById("weight-input-val").value);
+        const dVal = document.getElementById("weight-date-val").value;
+        if(isNaN(wVal) || !dVal) {
+          toast("Mohon masukkan berat dan tanggal yang valid.");
+          return;
+        }
+        
+        state.settings.weight = wVal;
+        if(!state.weightHistory) state.weightHistory = [];
+        
+        const existingIdx = state.weightHistory.findIndex(item => item.date === dVal);
+        if(existingIdx !== -1) {
+          state.weightHistory[existingIdx].weight = wVal;
+        } else {
+          state.weightHistory.push({date: dVal, weight: wVal});
+        }
+
+        save();
+        closeModal("weight-modal");
+        renderWeightTab();
+        renderDashboard();
+        toast("Berat badan berhasil dicatat!");
       };
 
       document.getElementById("dashboard-start").onclick=()=>handleTabNavigation("workout");
@@ -1602,8 +2536,100 @@
       document.getElementById("confirm-cancel").onclick=()=>closeModal("confirm-modal");
       document.getElementById("confirm-action").onclick=()=>{closeModal("confirm-modal");if(confirmCallback)confirmCallback();};
       document.getElementById("exercise-search").oninput=renderExercises;
+      document.getElementById("builder-exercise-search").oninput=renderBuilderLibrary;
+
+      document.getElementById("routine-list").onclick=e=>{
+        const b=e.target.closest("button");
+        if(!b)return;
+        const id=b.dataset.id;
+        if(b.classList.contains("start-routine")) startWorkout(id);
+        if(b.classList.contains("edit-routine")) openRoutineBuilder(id);
+        if(b.classList.contains("delete-routine")) {
+          showConfirm("Hapus routine?","Routine ini akan dihapus, tetapi history workout lama tetap disimpan.","Hapus",()=>{
+            state.routines=state.routines.filter(r=>r.id!==id);
+            save();
+            populateSelects();
+            renderRoutines();
+            renderDashboard();
+            toast("Routine dihapus.");
+          });
+        }
+      };
+
+      document.getElementById("start-workout-button").onclick = () => {
+        const selectedRoutineVal = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
+        if (!selectedRoutineVal) {
+          toast("Pilih routine terlebih dahulu!");
+          return;
+        }
+        startWorkout(selectedRoutineVal);
+      };
+
+      document.getElementById("end-workout-button").onclick = endWorkout;
       
-      document.getElementById("routine-list").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.id;if(b.classList.contains("start-routine"))startWorkout(id);if(b.classList.contains("edit-routine"))openRoutineBuilder(id);if(b.classList.contains("delete-routine"))showConfirm("Hapus routine?","Routine ini akan dihapus, tetapi history workout lama tetap disimpan.","Hapus",()=>{state.routines=state.routines.filter(r=>r.id!==id);save();populateSelects();renderRoutines();renderDashboard();toast("Routine dihapus.");});};
+      document.getElementById("previous-exercise").onclick = () => {
+        if(state.activeSession && state.activeSession.currentExerciseIndex > 0) {
+          state.activeSession.currentExerciseIndex--;
+          save();
+          renderWorkout();
+        }
+      };
+
+      document.getElementById("next-exercise").onclick = () => {
+        if(state.activeSession) {
+          if(state.activeSession.currentExerciseIndex < state.activeSession.exercises.length - 1) {
+            state.activeSession.currentExerciseIndex++;
+            save();
+            renderWorkout();
+          } else {
+            endWorkout();
+          }
+        }
+      };
+
+      document.getElementById("add-set-button").onclick = () => {
+        const ex = currentExercise();
+        if(ex) {
+          const lastSet = ex.sets.slice(-1)[0] || { reps: 15, weight: 2 };
+          ex.sets.push({ reps: lastSet.reps, weight: lastSet.weight, completedAt: null });
+          save();
+          renderWorkout();
+        }
+      };
+
+      document.getElementById("exercise-notes").oninput = (e) => {
+        const ex = currentExercise();
+        if(ex) {
+          ex.notes = e.target.value;
+          save();
+        }
+      };
+
+      document.getElementById("rest-pause").onclick = () => {
+        if(state.activeSession) {
+          state.activeSession.restPaused = !state.activeSession.restPaused;
+          save();
+          updateTimers();
+        }
+      };
+
+      document.getElementById("rest-skip").onclick = () => {
+        if(state.activeSession) {
+          state.activeSession.restRemaining = 0;
+          state.activeSession.restPaused = true;
+          save();
+          updateTimers();
+        }
+      };
+
+      document.getElementById("rest-reset").onclick = () => {
+        if(state.activeSession) {
+          state.activeSession.restRemaining = state.settings.restSeconds || 90;
+          state.activeSession.restPaused = false;
+          save();
+          updateTimers();
+        }
+      };
       
       document.getElementById("history-list").onclick=e=>{
         const b=e.target.closest(".delete-history-session");
@@ -1618,7 +2644,6 @@
         });
       };
 
-      // EVENT LISTENER UNTUK CHIP KATEGORI WAKTU HISTORI DENGAN EFEK AKTIF HIJAU
       document.querySelectorAll(".history-time-chip").forEach(chip => {
         chip.onclick = (e) => {
           document.querySelectorAll(".history-time-chip").forEach(c => c.classList.remove("active"));
@@ -1649,40 +2674,58 @@
         const equipment=document.getElementById("custom-exercise-equipment").value.trim();
         if(!name||!muscle||!equipment){toast("Mohon lengkapi semua field exercise.");return;}
         state.exercises.push({id:uid(),name,muscle,equipment,isCustom:true});
-        save();renderExercises();populateSelects();closeModal("exercise-modal");document.getElementById("exercise-form").reset();
+        save();
+        renderExercises();
+        populateSelects();
+        closeModal("exercise-modal");
+        document.getElementById("exercise-form").reset();
         toast("Exercise custom berhasil ditambahkan.");
       };
 
-      document.getElementById("day-picker").onclick=e=>{const b=e.target.closest("button");if(!b)return;b.classList.toggle("active");};
-      
-      document.getElementById("routine-form").onsubmit=e=>{
-        e.preventDefault();
-        const id=document.getElementById("routine-id").value, name=document.getElementById("routine-name").value.trim(), description=document.getElementById("routine-description").value.trim();
-        const daysArr=[...document.querySelectorAll("#day-picker .day-chip.active")].map(b=>b.dataset.day);
-        if(!name){toast("Nama routine wajib diisi.");return;}
-        if(!selectedRoutineExercises.length){toast("Pilih minimal satu exercise untuk routine ini.");return;}
-        if(id){const r=routineById(id);if(r){r.name=name;r.description=description;r.days=daysArr;r.exerciseIds=[...selectedRoutineExercises];}}
-        else{state.routines.push({id:uid(),name,description,days:daysArr,exerciseIds:[...selectedRoutineExercises]});}
-        save();renderRoutines();populateSelects();renderDashboard();closeModal("routine-modal");toast("Routine berhasil disimpan.");
+      document.getElementById("day-picker").onclick=e=>{
+        const b=e.target.closest("button");
+        if(!b)return;
+        b.classList.toggle("active");
       };
+      
+      document.getElementById("routine-form").onsubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById("routine-id").value;
+        const name = document.getElementById("routine-name").value.trim();
+        const description = document.getElementById("routine-description").value.trim();
+        const daysSelected = Array.from(document.querySelectorAll("#day-picker .day-chip.active")).map(c => c.dataset.day);
 
-      document.getElementById("builder-exercise-search").oninput=renderBuilderExercises;
-      document.getElementById("builder-library").onclick=e=>{const b=e.target.closest("button");if(!b)return;selectedRoutineExercises.push(b.dataset.id);renderBuilderExercises();};
-      document.getElementById("builder-selected-exercises").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.id;if(b.classList.contains("remove-builder-exercise")){selectedRoutineExercises=selectedRoutineExercises.filter(x=>x!==id);}if(b.classList.contains("move-exercise")){const idx=selectedRoutineExercises.indexOf(id),dir=parseInt(b.dataset.dir);const target=idx+dir;if(target>=0&&target<selectedRoutineExercises.length){const tmp=selectedRoutineExercises[idx];selectedRoutineExercises[idx]=selectedRoutineExercises[target];selectedRoutineExercises[target]=tmp;}}renderBuilderExercises();};
-      
-      document.getElementById("start-workout-button").onclick=()=>{const rId=document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;startWorkout(rId);};
-      document.getElementById("end-workout-button").onclick=()=>showConfirm("Akhiri workout?","Sesi latihan akan disimpan ke progress riwayat.","Akhiri",endWorkout);
-      
-      document.getElementById("set-list").onclick=e=>{const b=e.target.closest("button");if(!b||!b.classList.contains("complete-set"))return;const i=parseInt(b.dataset.index),ex=currentExercise(),set=ex.sets[i];const rInput=document.getElementById(`reps-${i}`),wInput=document.getElementById(`weight-${i}`);if(!rInput.value||!wInput.value){toast("Isi reps dan weight terlebih dahulu.");return;}set.reps=rInput.value;set.weight=wInput.value;set.completedAt=new Date().toISOString();if(i===ex.sets.length-1){ex.sets.push({reps:"",weight:"",completedAt:null});}state.activeSession.restRemaining=state.settings.restSeconds;state.activeSession.restPaused=false;save();renderWorkout();toast("Set selesai! Istirahat dimulai.");};
-      document.getElementById("add-set-button").onclick=()=>{currentExercise().sets.push({reps:"",weight:"",completedAt:null});save();renderWorkout();};
-      
-      document.getElementById("previous-exercise").onclick=()=>{if(state.activeSession.currentExerciseIndex>0){state.activeSession.currentExerciseIndex--;save();renderWorkout();}};
-      document.getElementById("next-exercise").onclick=()=>{const a=state.activeSession;if(a.currentExerciseIndex<a.exercises.length-1){a.currentExerciseIndex++;save();renderWorkout();}else{endWorkout();}};
-      
-      document.getElementById("rest-pause").onclick=()=>{const a=state.activeSession;if(!a)return;a.restPaused=!a.restPaused;save();updateTimers();};
-      document.getElementById("rest-skip").onclick=()=>{const a=state.activeSession;if(!a)return;a.restRemaining=0;a.restPaused=true;save();updateTimers();toast("Waktu istirahat dilewati.");};
-      document.getElementById("rest-reset").onclick=()=>{const a=state.activeSession;if(!a)return;a.restRemaining=state.settings.restSeconds;save();updateTimers();};
-      document.getElementById("exercise-notes").oninput=e=>{const ex=currentExercise();if(ex){ex.notes=e.target.value;save();}};
+        if (!name) {
+          toast("Nama routine wajib diisi!");
+          return;
+        }
+        if (selectedRoutineExercises.length === 0) {
+          toast("Pilih minimal 1 exercise!");
+          return;
+        }
+
+        const routineData = {
+          id: id || uid(),
+          name,
+          description,
+          days: daysSelected,
+          exerciseIds: selectedRoutineExercises.map(item => item.id),
+          exercises: selectedRoutineExercises
+        };
+
+        if (id) {
+          const idx = state.routines.findIndex(r => r.id === id);
+          if (idx !== -1) state.routines[idx] = routineData;
+        } else {
+          state.routines.push(routineData);
+        }
+
+        save();
+        closeModal("routine-modal");
+        renderRoutines();
+        renderDashboard();
+        toast("Routine berhasil disimpan!");
+      };
     });
   </script>
 </body>
