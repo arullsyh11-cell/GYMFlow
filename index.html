@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rancang jadwal latihan dan kelola rutinitas fitness Anda dengan mudah di GymFlow.">
+  <link rel="icon" type="image/png" sizes="48x48" href="/LOGO.png">
+  <link rel="apple-touch-icon" href="LOGO.png">
+  <title>GymFlow — Your Fitness Journey</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <!-- Library html2pdf untuk ekspor PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="w-full">
+
+<div id="splash-screen">
+  <div class="logo-splash">
+    <img src="LOGO_PL-removebg-preview.png" alt="GYMFlow">
+    <span>GYMFlow</span>
+  </div>
+</div>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navigasi utama desktop">
+      <div class="flex items-center gap-3 px-3 mb-10">
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-lime-300 text-slate-950 grid place-items-center">
+          <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+        </div>
+        <span class="font-extrabold text-xl tracking-tight">GYMFlow</span>
+      </div>
+      <nav class="space-y-2" id="desktop-nav">
+        <button class="nav-item active w-full" data-tab="dashboard"><i data-lucide="layout-grid"></i>Home</button> 
+        <button class="nav-item w-full" data-tab="exercises"><i data-lucide="book-open"></i>Exercises</button> 
+        <button class="nav-item w-full" data-tab="routines"><i data-lucide="repeat"></i>Routines</button> 
+        <button class="nav-item w-full" data-tab="workout"><i data-lucide="timer"></i>Workout</button> 
+        <button class="nav-item w-full" data-tab="history"><i data-lucide="trending-up"></i>Progress</button>
+      </nav>
+      <div class="mt-auto space-y-3">
+        <button id="desktop-reset" class="secondary-btn w-full text-sm">Reset data</button>
+        <p class="muted text-xs px-2">Data tersimpan di perangkat ini.</p>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="flex items-center justify-between gap-4 mb-7">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl overflow-hidden bg-lime-300/10 border border-lime-500/20 grid place-items-center shrink-0">
+            <img src="LOGO.jpg" alt="Logo" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h1 class="font-extrabold text-2xl tracking-tight">GYMFlow</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span> 
+          <button id="open-profile-btn" type="button" aria-label="Profil & Target" title="Profil & Target">A</button>
+        </div>
+      </header>
+      
+      <!-- DASHBOARD TAB -->
+      <section id="dashboard" class="tab active" aria-label="Dashboard">
+        <div id="weekly-target-container" class="panel p-5 mb-5 relative overflow-hidden">
+          <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
+          <p id="siap-bergerak-label" class="text-lime-300 font-bold text-sm relative tracking-wider">SELAMAT PAGI, <span id="profile-name-display">COYY</span>?</p>
+          <p id="next-workout-copy" class="muted mt-2 relative text-sm">Pilih routine dan mulai saat kamu siap.</p>
+
+          <!-- KARTU TARGET MINGGUAN MODERN (THIS WEEK) -->
+          <div class="mt-4 p-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] relative">
+            <!-- Header: Judul & Pill Badge -->
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-extrabold text-lg tracking-tight">This Week</h3>
+              <span id="weekly-pill-count" class="px-3 py-1 rounded-full bg-[var(--lime)] text-[#142009] font-extrabold text-xs">0/4</span>
+            </div>
+
+            <!-- Baris Hari Mingguan (Mon - Sun) -->
+            <div id="weekly-days-bar" class="grid grid-cols-7 gap-1 text-center mb-4"></div>
+
+            <!-- Progress Bar & Persentase -->
+            <div>
+              <div class="flex justify-between text-xs font-bold muted mb-1.5">
+                <span>Weekly target progress</span>
+                <span id="weekly-progress-percent" class="text-[var(--text)]">0%</span>
+              </div>
+              <div class="progress-line">
+                <span id="weekly-progress-bar-fill" style="width: 0%"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
+            <button id="dashboard-start" class="lime-btn px-5 w-full relative">Mulai Workout</button>
+          </div>
+        </div>
+
+        <!-- KALENDER BULANAN -->
+        <div class="panel p-5 mb-5">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-5 h-5 text-lime-300"></i>
+              <h3 id="calendar-month-title" class="font-extrabold text-lg">September 2026</h3>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(-1)" aria-label="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+              <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(1)" aria-label="Bulan berikutnya"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold muted mb-2">
+            <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+          </div>
+          <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+        </div>
+
+        <!-- SESI AKTIF -->
+        <div class="panel p-5 mb-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <p class="muted text-xs font-bold uppercase tracking-wider">Sesi Aktif</p>
+            <i data-lucide="activity" class="w-4 h-4 text-lime-300"></i>
+          </div>
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <p id="active-session-copy" class="muted text-sm font-medium m-0">Belum ada sesi aktif.</p>
+            <button id="resume-workout" class="secondary-btn px-3 py-1.5 text-xs hidden shrink-0">Lanjutkan</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ROUTINES TAB -->
+      <section id="routines" class="tab" aria-label="Routines">
+        <div class="panel p-6 mb-6 relative overflow-hidden bg-gradient-to-r from-[var(--surface)] to-[var(--surface-2)]">
+          <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-[var(--lime)] opacity-10 blur-xl pointer-events-none"></div>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-[var(--lime)]/15 text-[var(--lime)] grid place-items-center shrink-0">
+                <i data-lucide="repeat" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-3">
+                  <h2 class="font-extrabold text-2xl md:text-3xl tracking-tight">Routines</h2>
+                  <span class="px-2.5 py-1 rounded-md bg-[var(--lime)]/15 text-[var(--lime)] text-xs font-bold uppercase tracking-wider">Workout Planner</span>
+                </div>
+                <p class="muted text-sm mt-1 max-w-lg">Atur program latihan mingguanmu, kelompokkan gerakan terbaik, dan capai target otot maksimal.</p>
+              </div>
+            </div>
+            <button id="open-routine-builder" class="lime-btn px-5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--lime)]/10 shrink-0">
+              <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i> Buat Routine Baru
+            </button>
+          </div>
+        </div>
+
+        <div id="routine-list" class="grid lg:grid-cols-2 gap-5"></div>
+        
+        <div id="routine-empty" class="panel p-12 text-center hidden flex flex-col items-center justify-center">
+          <div class="w-16 h-16 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] grid place-items-center text-[var(--lime)] mb-4 shadow-inner">
+            <i data-lucide="repeat" class="w-8 h-8 opacity-80"></i>
+          </div>
+          <h3 class="font-extrabold text-lg">Belum Ada Routine Latihan</h3>
+          <p class="muted text-sm mt-1 max-w-sm">Mulai rancang jadwal dan rangkaian gerakan latihan pertamamu sekarang.</p>
+          <button onclick="openRoutineBuilder()" class="lime-btn px-5 mt-5 text-xs">Buat Routine Sekarang</button>
+        </div>
+      </section>
+      
+      <!-- EXERCISES TAB -->
+      <section id="exercises" class="tab" aria-label="Exercise Library">
+        <div class="panel p-6 mb-6 relative overflow-hidden bg-gradient-to-r from-[var(--surface)] to-[var(--surface-2)]">
+          <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-[var(--lime)] opacity-10 blur-xl pointer-events-none"></div>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-md bg-[var(--lime)]/15 text-[var(--lime)] text-xs font-bold uppercase tracking-wider">Exercise Directory</span>
+              </div>
+              <h2 class="font-extrabold text-2xl md:text-3xl tracking-tight">Exercises</h2>
+              <p class="muted text-sm mt-1 max-w-lg">Cari exercise bawaan atau tambahkan gerakan custom sesuai kebutuhan latihanmu.</p>
+            </div>
+            <button id="open-exercise-builder" class="lime-btn px-5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--lime)]/10 shrink-0">
+              <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i> Tambah Exercise
+            </button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-[1fr_260px] gap-3 mb-6">
+          <label class="sr-only" for="exercise-search">Cari exercise</label> 
+          <input id="exercise-search" class="field" type="search" placeholder="Cari berdasarkan nama atau equipment..."> 
+          
+          <div id="custom-muscle-filter" class="custom-select-wrapper">
+            <div class="field custom-select-trigger" tabindex="0">
+              <span class="selected-label">Semua target otot</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+            </div>
+            <div class="custom-options">
+              <div class="custom-option selected" data-value="">Semua target otot</div>
+              <div class="custom-option" data-value="Cardio">Cardio</div>
+              <div class="custom-option" data-value="Chest">Chest</div>
+              <div class="custom-option" data-value="Back">Back</div>
+              <div class="custom-option" data-value="Shoulders">Shoulders</div>
+              <div class="custom-option" data-value="Legs">Legs</div>
+              <div class="custom-option" data-value="Arms">Arms</div>
+              <div class="custom-option" data-value="Core">Core</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="exercise-list" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        
+        <div id="exercise-empty" class="panel p-12 text-center hidden flex flex-col items-center justify-center">
+          <div class="w-16 h-16 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] grid place-items-center text-[var(--lime)] mb-4 shadow-inner">
+            <i data-lucide="search" class="w-8 h-8 opacity-80"></i>
+          </div>
+          <h3 class="font-extrabold text-lg">Exercise Tidak Ditemukan</h3>
+          <p class="muted text-sm mt-1 max-w-sm">Coba ubah kata kunci pencarian atau tambahkan exercise custom baru.</p>
+        </div>
+      </section>
+      
+      <!-- WORKOUT TAB -->
+      <section id="workout" class="tab" aria-label="Live Workout">
+        <div id="workout-start-state" class="panel p-5 md:p-6 max-w-xl mx-auto">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-[var(--lime)]/15 text-[var(--lime)] text-xs font-bold uppercase tracking-wider">Live Workout</span>
+          </div>
+          <h2 class="font-extrabold text-2xl md:text-3xl tracking-tight">Mulai sesi berikutnya.</h2>
+          <p class="muted text-sm mt-1 mb-6">Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.</p>
+          
+          <label class="block text-xs font-bold uppercase tracking-wider muted mb-2" for="custom-workout-routine">Pilih Routine</label> 
+          <div id="custom-workout-routine" class="custom-select-wrapper mb-4">
+            <div class="field custom-select-trigger" tabindex="0">
+              <span class="selected-label">Pilih routine...</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+            </div>
+            <div class="custom-options" id="workout-routine-options"></div>
+          </div> 
+          
+          <button id="start-workout-button" class="lime-btn w-full flex items-center justify-center gap-2 mt-2">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i> Mulai Sesi
+          </button>
+
+          <div class="mt-4 pt-4 border-t border-[var(--line)] text-center">
+            <button type="button" class="secondary-btn w-full text-xs py-2" onclick="openRoutineBuilder()">+ Buat Routine Baru</button>
+          </div>
+        </div>
+
+        <div id="workout-live-state" class="hidden">
+          <div class="panel p-4 mb-4 sticky top-3 z-10">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p id="workout-routine-name" class="font-extrabold"></p>
+                <p id="workout-elapsed" class="muted text-sm">00:00</p>
+              </div>
+              <div class="min-w-[150px] flex-1 max-w-xs">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Progress</span><span id="workout-progress-label">0/0 Set</span>
+                </div>
+                <div class="progress-line">
+                  <span id="workout-progress-bar"></span>
+                </div>
+              </div>
+              <button id="end-workout-button" class="danger-btn px-4">Akhiri workout</button>
+            </div>
+          </div>
+
+          <div id="rest-timer-card" class="panel p-4 mb-4 hidden border-lime-300">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-bold text-lime-300 tracking-wider">WAKTU ISTIRAHAT</p>
+                <strong id="rest-time" class="block text-3xl tracking-tight">01:30</strong>
+              </div>
+              <div class="flex gap-2">
+                <button id="rest-pause" class="secondary-btn px-3">Jeda</button> 
+                <button id="rest-skip" class="secondary-btn px-3">Lewati</button> 
+                <button id="rest-reset" class="secondary-btn px-3">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <article class="panel p-5">
+            <div class="flex justify-between gap-3 items-start">
+              <div>
+                <p id="exercise-position" class="text-lime-300 text-sm font-bold"></p>
+                <h2 id="active-exercise-name" class="font-extrabold text-2xl mt-1"></h2>
+                <p id="previous-performance" class="muted text-sm mt-1"></p>
+              </div>
+              <span id="active-exercise-muscle" class="chip"></span>
+            </div>
+            
+            <label class="block mt-5 text-sm font-bold" for="exercise-notes">Catatan</label> 
+            <textarea id="exercise-notes" class="field mt-2 min-h-20" placeholder="Contoh: jaga tempo saat turun"></textarea>
+            
+            <div id="set-table-header" class="grid grid-cols-[44px_1fr_1fr_44px] gap-2 px-2 mb-2 text-xs font-semibold text-[var(--muted)]">
+              <span class="text-center">Set</span>
+              <span id="col-header-1">Reps</span>
+              <span id="col-header-2">Weight (kg)</span>
+              <span class="text-center">Status</span>
+            </div>
+            
+            <div id="set-list" class="space-y-2"></div>
+            
+            <button id="add-set-button" class="secondary-btn px-4 mt-4"><i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>Tambah Set</button>
+            
+            <div class="flex justify-between gap-3 mt-6">
+              <button id="previous-exercise" class="secondary-btn px-4">← Sebelumnya</button> 
+              <button id="next-exercise" class="lime-btn px-4">Exercise berikutnya →</button>
+            </div>
+          </article>
+        </div>
+      </section>
+      
+      <!-- HISTORY TAB (PROGRESS) -->
+      <section id="history" class="tab" aria-label="Workout History">
+        <!-- Header Progress & Tombol Export -->
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
+          <div>
+            <h2 class="font-extrabold text-2xl">Progress</h2>
+            <p id="workouts-logged-count" class="muted text-sm mt-1">0 workouts logged</p>
+          </div>
+          <div class="flex items-center">
+            <button id="export-pdf-daily" class="secondary-btn px-4 text-xs flex items-center gap-1.5 font-bold">
+              <i data-lucide="file-down" class="w-4 h-4 text-lime-300"></i> Export
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Tab Pill Interaktif (Overview | Weight | History) -->
+        <div class="flex items-center p-1 bg-[var(--surface-2)] border border-[var(--line)] rounded-xl mb-5">
+          <button type="button" id="tab-overview-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg bg-[var(--surface)] text-[var(--text)] shadow-sm transition-all" onclick="switchProgressTab('overview')">Overview</button>
+          <button type="button" id="tab-weight-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('weight')">Weight</button>
+          <button type="button" id="tab-history-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('history')">History</button>
+        </div>
+
+        <!-- KONTEN TAB OVERVIEW -->
+        <div id="progress-overview-content" class="space-y-5">
+          <!-- Kotak Metrik 2x2 Berdampingan (Grid 2 Kolom) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-amber-400"><i data-lucide="flame" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-session-count" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0</strong>
+                <p class="muted text-xs font-bold mt-0.5">Total Workouts</p>
+              </div>
+            </div>
+
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-orange-400"><i data-lucide="flame" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-calories" class="block text-2xl md:text-3xl font-extrabold tracking-tight text-lime-300">0 kkal</strong>
+                <p class="muted text-xs font-bold mt-0.5">Total Calories</p>
+              </div>
+            </div>
+
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-indigo-400"><i data-lucide="timer" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-total-time" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong>
+                <p class="muted text-xs font-bold mt-0.5">Total Time</p>
+              </div>
+            </div>
+
+            <div class="metric flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-cyan-400"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></span>
+              </div>
+              <div>
+                <strong id="history-avg-duration" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong>
+                <p class="muted text-xs font-bold mt-0.5">Avg Duration</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grafik Workouts per Week -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-4">Workouts per Week</h3>
+            <div id="workouts-per-week-chart" class="h-48 w-full"></div>
+          </div>
+
+          <!-- Grafik Calories per Workout -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-4">Calories per Workout</h3>
+            <div id="calories-per-workout-chart" class="h-48 w-full"></div>
+          </div>
+        </div>
+
+        <!-- KONTEN TAB WEIGHT (BERSIH DARI DATA DUMMY) -->
+        <div id="progress-weight-content" class="space-y-4 hidden">
+          <!-- Current Weight Card -->
+          <div class="panel p-5 flex items-center justify-between">
+            <div>
+              <p class="muted text-xs font-bold uppercase tracking-wider">Current Weight</p>
+              <div class="mt-1 flex items-baseline gap-1.5">
+                <strong id="current-weight-display" class="text-3xl font-extrabold tracking-tight">65</strong>
+                <span class="muted text-sm font-bold">kg</span>
+              </div>
+            </div>
+            <button type="button" class="lime-btn px-4 text-xs" onclick="openWeightModal()">Log Weight</button>
+          </div>
+
+          <!-- Weight Trend Chart -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-4">Weight Trend</h3>
+            <div id="weight-chart-area" class="h-48 w-full"></div>
+          </div>
+
+          <!-- Log List -->
+          <div class="panel p-5">
+            <h3 class="font-extrabold text-lg mb-3">Log</h3>
+            <div id="weight-log-list" class="divide-y divide-[var(--line)]"></div>
+            <div id="weight-log-empty" class="text-center py-6 hidden">
+              <p class="muted text-xs">Belum ada riwayat berat badan.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KONTEN TAB HISTORY (DAFTAR RIWAYAT KARTU) -->
+        <div id="progress-history-content" class="space-y-4 hidden">
+          <div class="flex items-center gap-2 mb-2 overflow-x-auto pb-1">
+            <button type="button" class="chip history-time-chip active" data-time="all">Semua Riwayat</button>
+            <button type="button" class="chip history-time-chip" data-time="today">Hari Ini</button>
+            <button type="button" class="chip history-time-chip" data-time="week">Seminggu Terakhir</button>
+          </div>
+
+          <div id="history-list" class="space-y-3"></div>
+          
+          <div id="history-empty" class="panel p-8 text-center hidden">
+            <p class="muted">Belum ada history. Selesaikan workout untuk melihat progress di sini.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" aria-label="Bottom Navigation">
+      <button class="mobile-nav-btn active" data-tab="dashboard" title="Home">
+        <i data-lucide="layout-grid"></i>
+        <span>Home</span>
+      </button> 
+      <button class="mobile-nav-btn" data-tab="exercises" title="Exercises">
+        <i data-lucide="book-open"></i>
+        <span>Exercises</span>
+      </button> 
+      <button class="mobile-nav-btn center-fab-btn" data-tab="routines" title="Routines">
+        <div class="fab-circle">
+          <i data-lucide="repeat"></i>
+        </div>
+        <span>Routines</span>
+      </button> 
+      <button class="mobile-nav-btn" data-tab="workout" title="Workout">
+        <i data-lucide="timer"></i>
+        <span>Workout</span>
+      </button> 
+      <button class="mobile-nav-btn" data-tab="history" title="Progress">
+        <i data-lucide="trending-up"></i>
+        <span>Progress</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODALS -->
+  <div id="weight-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="weight-modal-title">
+    <form id="weight-form" class="modal max-w-md">
+      <div class="flex justify-between gap-3 items-center mb-5">
+        <h2 id="weight-modal-title" class="font-extrabold text-xl">Catat Berat Badan</h2>
+        <button type="button" class="icon-btn close-modal" data-close="weight-modal" aria-label="Tutup form berat badan"><i data-lucide="x"></i></button>
+      </div>
+      
+      <label class="block text-sm font-bold" for="weight-input-val">Berat Badan (kg)</label>
+      <input id="weight-input-val" class="field mt-2" type="number" step="0.1" min="20" max="300" required placeholder="Contoh: 65.0"> 
+
+      <label class="block text-sm font-bold mt-4" for="weight-date-val">Tanggal</label>
+      <input id="weight-date-val" class="field mt-2" type="date" required> 
+
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="weight-modal">Batal</button>
+        <button class="lime-btn px-4" type="submit">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="profile-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal">
+      <div class="flex justify-end mb-1">
+        <button type="button" class="icon-btn !w-8 !h-8 close-modal" data-close="profile-modal" aria-label="Tutup profil"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      
+      <!-- Kartu Header Profil -->
+      <div class="panel p-4 mb-5 flex items-center gap-4 bg-[var(--surface-2)] border-[var(--line)]">
+        <div id="profile-avatar-initial" class="w-14 h-14 rounded-2xl bg-lime-300 text-slate-950 font-extrabold text-2xl grid place-items-center shrink-0">A</div>
+        <div>
+          <h2 id="profile-header-name" class="font-extrabold text-xl tracking-tight">COYY</h2>
+          <p id="profile-header-stats" class="muted text-xs mt-0.5">13 workouts · 4,250 kkal</p>
+          <span id="profile-header-target-badge" class="inline-block mt-1 text-[11px] font-bold text-lime-300">4x/week target</span>
+        </div>
+      </div>
+
+      <form id="profile-form" class="space-y-5">
+        <!-- Personal Data Section -->
+        <div class="space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider muted">Personal Data</h3>
+          
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-name-input">Name</label>
+            <input id="profile-name-input" class="field" type="text" maxlength="30" placeholder="Contoh: COYY" required>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-age-input">Age</label>
+            <input id="profile-age-input" class="field" type="number" min="10" max="120" placeholder="Contoh: 28">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 items-end">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-tb">Height (<span id="height-unit-label">cm</span>)</label>
+              <input id="profile-tb" class="field" type="number" min="50" max="250" required placeholder="178">
+            </div>
+            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)]">
+              <button type="button" id="unit-cm" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" onclick="setHeightUnit('cm')">cm</button>
+              <button type="button" id="unit-ft" class="flex-1 py-2 text-xs font-bold rounded-lg muted transition-all" onclick="setHeightUnit('ft')">ft</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 items-end">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-bb">Weight (<span id="weight-unit-label">kg</span>)</label>
+              <input id="profile-bb" class="field" type="number" step="0.5" min="20" max="300" required placeholder="78">
+            </div>
+            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)]">
+              <button type="button" id="unit-kg" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" onclick="setWeightUnit('kg')">kg</button>
+              <button type="button" id="unit-lbs" class="flex-1 py-2 text-xs font-bold rounded-lg muted transition-all" onclick="setWeightUnit('lbs')">lbs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Target Section -->
+        <div class="space-y-2 pt-2 border-t border-[var(--line)]">
+          <h3 class="text-xs font-bold uppercase tracking-wider muted">Weekly Target</h3>
+          <p class="muted text-xs">How many workouts per week are you aiming for?</p>
+          <div id="weekly-target-pills" class="grid grid-cols-6 gap-1.5 pt-1">
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="2">2</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="3">3</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill active" data-val="4">4</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="5">5</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="6">6</button>
+            <button type="button" class="chip !justify-center !py-2.5 font-bold text-sm target-pill" data-val="7">7</button>
+          </div>
+        </div>
+
+        <!-- Tombol Save Profile -->
+        <button class="lime-btn w-full mt-4" type="submit">Save Profile</button>
+      </form>
+
+      <!-- Appearance Section -->
+      <div class="space-y-3 pt-4 mt-4 border-t border-[var(--line)]">
+        <h3 class="text-xs font-bold uppercase tracking-wider muted">Appearance</h3>
+        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+          <div>
+            <p class="font-bold text-sm">Dark Mode</p>
+            <p id="dark-mode-desc" class="muted text-xs">Currently dark</p>
+          </div>
+          <button type="button" id="profile-dark-toggle" class="w-12 h-6 rounded-full bg-lime-300 p-1 transition-colors relative" onclick="toggleProfileDarkMode()">
+            <div id="dark-mode-thumb" class="w-4 h-4 rounded-full bg-slate-950 transition-transform translate-x-6"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Data & Storage Section -->
+      <div class="space-y-3 pt-4 mt-4 border-t border-[var(--line)]">
+        <h3 class="text-xs font-bold uppercase tracking-wider muted">Data & Storage</h3>
+        <div class="space-y-2 text-xs p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+          <div class="flex justify-between"><span class="muted">Workout sessions</span><strong id="storage-sessions-count">0</strong></div>
+          <div class="flex justify-between"><span class="muted">Weight entries</span><strong id="storage-weights-count">0</strong></div>
+          <div class="flex justify-between"><span class="muted">Routines</span><strong id="storage-routines-count">0</strong></div>
+          <div class="flex justify-between"><span class="muted">Custom exercises</span><strong id="storage-customs-count">0</strong></div>
+          <div class="flex justify-between pt-2 border-t border-[var(--line)]"><span class="muted">Storage</span><strong class="text-lime-300">Local device</strong></div>
+        </div>
+        <button type="button" class="danger-btn w-full text-xs py-2.5" onclick="triggerProfileReset()">Reset All Data</button>
+      </div>
+
+      <!-- App Info Footer -->
+      <div class="mt-5 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-lime-300 text-slate-950 font-extrabold grid place-items-center shrink-0">G</div>
+        <div>
+          <p class="font-extrabold text-xs">GYMFlow</p>
+          <p class="muted text-[10px]">Version 1.0.0</p>
+        </div>
+      </div>
+      <p class="muted text-[10px] text-center mt-2 px-2 leading-relaxed">All data is stored locally on your device. No account required. Your workouts, routines, and progress stay private.</p>
+    </div>
+  </div>
+
+  <div id="routine-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
+    <form id="routine-form" class="modal max-w-xl">
+      <div class="flex justify-between gap-3 items-center pb-4 mb-5 border-b border-[var(--line)]">
+        <div>
+          <h2 id="routine-modal-title" class="font-extrabold text-xl">Routine Builder</h2>
+          <p class="muted text-xs mt-0.5">Rancang alur latihan dan pilih gerakan terbaikmu.</p>
+        </div>
+        <button type="button" class="icon-btn close-modal" data-close="routine-modal" aria-label="Tutup builder routine"><i data-lucide="x"></i></button>
+      </div>
+
+      <input id="routine-id" type="hidden"> 
+
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider muted mb-1.5" for="routine-name">Nama Routine</label>
+          <input id="routine-name" class="field" required="" maxlength="50" placeholder="Contoh: Upper Body Hypertrophy">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider muted mb-1.5" for="routine-description">Deskripsi Singkat <span class="font-normal normal-case">(opsional)</span></label>
+          <textarea id="routine-description" class="field min-h-[70px]" maxlength="140" placeholder="Fokus dan tujuan dari routine ini..."></textarea>
+        </div>
+      </div>
+
+      <div class="mb-6 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+        <label class="block text-xs font-bold uppercase tracking-wider muted mb-2.5">Jadwal Hari Latihan</label>
+        <div id="day-picker" class="grid grid-cols-7 gap-1.5"></div>
+      </div>
+
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2.5">
+          <label class="block text-xs font-bold uppercase tracking-wider muted">Daftar Exercise <span id="selected-count" class="ml-1 px-2 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--line)] text-xs font-bold text-[var(--lime)]">0 dipilih</span></label>
+        </div>
+        <div id="builder-selected-exercises" class="space-y-2 max-h-56 overflow-auto p-1"></div>
+      </div>
+
+      <div class="pt-4 border-t border-[var(--line)] mb-6">
+        <label class="block text-xs font-bold uppercase tracking-wider muted mb-2">Tambah dari Library</label>
+        <input id="builder-exercise-search" class="field mb-2.5" type="search" placeholder="Cari nama exercise...">
+        <div id="builder-library" class="max-h-48 overflow-auto space-y-1.5 pr-1"></div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-[var(--line)]">
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="routine-modal">Batal</button>
+        <button class="lime-btn px-5" type="submit">Simpan Routine</button>
+      </div>
+    </form>
+  </div>
+  
+  <div id="exercise-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
+    <form id="exercise-form" class="modal max-w-md">
+      <div class="flex justify-between gap-3 items-center mb-5">
+        <h2 id="exercise-modal-title" class="font-extrabold text-xl">Tambah Exercise Custom</h2>
+        <button type="button" class="icon-btn close-modal" data-close="exercise-modal" aria-label="Tutup form exercise"><i data-lucide="x"></i></button>
+      </div>
+      
+      <label class="block text-sm font-bold" for="custom-exercise-name">Nama exercise</label>
+      <input id="custom-exercise-name" class="field mt-2" required="" maxlength="60" placeholder="Contoh: Cable Fly"> 
+      
+      <label class="block text-sm font-bold mt-4">Target otot</label>
+      <div id="custom-exercise-muscle-select" class="custom-select-wrapper mt-2">
+        <div class="field custom-select-trigger" tabindex="0">
+          <span class="selected-label">Pilih target otot</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+        </div>
+        <div class="custom-options">
+          <div class="custom-option selected" data-value="">Pilih target otot</div>
+          <div class="custom-option" data-value="Cardio">Cardio</div>
+          <div class="custom-option" data-value="Chest">Chest</div>
+          <div class="custom-option" data-value="Back">Back</div>
+          <div class="custom-option" data-value="Shoulders">Shoulders</div>
+          <div class="custom-option" data-value="Legs">Legs</div>
+          <div class="custom-option" data-value="Arms">Arms</div>
+          <div class="custom-option" data-value="Core">Core</div>
+        </div>
+      </div> 
+
+      <label class="block text-sm font-bold mt-4" for="custom-exercise-equipment">Equipment</label>
+      <input id="custom-exercise-equipment" class="field mt-2" required="" maxlength="40" placeholder="Contoh: Cable machine">
+      
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="secondary-btn px-4 close-modal" data-close="exercise-modal">Batal</button>
+        <button class="lime-btn px-4" type="submit">Simpan Exercise</button>
+      </div>
+    </form>
+  </div>
+  
+  <div id="confirm-modal" class="modal-layer" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal max-w-md">
+      <h2 id="confirm-title" class="font-extrabold text-xl">Konfirmasi tindakan</h2>
+      <p id="confirm-message" class="muted mt-2"></p>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="confirm-cancel" class="secondary-btn px-4">Batal</button>
+        <button id="confirm-action" class="danger-btn px-4">Hapus</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast" role="status" aria-live="polite">Profil & target diperbarui secara otomatis.</div>
+  
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
+</body>
+</html>
