@@ -7,6 +7,264 @@ const KEY = "gymflow-v3";
     let state, selectedRoutineExercises = [], confirmCallback = null, elapsedInterval = null;
     let currentCalendarDate = new Date();
 
+
+    // ==================== GYMFlow i18n ====================
+    // UI translation layer: keeps workout/user data intact and only translates interface text.
+    const I18N = {
+      "GYMFlow": {id:"GYMFlow", en:"GYMFlow"},
+      "Home": {id:"Beranda", en:"Home"},
+      "Exercises": {id:"Latihan", en:"Exercises"},
+      "Routines": {id:"Routine", en:"Routines"},
+      "Workout": {id:"Workout", en:"Workout"},
+      "Progress": {id:"Progres", en:"Progress"},
+      "Reset data": {id:"Reset data", en:"Reset data"},
+      "Data tersimpan di perangkat ini.": {id:"Data tersimpan di perangkat ini.", en:"Data is stored on this device."},
+      "Offline": {id:"Offline", en:"Offline"},
+      "SELAMAT PAGI,": {id:"SELAMAT PAGI,", en:"GOOD MORNING,"},
+      "SELAMAT SIANG,": {id:"SELAMAT SIANG,", en:"GOOD AFTERNOON,"},
+      "SELAMAT SORE,": {id:"SELAMAT SORE,", en:"GOOD EVENING,"},
+      "SELAMAT MALAM,": {id:"SELAMAT MALAM,", en:"GOOD EVENING,"},
+      "Pilih routine dan mulai saat kamu siap.": {id:"Pilih routine dan mulai saat kamu siap.", en:"Choose a routine and start when you're ready."},
+      "Buat routine pertama untuk mulai mencatat progress.": {id:"Buat routine pertama untuk mulai mencatat progress.", en:"Create your first routine to start tracking progress."},
+      "This Week": {id:"Minggu Ini", en:"This Week"},
+      "Weekly target progress": {id:"Progres target mingguan", en:"Weekly target progress"},
+      "Mulai Workout": {id:"Mulai Workout", en:"Start Workout"},
+      "Sesi Aktif": {id:"Sesi Aktif", en:"Active Session"},
+      "Belum ada sesi aktif.": {id:"Belum ada sesi aktif.", en:"No active session."},
+      "Lanjutkan": {id:"Lanjutkan", en:"Resume"},
+      "Routines": {id:"Routine", en:"Routines"},
+      "Workout Planner": {id:"Perencana Workout", en:"Workout Planner"},
+      "Atur program latihan mingguanmu, kelompokkan gerakan terbaik, dan capai target otot maksimal.": {id:"Atur program latihan mingguanmu, kelompokkan gerakan terbaik, dan capai target otot maksimal.", en:"Plan your weekly workouts, group your best movements, and maximize your training goals."},
+      "Buat Routine Baru": {id:"Buat Routine Baru", en:"Create New Routine"},
+      "Belum Ada Routine Latihan": {id:"Belum Ada Routine Latihan", en:"No Workout Routines Yet"},
+      "Mulai rancang jadwal dan rangkaian gerakan latihan pertamamu sekarang.": {id:"Mulai rancang jadwal dan rangkaian gerakan latihan pertamamu sekarang.", en:"Start planning your first workout schedule and exercise sequence now."},
+      "Buat Routine Sekarang": {id:"Buat Routine Sekarang", en:"Create Routine Now"},
+      "Exercise Directory": {id:"Daftar Exercise", en:"Exercise Directory"},
+      "Cari exercise bawaan atau tambahkan gerakan custom sesuai kebutuhan latihanmu.": {id:"Cari exercise bawaan atau tambahkan gerakan custom sesuai kebutuhan latihanmu.", en:"Browse built-in exercises or add custom movements for your training needs."},
+      "Tambah Exercise": {id:"Tambah Exercise", en:"Add Exercise"},
+      "Cari exercise": {id:"Cari exercise", en:"Search exercises"},
+      "Semua target otot": {id:"Semua target otot", en:"All muscle targets"},
+      "Cardio": {id:"Kardio", en:"Cardio"},
+      "Chest": {id:"Dada", en:"Chest"},
+      "Back": {id:"Punggung", en:"Back"},
+      "Shoulders": {id:"Bahu", en:"Shoulders"},
+      "Legs": {id:"Kaki", en:"Legs"},
+      "Arms": {id:"Lengan", en:"Arms"},
+      "Core": {id:"Core", en:"Core"},
+      "Exercise Tidak Ditemukan": {id:"Exercise Tidak Ditemukan", en:"No Exercises Found"},
+      "Coba ubah kata kunci pencarian atau tambahkan exercise custom baru.": {id:"Coba ubah kata kunci pencarian atau tambahkan exercise custom baru.", en:"Try changing your search or add a new custom exercise."},
+      "Live Workout": {id:"Live Workout", en:"Live Workout"},
+      "Mulai sesi berikutnya.": {id:"Mulai sesi berikutnya.", en:"Start your next session."},
+      "Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.": {id:"Pilih routine untuk mencatat Set, Reps, dan Weight secara cepat.", en:"Choose a routine to quickly record sets, reps, and weight."},
+      "Pilih Routine": {id:"Pilih Routine", en:"Choose Routine"},
+      "Pilih routine...": {id:"Pilih routine...", en:"Choose routine..."},
+      "Mulai Sesi": {id:"Mulai Sesi", en:"Start Session"},
+      "+ Buat Routine Baru": {id:"+ Buat Routine Baru", en:"+ Create New Routine"},
+      "Progress": {id:"Progres", en:"Progress"},
+      "Akhiri workout": {id:"Akhiri workout", en:"End Workout"},
+      "WAKTU ISTIRAHAT": {id:"WAKTU ISTIRAHAT", en:"REST TIMER"},
+      "Jeda": {id:"Jeda", en:"Pause"},
+      "Lanjut": {id:"Lanjut", en:"Resume"},
+      "Lewati": {id:"Lewati", en:"Skip"},
+      "Reset": {id:"Reset", en:"Reset"},
+      "Catatan": {id:"Catatan", en:"Notes"},
+      "Set": {id:"Set", en:"Set"},
+      "Reps": {id:"Repetisi", en:"Reps"},
+      "Weight (kg)": {id:"Berat (kg)", en:"Weight (kg)"},
+      "Status": {id:"Status", en:"Status"},
+      "Tambah Set": {id:"Tambah Set", en:"Add Set"},
+      "← Sebelumnya": {id:"← Sebelumnya", en:"← Previous"},
+      "Exercise berikutnya →": {id:"Exercise berikutnya →", en:"Next Exercise →"},
+      "Selesai workout →": {id:"Selesai workout →", en:"Finish Workout →"},
+      "Overview": {id:"Ringkasan", en:"Overview"},
+      "Weight": {id:"Berat", en:"Weight"},
+      "History": {id:"Riwayat", en:"History"},
+      "Total Workouts": {id:"Total Workout", en:"Total Workouts"},
+      "Total Calories": {id:"Total Kalori", en:"Total Calories"},
+      "Total Time": {id:"Total Waktu", en:"Total Time"},
+      "Avg Duration": {id:"Durasi Rata-rata", en:"Avg Duration"},
+      "Workouts per Week": {id:"Workout per Minggu", en:"Workouts per Week"},
+      "Calories per Workout": {id:"Kalori per Workout", en:"Calories per Workout"},
+      "Current Weight": {id:"Berat Saat Ini", en:"Current Weight"},
+      "Log Weight": {id:"Catat Berat", en:"Log Weight"},
+      "Weight Trend": {id:"Tren Berat Badan", en:"Weight Trend"},
+      "Log List": {id:"Daftar Catatan", en:"Log List"},
+      "Log": {id:"Catat", en:"Log"},
+      "Belum ada riwayat berat badan.": {id:"Belum ada riwayat berat badan.", en:"No weight history yet."},
+      "Semua Riwayat": {id:"Semua Riwayat", en:"All History"},
+      "Hari Ini": {id:"Hari Ini", en:"Today"},
+      "Seminggu Terakhir": {id:"Seminggu Terakhir", en:"Last 7 Days"},
+      "Belum ada history. Selesaikan workout untuk melihat progress di sini.": {id:"Belum ada riwayat. Selesaikan workout untuk melihat progres di sini.", en:"No history yet. Complete a workout to see your progress here."},
+      "Catat Berat Badan": {id:"Catat Berat Badan", en:"Log Weight"},
+      "Berat Badan (kg)": {id:"Berat Badan (kg)", en:"Weight (kg)"},
+      "Tanggal": {id:"Tanggal", en:"Date"},
+      "Batal": {id:"Batal", en:"Cancel"},
+      "Simpan": {id:"Simpan", en:"Save"},
+      "Profil & Target": {id:"Profil & Target", en:"Profile & Goals"},
+      "Personal Data": {id:"Data Pribadi", en:"Personal Data"},
+      "Name": {id:"Nama", en:"Name"},
+      "Age": {id:"Usia", en:"Age"},
+      "Height": {id:"Tinggi", en:"Height"},
+      "Weight": {id:"Berat", en:"Weight"},
+      "Weekly Target": {id:"Target Mingguan", en:"Weekly Target"},
+      "How many workouts per week are you aiming for?": {id:"Berapa workout per minggu yang ingin kamu capai?", en:"How many workouts per week are you aiming for?"},
+      "Save Profile": {id:"Simpan Profil", en:"Save Profile"},
+      "Appearance": {id:"Tampilan", en:"Appearance"},
+      "Dark Mode": {id:"Mode Gelap", en:"Dark Mode"},
+      "Currently dark": {id:"Saat ini gelap", en:"Currently dark"},
+      "Currently light": {id:"Saat ini terang", en:"Currently light"},
+      "Data & Storage": {id:"Data & Penyimpanan", en:"Data & Storage"},
+      "Workout sessions": {id:"Sesi workout", en:"Workout sessions"},
+      "Weight entries": {id:"Catatan berat", en:"Weight entries"},
+      "Custom exercises": {id:"Exercise custom", en:"Custom exercises"},
+      "Storage": {id:"Penyimpanan", en:"Storage"},
+      "Local device": {id:"Perangkat lokal", en:"Local device"},
+      "Reset All Data": {id:"Reset Semua Data", en:"Reset All Data"},
+      "All data is stored locally on your device. No account required. Your workouts, routines, and progress stay private.": {id:"Semua data disimpan secara lokal di perangkatmu. Tidak perlu akun. Workout, routine, dan progresmu tetap privat.", en:"All data is stored locally on your device. No account required. Your workouts, routines, and progress stay private."},
+      "Routine Builder": {id:"Pembuat Routine", en:"Routine Builder"},
+      "Rancang alur latihan dan pilih gerakan terbaikmu.": {id:"Rancang alur latihan dan pilih gerakan terbaikmu.", en:"Build your workout flow and choose your best movements."},
+      "Nama Routine": {id:"Nama Routine", en:"Routine Name"},
+      "Deskripsi Singkat": {id:"Deskripsi Singkat", en:"Short Description"},
+      "(opsional)": {id:"(opsional)", en:"(optional)"},
+      "Jadwal Hari Latihan": {id:"Jadwal Hari Latihan", en:"Workout Days"},
+      "Daftar Exercise": {id:"Daftar Exercise", en:"Exercise List"},
+      "Tambah dari Library": {id:"Tambah dari Library", en:"Add from Library"},
+      "Simpan Routine": {id:"Simpan Routine", en:"Save Routine"},
+      "Tambah Exercise Custom": {id:"Tambah Exercise Custom", en:"Add Custom Exercise"},
+      "Nama exercise": {id:"Nama exercise", en:"Exercise name"},
+      "Target otot": {id:"Target otot", en:"Target muscle"},
+      "Pilih target otot": {id:"Pilih target otot", en:"Choose target muscle"},
+      "Equipment": {id:"Peralatan", en:"Equipment"},
+      "Konfirmasi tindakan": {id:"Konfirmasi tindakan", en:"Confirm action"},
+      "Hapus": {id:"Hapus", en:"Delete"},
+      "Edit Routine": {id:"Edit Routine", en:"Edit Routine"},
+      "Selesai": {id:"Selesai", en:"Done"},
+      "Tandai Selesai": {id:"Tandai Selesai", en:"Mark Complete"},
+      "Language": {id:"Bahasa", en:"Language"},
+      "Version 1.0.0": {id:"Versi 1.0.0", en:"Version 1.0.0"},
+      "KALORI": {id:"KALORI", en:"CALORIES"}
+    };
+
+    const I18N_REVERSE = {};
+    Object.entries(I18N).forEach(([key, pair]) => {
+      I18N_REVERSE[pair.id] = key;
+      I18N_REVERSE[pair.en] = key;
+    });
+
+    function currentLanguage(){ return state?.settings?.language === "en" ? "en" : "id"; }
+    function tr(key){ return I18N[key]?.[currentLanguage()] ?? key; }
+
+    function translateDynamicText(text){
+      const lang = currentLanguage();
+      const raw = String(text ?? "");
+      if (I18N_REVERSE[raw]) return tr(I18N_REVERSE[raw]);
+
+      let m;
+      if ((m = raw.match(/^(\d+) workouts logged$/))) return lang === "en" ? `${m[1]} workouts logged` : `${m[1]} workout tercatat`;
+      if ((m = raw.match(/^(\d+) workout tercatat$/))) return lang === "en" ? `${m[1]} workouts logged` : raw;
+      if ((m = raw.match(/^(\d+)x\/week target$/))) return lang === "en" ? raw : `target ${m[1]}x/minggu`;
+      if ((m = raw.match(/^target (\d+)x\/minggu$/))) return lang === "en" ? `${m[1]}x/week target` : raw;
+      if ((m = raw.match(/^(.+) · (\d+) exercise siap dijalankan\.$/))) return lang === "en" ? `${m[1]} · ${m[2]} exercises ready.` : raw;
+      if ((m = raw.match(/^(.+) · (\d+) exercises ready\.$/))) return lang === "en" ? raw : `${m[1]} · ${m[2]} exercise siap dijalankan.`;
+      if ((m = raw.match(/^Sesi (.+) masih berjalan\.$/))) return lang === "en" ? `Session ${m[1]} is still active.` : raw;
+      if ((m = raw.match(/^Session (.+) is still active\.$/))) return lang === "en" ? raw : `Sesi ${m[1]} masih berjalan.`;
+      if (/^EXERCISE \d+ DARI \d+$/.test(raw)) return lang === "en" ? raw.replace(" DARI ", " OF ") : raw.replace("EXERCISE ", "LATIHAN ").replace(" DARI ", " DARI ");
+      if (/^LATIHAN \d+ DARI \d+$/.test(raw)) return lang === "en" ? raw.replace("LATIHAN ", "EXERCISE ").replace(" DARI ", " OF ") : raw;
+      if ((m = raw.match(/^(\d+) \/ (\d+) dipilih$/))) return lang === "en" ? `${m[1]} of ${m[2]} selected` : raw;
+      if ((m = raw.match(/^(\d+) dipilih$/))) return lang === "en" ? `${m[1]} selected` : raw;
+      if ((m = raw.match(/^Daftar Gerakan \((\d+)\)$/))) return lang === "en" ? `Exercise List (${m[1]})` : raw;
+      if ((m = raw.match(/^Exercise List \((\d+)\)$/))) return lang === "en" ? raw : `Daftar Gerakan (${m[1]})`;
+      if ((m = raw.match(/^\+(\d+) lainnya$/))) return lang === "en" ? `+${m[1]} more` : raw;
+      if ((m = raw.match(/^\+(\d+) more$/))) return lang === "en" ? raw : `+${m[1]} lainnya`;
+      if (/^\d+\/\d+ Set$/.test(raw)) return raw;
+      if ((m = raw.match(/^Sebelumnya: (.+)$/))) return lang === "en" ? `Previous: ${m[1]}` : raw;
+      if ((m = raw.match(/^Previous: (.+)$/))) return lang === "en" ? raw : `Sebelumnya: ${m[1]}`;
+      if (raw === "Belum ada catatan performance sebelumnya.") return lang === "en" ? "No previous performance recorded." : raw;
+      if (raw === "No previous performance recorded.") return lang === "en" ? raw : "Belum ada catatan performance sebelumnya.";
+      if (raw === "Belum ada exercise") return lang === "en" ? "No exercises yet" : raw;
+      if (raw === "No exercises yet") return lang === "en" ? raw : "Belum ada exercise";
+      if (raw === "Belum ada hari dijadwalkan") return lang === "en" ? "No days scheduled" : raw;
+      if (raw === "No days scheduled") return lang === "en" ? raw : "Belum ada hari dijadwalkan";
+      if (raw === "Tidak ada deskripsi rutin.") return lang === "en" ? "No routine description." : raw;
+      if (raw === "No routine description.") return lang === "en" ? raw : "Tidak ada deskripsi rutin.";
+      if (raw === "Workout tersimpan. Membakar ±${caloriesBurned} kkal!") return raw;
+      return raw;
+    }
+
+    function translateAttributes(root=document){
+      const attrNames = ["placeholder","title","aria-label"];
+      root.querySelectorAll?.("*").forEach(el => {
+        attrNames.forEach(attr => {
+          if (el.hasAttribute(attr)) {
+            const v = el.getAttribute(attr);
+            const key = I18N_REVERSE[v];
+            if (key) el.setAttribute(attr, tr(key));
+          }
+        });
+      });
+    }
+
+    function syncLanguageCustomSelect(){
+      const wrapper = document.getElementById("language-custom-select");
+      if (!wrapper) return;
+      const lang = currentLanguage();
+      const label = wrapper.querySelector(".selected-label");
+      const options = wrapper.querySelectorAll(".custom-option");
+      const labels = {
+        id: "🇮🇩 Bahasa Indonesia",
+        en: "🇬🇧 English"
+      };
+      if (label) label.textContent = labels[lang];
+      options.forEach(option => {
+        option.classList.toggle("selected", option.dataset.value === lang);
+      });
+    }
+
+    function initLanguageCustomSelect(){
+      initCustomSelect("language-custom-select", (val) => setLanguage(val));
+      syncLanguageCustomSelect();
+    }
+
+    function applyLanguage(){
+      if (!state?.settings) return;
+      const lang = currentLanguage();
+      document.documentElement.lang = lang;
+      syncLanguageCustomSelect();
+
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const nodes=[];
+      let node;
+      while ((node=walker.nextNode())) nodes.push(node);
+      nodes.forEach(n => {
+        if (!n.nodeValue.trim()) return;
+        const parent = n.parentElement;
+        if (!parent || ["SCRIPT","STYLE","INPUT","TEXTAREA","SELECT","OPTION"].includes(parent.tagName)) return;
+        const translated = translateDynamicText(n.nodeValue.trim());
+        if (translated !== n.nodeValue.trim()) {
+          const leading = n.nodeValue.match(/^\s*/)?.[0] || "";
+          const trailing = n.nodeValue.match(/\s*$/)?.[0] || "";
+          n.nodeValue = leading + translated + trailing;
+        }
+      });
+      translateAttributes(document);
+      updateHeaderInitial();
+    }
+
+    function setLanguage(lang){
+      state.settings.language = lang === "en" ? "en" : "id";
+      save();
+      syncLanguageCustomSelect();
+      // Re-render dynamic sections so generated text follows the selected language.
+      renderDashboard();
+      renderRoutines();
+      renderExercises();
+      renderWorkout();
+      renderHistory();
+      renderProfileModal();
+      applyLanguage();
+      lucide.createIcons();
+    }
+
     const seedExercises = [
       ["ex_treadmill","Treadmill","Cardio","Machine"],
       ["ex_cycling","Sepedahan (Cycling)","Cardio","Machine"],
@@ -49,7 +307,7 @@ const KEY = "gymflow-v3";
 
     function seedState() {
       return {
-        settings:{theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY"},
+        settings:{theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"},
         exercises:seedExercises,
         routines:[],
         activeSession:null,
@@ -84,7 +342,7 @@ const KEY = "gymflow-v3";
         const existingCustoms = (loaded.exercises || []).filter(e => e.isCustom);
         loaded.exercises = [...seedExercises, ...existingCustoms];
 
-        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY"};
+        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"};
         if(loaded.settings.weight === undefined) loaded.settings.weight = 65;
         if(loaded.settings.height === undefined) loaded.settings.height = 170;
         if(loaded.settings.age === undefined) loaded.settings.age = 25;
@@ -92,6 +350,7 @@ const KEY = "gymflow-v3";
         if(loaded.settings.weightUnit === undefined) loaded.settings.weightUnit = "kg";
         if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
         if(loaded.settings.userName === undefined) loaded.settings.userName = "COYY";
+        if(loaded.settings.language !== "en" && loaded.settings.language !== "id") loaded.settings.language = "id";
 
         if(!loaded.weightHistory) {
           loaded.weightHistory = [];
@@ -169,8 +428,8 @@ const KEY = "gymflow-v3";
 
       document.getElementById("profile-avatar-initial").textContent = name.charAt(0).toUpperCase();
       document.getElementById("profile-header-name").textContent = name;
-      document.getElementById("profile-header-stats").textContent = `${totalWorkouts} workouts · ${new Intl.NumberFormat("id-ID").format(totalCals)} kkal`;
-      document.getElementById("profile-header-target-badge").textContent = `${state.settings.weeklyGoal}x/week target`;
+      document.getElementById("profile-header-stats").textContent = currentLanguage()==="en" ? `${totalWorkouts} workouts · ${new Intl.NumberFormat("id-ID").format(totalCals)} kcal` : `${totalWorkouts} workout · ${new Intl.NumberFormat("id-ID").format(totalCals)} kkal`;
+      document.getElementById("profile-header-target-badge").textContent = currentLanguage()==="en" ? `${state.settings.weeklyGoal}x/week target` : `target ${state.settings.weeklyGoal}x/minggu`;
 
       document.getElementById("profile-name-input").value = name;
       document.getElementById("profile-age-input").value = state.settings.age || 25;
@@ -188,7 +447,7 @@ const KEY = "gymflow-v3";
 
       // Dark mode status
       const isDark = state.settings.theme !== "light";
-      document.getElementById("dark-mode-desc").textContent = isDark ? "Currently dark" : "Currently light";
+      document.getElementById("dark-mode-desc").textContent = isDark ? tr("Currently dark") : tr("Currently light");
       const thumb = document.getElementById("dark-mode-thumb");
       const toggleBtn = document.getElementById("profile-dark-toggle");
       if(isDark) {
@@ -214,7 +473,7 @@ const KEY = "gymflow-v3";
     }
 
     function triggerProfileReset() {
-      showConfirm("Reset all data?","Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
+      showConfirm(currentLanguage()==="en" ? "Reset all data?" : "Reset semua data?",currentLanguage()==="en" ? "All routines, history, active sessions, and custom exercises on this device will be deleted." : "Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
         state = seedState();
         save();
         setTheme();
@@ -227,7 +486,7 @@ const KEY = "gymflow-v3";
         renderWeightTab();
         updateHeaderInitial();
         closeModal("profile-modal");
-        toast("Data berhasil direset.");
+        toast(currentLanguage()==="en" ? "Data reset successfully." : "Data berhasil direset.");
       });
     }
 
@@ -244,6 +503,7 @@ const KEY = "gymflow-v3";
           if(w !== wrapper) w.classList.remove('open');
         });
         wrapper.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', wrapper.classList.contains('open') ? 'true' : 'false');
       };
 
       optionsContainer.onclick = (e) => {
@@ -256,6 +516,7 @@ const KEY = "gymflow-v3";
         option.classList.add('selected');
         label.textContent = text;
         wrapper.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
 
         if(typeof onSelectCb === 'function') onSelectCb(val, text);
       };
@@ -530,7 +791,7 @@ const KEY = "gymflow-v3";
 
     function removeSetFromBuilder(exIndex, setIndex) {
       if (selectedRoutineExercises[exIndex].sets.length <= 1) {
-        toast("Minimal harus ada 1 set!");
+        toast(currentLanguage()==="en" ? "At least one set is required!" : "Minimal harus ada 1 set!");
         return;
       }
       selectedRoutineExercises[exIndex].sets.splice(setIndex, 1);
@@ -669,7 +930,7 @@ const KEY = "gymflow-v3";
       // Render Baris Hari (Mon - Sun)
       const daysBar = document.getElementById("weekly-days-bar");
       if (daysBar) {
-        const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const dayNames = currentLanguage()==="en" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
         daysBar.innerHTML = weekDates.map((item, idx) => {
           let circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-medium text-[var(--muted)]";
           let indicatorStyle = "h-1 w-full rounded-full bg-[var(--line)] mb-2";
@@ -694,14 +955,15 @@ const KEY = "gymflow-v3";
 
     function renderDashboard(){
       const currentHour = new Date().getHours();
-      let greeting = "SELAMAT MALAM";
+      let greetingKey = "SELAMAT MALAM,";
       if (currentHour >= 3 && currentHour < 11) {
-        greeting = "SELAMAT PAGI";
+        greetingKey = "SELAMAT PAGI,";
       } else if (currentHour >= 11 && currentHour < 15) {
-        greeting = "SELAMAT SIANG";
+        greetingKey = "SELAMAT SIANG,";
       } else if (currentHour >= 15 && currentHour < 18) {
-        greeting = "SELAMAT SORE";
+        greetingKey = "SELAMAT SORE,";
       }
+      const greeting = currentLanguage()==="en" ? tr(greetingKey) : tr(greetingKey).replace(/,$/,"");
 
       document.getElementById("siap-bergerak-label").innerHTML = `${greeting}, <span id="profile-name-display">${esc((state.settings.userName || "COYY").toUpperCase())}</span>`;
       
@@ -710,9 +972,9 @@ const KEY = "gymflow-v3";
       renderWeeklyTargetCard();
 
       const upcoming=state.routines[0];
-      document.getElementById("next-workout-copy").textContent=upcoming ? upcoming.name+" · "+upcoming.exerciseIds.length+" exercise siap dijalankan." : "Buat routine pertama untuk mulai mencatat progress.";
+      document.getElementById("next-workout-copy").textContent=upcoming ? (currentLanguage()==="en" ? `${upcoming.name} · ${upcoming.exerciseIds.length} exercises ready.` : `${upcoming.name} · ${upcoming.exerciseIds.length} exercise siap dijalankan.`) : tr("Buat routine pertama untuk mulai mencatat progress.");
       const active=state.activeSession, activeCopy=document.getElementById("active-session-copy"), resume=document.getElementById("resume-workout");
-      activeCopy.textContent=active ? "Sesi "+(routineById(active.routineId)?.name||"Workout")+" masih berjalan." : "Belum ada sesi aktif.";
+      activeCopy.textContent=active ? (currentLanguage()==="en" ? `Session ${routineById(active.routineId)?.name||"Workout"} is still active.` : `Sesi ${routineById(active.routineId)?.name||"Workout"} masih berjalan.`) : tr("Belum ada sesi aktif.");
       resume.classList.toggle("hidden",!active);
     }
     
@@ -858,6 +1120,7 @@ const KEY = "gymflow-v3";
       };
 
       save();
+      renderDashboard();
       navigate("workout");
     }
     
@@ -873,7 +1136,7 @@ const KEY = "gymflow-v3";
       const isCardio = e && e.muscle === "Cardio";
 
       document.getElementById("workout-routine-name").textContent=r?.name||"Workout";
-      document.getElementById("exercise-position").textContent=`EXERCISE ${active.currentExerciseIndex+1} DARI ${active.exercises.length}`;
+      document.getElementById("exercise-position").textContent=currentLanguage()==="en" ? `EXERCISE ${active.currentExerciseIndex+1} OF ${active.exercises.length}` : `LATIHAN ${active.currentExerciseIndex+1} DARI ${active.exercises.length}`;
       document.getElementById("active-exercise-name").textContent=e?.name||"Exercise";
       document.getElementById("active-exercise-muscle").textContent=e?.muscle||"";
       
@@ -881,7 +1144,7 @@ const KEY = "gymflow-v3";
       document.getElementById("col-header-2").textContent = isCardio ? "KM" : "Weight (kg)";
 
       const previous=[...state.history].reverse().flatMap(s=>s.exercises).find(x=>x.exerciseId===e?.id&&x.sets.some(s=>s.completedAt));
-      document.getElementById("previous-performance").textContent=previous?"Sebelumnya: "+previous.sets.filter(s=>s.completedAt).map(s=>isCardio ? `${s.reps} mnt · ${s.weight} km` : `${s.reps}×${s.weight}kg`).join(" · "):"Belum ada catatan performance sebelumnya.";
+      document.getElementById("previous-performance").textContent=previous ? (currentLanguage()==="en" ? "Previous: " : "Sebelumnya: ") + previous.sets.filter(s=>s.completedAt).map(s=>isCardio ? `${s.reps} min · ${s.weight} km` : `${s.reps}×${s.weight}kg`).join(" · ") : (currentLanguage()==="en" ? "No previous performance recorded." : "Belum ada catatan performance sebelumnya.");
       document.getElementById("exercise-notes").value=ex.notes||"";
 
       const list = document.getElementById("set-list");
@@ -931,7 +1194,7 @@ const KEY = "gymflow-v3";
       document.getElementById("workout-progress-label").textContent=done+"/"+all.length+" Set";
       document.getElementById("workout-progress-bar").style.width=(all.length?done/all.length*100:0)+"%";
       document.getElementById("previous-exercise").disabled=active.currentExerciseIndex===0; 
-      document.getElementById("next-exercise").textContent=active.currentExerciseIndex===active.exercises.length-1?"Selesai workout →":"Exercise berikutnya →";
+      document.getElementById("next-exercise").textContent=active.currentExerciseIndex===active.exercises.length-1 ? (currentLanguage()==="en" ? "Finish Workout →" : "Selesai workout →") : (currentLanguage()==="en" ? "Next Exercise →" : "Exercise berikutnya →");
       
       updateTimers(); 
       lucide.createIcons();
@@ -949,7 +1212,7 @@ const KEY = "gymflow-v3";
       const a=state.activeSession, card=document.getElementById("rest-timer-card");
       card.classList.toggle("hidden",!a.restRemaining);
       document.getElementById("rest-time").textContent=formatDuration(a.restRemaining);
-      document.getElementById("rest-pause").textContent=a.restPaused?"Lanjut":"Jeda";
+      document.getElementById("rest-pause").textContent=a.restPaused ? (currentLanguage()==="en" ? "Resume" : "Lanjut") : (currentLanguage()==="en" ? "Pause" : "Jeda");
     }
     
     function tick(){
@@ -960,7 +1223,7 @@ const KEY = "gymflow-v3";
         if(a.restRemaining<=0){
           a.restRemaining=0;
           a.restPaused=true;
-          toast("Waktu istirahat selesai. Siap set berikutnya!");
+          toast(currentLanguage()==="en" ? "Rest time is over. Ready for the next set!" : "Waktu istirahat selesai. Siap set berikutnya!");
         }
         save();
       }
@@ -971,7 +1234,7 @@ const KEY = "gymflow-v3";
       const a=state.activeSession;
       if(!a)return;
       const totalSets=a.exercises.reduce((n,x)=>n+x.sets.filter(s=>s.completedAt).length,0);
-      if(!totalSets){toast("Selesaikan minimal satu set sebelum mengakhiri workout.");return;}
+      if(!totalSets){toast(currentLanguage()==="en" ? "Complete at least one set before ending the workout." : "Selesaikan minimal satu set sebelum mengakhiri workout.");return;}
       
       const durationSeconds = elapsed();
       const durationMinutes = durationSeconds / 60;
@@ -984,7 +1247,7 @@ const KEY = "gymflow-v3";
       save();
       renderDashboard();
       navigate("history");
-      toast(`Workout tersimpan. Membakar ±${caloriesBurned} kkal!`);
+      toast(currentLanguage()==="en" ? `Workout saved. Burned ±${caloriesBurned} kcal!` : `Workout tersimpan. Membakar ±${caloriesBurned} kkal!`);
     }
 
     function renderOverviewMetrics(){
@@ -998,7 +1261,7 @@ const KEY = "gymflow-v3";
       document.getElementById("history-calories").textContent = fmtKkal(totalCalories);
       document.getElementById("history-total-time").textContent = formatTimeDetailed(totalSeconds);
       document.getElementById("history-avg-duration").textContent = formatTimeDetailed(avgSeconds);
-      document.getElementById("workouts-logged-count").textContent = state.history.length + " workouts logged";
+      document.getElementById("workouts-logged-count").textContent = currentLanguage()==="en" ? `${state.history.length} workouts logged` : `${state.history.length} workout tercatat`;
       
       renderOverviewCharts();
     }
@@ -1019,7 +1282,7 @@ const KEY = "gymflow-v3";
         sessions = sessions.filter(s => new Date(s.endedAt) >= oneWeekAgo);
       }
 
-      document.getElementById("workouts-logged-count").textContent = state.history.length + " workouts logged";
+      document.getElementById("workouts-logged-count").textContent = currentLanguage()==="en" ? `${state.history.length} workouts logged` : `${state.history.length} workout tercatat`;
       
       const list=document.getElementById("history-list"),empty=document.getElementById("history-empty");
       list.innerHTML="";
@@ -1063,8 +1326,8 @@ const KEY = "gymflow-v3";
       const area = document.getElementById("workouts-per-week-chart");
       const history = state.history;
 
-      if(history.length === 0) {
-        area.innerHTML = '<div class="h-full grid place-items-center muted text-sm text-center px-4">Belum ada riwayat workout untuk ditampilkan di grafik mingguan.</div>';
+      if (history.length === 0) {
+        area.innerHTML = `<div class="h-full grid place-items-center muted text-sm text-center px-4">${currentLanguage()==="en" ? "No workout history to display in the weekly chart." : "Belum ada riwayat workout untuk ditampilkan di grafik mingguan."}</div>`;
         return;
       }
 
@@ -1072,51 +1335,50 @@ const KEY = "gymflow-v3";
       history.forEach(s => {
         const d = new Date(s.endedAt);
         const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        const monday = new Date(d.setDate(diff));
+        const diff = day === 0 ? -6 : 1 - day;
+        const monday = new Date(d);
+        monday.setDate(d.getDate() + diff);
+        monday.setHours(0, 0, 0, 0);
         const key = monday.toISOString().slice(0, 10);
-        
-        if(!weeksMap[key]) {
-          weeksMap[key] = { date: new Date(monday), count: 0 };
-        }
+        if (!weeksMap[key]) weeksMap[key] = { date: new Date(monday), count: 0 };
         weeksMap[key].count++;
       });
 
-      const sortedWeeks = Object.values(weeksMap).sort((a,b) => a.date - b.date).slice(-5);
+      const today = new Date();
+      const currentDay = today.getDay();
+      const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+      const currentMonday = new Date(today);
+      currentMonday.setDate(today.getDate() + diffToMonday);
+      currentMonday.setHours(0, 0, 0, 0);
 
-      if(sortedWeeks.length === 0) {
-        area.innerHTML = '<div class="h-full grid place-items-center muted text-sm text-center px-4">Belum ada data mingguan.</div>';
-        return;
+      const sortedWeeks = [];
+      for (let i = 4; i >= 0; i--) {
+        const monday = new Date(currentMonday);
+        monday.setDate(currentMonday.getDate() - (i * 7));
+        const key = monday.toISOString().slice(0, 10);
+        sortedWeeks.push({ date: monday, count: weeksMap[key]?.count || 0 });
       }
 
       const counts = sortedWeeks.map(w => w.count);
       const maxCount = Math.max(...counts, 4);
-      const w = 600, h = 170;
-      const barWidth = 45;
-      const gap = (w - 60 - (sortedWeeks.length * barWidth)) / Math.max(1, sortedWeeks.length - 1);
+      const w = 600, h = 170, barWidth = 45;
+      const gap = (w - 60 - (sortedWeeks.length * barWidth)) / (sortedWeeks.length - 1);
+      const monthNamesShort = currentLanguage()==="en" ? ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"] : ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
 
-      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-
-      let svgContent = `
-        <svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik Workouts per Week">
-          <line x1="30" y1="${h-25}" x2="${w-30}" y2="${h-25}" stroke="var(--line)"/>
-          <text x="20" y="25" fill="var(--muted)" font-size="10">${maxCount}</text>
-          <text x="20" y="${(h-25)/2}" fill="var(--muted)" font-size="10">${Math.round(maxCount/2)}</text>
-          <text x="20" y="${h-30}" fill="var(--muted)" font-size="10">0</text>
-      `;
+      let svgContent = `<svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="${currentLanguage()==="en" ? "Workouts per Week Chart" : "Grafik Workout per Minggu"}">
+        <line x1="30" y1="${h-25}" x2="${w-30}" y2="${h-25}" stroke="var(--line)"/>
+        <text x="20" y="25" fill="var(--muted)" font-size="10">${maxCount}</text>
+        <text x="20" y="${(h-25)/2}" fill="var(--muted)" font-size="10">${Math.round(maxCount/2)}</text>
+        <text x="20" y="${h-30}" fill="var(--muted)" font-size="10">0</text>`;
 
       sortedWeeks.forEach((item, i) => {
         const x = 40 + i * (barWidth + gap);
-        const barHeight = (item.count / maxCount) * (h - 55);
+        const barHeight = item.count === 0 ? 0 : (item.count / maxCount) * (h - 55);
         const y = (h - 25) - barHeight;
         const label = `${item.date.getDate()} ${monthNamesShort[item.date.getMonth()]}`;
-
-        svgContent += `
-          <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="6" fill="#bcf04a"/>
-          <text x="${x + barWidth/2}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="10">${label}</text>
-        `;
+        svgContent += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="6" fill="#88F914"/>
+          <text x="${x + barWidth/2}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="10">${label}</text>`;
       });
-
       svgContent += `</svg>`;
       area.innerHTML = svgContent;
     }
@@ -1202,14 +1464,14 @@ const KEY = "gymflow-v3";
       let htmlContent = `
         <div id="pdf-render-container" style="font-family: 'DM Sans', sans-serif; color: #17221b; padding: 32px; background: #ffffff; width: 100%; box-sizing: border-box; position: relative; min-height: 1000px;">
           <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5; z-index: 0; pointer-events: none; text-align: center;">
-            <img src="LOGO_WATERMARK.jpg" alt="Watermark Logo" style="width: 380px; height: 380px; object-fit: contain; filter: grayscale(100%);">
+            <img src="logo_newwm.jpg" alt="Watermark Logo" style="width: 380px; height: 380px; object-fit: contain; filter: grayscale(100%);">
           </div>
           <div style="position: relative; z-index: 1;">
             <div style="border-bottom: 3px solid #bcf04a; padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
                   <div style="width: 32px; height: 32px; background: #111923; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img src="LOGO.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="new_logoprofile.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
                   </div>
                   <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #111923; letter-spacing: -0.02em;">GYMFlow REPORT</h1>
                 </div>
@@ -1306,6 +1568,16 @@ const KEY = "gymflow-v3";
     state=loadState();
     setTheme();
 
+    document.addEventListener("click", (e) => {
+      document.querySelectorAll(".custom-select-wrapper.open").forEach(wrapper => {
+        if (!wrapper.contains(e.target)) {
+          wrapper.classList.remove("open");
+          const trigger = wrapper.querySelector(".custom-select-trigger");
+          if (trigger) trigger.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+
     document.addEventListener("DOMContentLoaded",()=>{
       setTimeout(() => {
         const splash = document.getElementById("splash-screen");
@@ -1322,14 +1594,16 @@ const KEY = "gymflow-v3";
         document.getElementById("custom-exercise-muscle-select").dataset.value = val;
       });
 
-      renderDashboard();
-      renderRoutines();
-      renderExercises();
-      renderWorkout();
-      renderHistory();
-      renderWeightTab();
-      updateHeaderInitial();
+      renderDashboard();renderRoutines();renderExercises();renderWorkout();renderHistory();
+      initLanguageCustomSelect();
+      applyLanguage();
       lucide.createIcons();
+
+      const i18nObserver = new MutationObserver(() => {
+        clearTimeout(window.__gymflowI18nTimer);
+        window.__gymflowI18nTimer = setTimeout(() => applyLanguage(), 0);
+      });
+      i18nObserver.observe(document.getElementById("app") || document.body, {childList:true, subtree:true});
 
       elapsedInterval=setInterval(tick,1000);
       
@@ -1345,7 +1619,7 @@ const KEY = "gymflow-v3";
       });
       
       const triggerReset = () => {
-        showConfirm("Reset data?","Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
+        showConfirm(currentLanguage()==="en" ? "Reset data?" : "Reset data?",currentLanguage()==="en" ? "All routines, history, active sessions, and custom exercises on this device will be deleted." : "Semua routine, history, sesi aktif, dan exercise custom di perangkat ini akan dihapus.","Reset",()=>{
           state=seedState();
           save();
           setTheme();
@@ -1357,7 +1631,7 @@ const KEY = "gymflow-v3";
           renderHistory();
           renderWeightTab();
           updateHeaderInitial();
-          toast("Data berhasil direset.");
+          toast(currentLanguage()==="en" ? "Data reset successfully." : "Data berhasil direset.");
         });
       };
 
@@ -1381,7 +1655,7 @@ const KEY = "gymflow-v3";
         const weightVal = parseFloat(document.getElementById("profile-bb").value);
 
         if(!nameVal) {
-          toast("Nama wajib diisi!");
+          toast(currentLanguage()==="en" ? "Name is required!" : "Nama wajib diisi!");
           return;
         }
 
@@ -1396,7 +1670,7 @@ const KEY = "gymflow-v3";
         closeModal("profile-modal");
         renderDashboard();
         updateHeaderInitial();
-        toast("Profil berhasil disimpan!");
+        toast(currentLanguage()==="en" ? "Profile saved successfully!" : "Profil berhasil disimpan!");
       };
 
       document.getElementById("weight-form").onsubmit = e => {
@@ -1404,7 +1678,7 @@ const KEY = "gymflow-v3";
         const wVal = parseFloat(document.getElementById("weight-input-val").value);
         const dVal = document.getElementById("weight-date-val").value;
         if(isNaN(wVal) || !dVal) {
-          toast("Mohon masukkan berat dan tanggal yang valid.");
+          toast(currentLanguage()==="en" ? "Please enter a valid weight and date." : "Mohon masukkan berat dan tanggal yang valid.");
           return;
         }
         
@@ -1422,7 +1696,7 @@ const KEY = "gymflow-v3";
         closeModal("weight-modal");
         renderWeightTab();
         renderDashboard();
-        toast("Berat badan berhasil dicatat!");
+        toast(currentLanguage()==="en" ? "Weight logged successfully!" : "Berat badan berhasil dicatat!");
       };
 
       document.getElementById("dashboard-start").onclick=()=>handleTabNavigation("workout");
@@ -1448,7 +1722,7 @@ const KEY = "gymflow-v3";
             populateSelects();
             renderRoutines();
             renderDashboard();
-            toast("Routine dihapus.");
+            toast(currentLanguage()==="en" ? "Routine deleted." : "Routine dihapus.");
           });
         }
       };
@@ -1456,7 +1730,7 @@ const KEY = "gymflow-v3";
       document.getElementById("start-workout-button").onclick = () => {
         const selectedRoutineVal = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
         if (!selectedRoutineVal) {
-          toast("Pilih routine terlebih dahulu!");
+          toast(currentLanguage()==="en" ? "Please choose a routine first!" : "Pilih routine terlebih dahulu!");
           return;
         }
         startWorkout(selectedRoutineVal);
@@ -1537,7 +1811,7 @@ const KEY = "gymflow-v3";
           save();
           renderHistory();
           renderDashboard();
-          toast("Sesi latihan berhasil dihapus.");
+          toast(currentLanguage()==="en" ? "Workout session deleted." : "Sesi latihan berhasil dihapus.");
         });
       };
 
@@ -1559,7 +1833,7 @@ const KEY = "gymflow-v3";
             save();
             renderExercises();
             populateSelects();
-            toast("Exercise berhasil dihapus.");
+            toast(currentLanguage()==="en" ? "Exercise deleted." : "Exercise berhasil dihapus.");
           });
         }
       };
@@ -1569,14 +1843,14 @@ const KEY = "gymflow-v3";
         const name=document.getElementById("custom-exercise-name").value.trim();
         const muscle=document.querySelector("#custom-exercise-muscle-select .custom-option.selected")?.dataset.value;
         const equipment=document.getElementById("custom-exercise-equipment").value.trim();
-        if(!name||!muscle||!equipment){toast("Mohon lengkapi semua field exercise.");return;}
+        if(!name||!muscle||!equipment){toast(currentLanguage()==="en" ? "Please complete all exercise fields." : "Mohon lengkapi semua field exercise.");return;}
         state.exercises.push({id:uid(),name,muscle,equipment,isCustom:true});
         save();
         renderExercises();
         populateSelects();
         closeModal("exercise-modal");
         document.getElementById("exercise-form").reset();
-        toast("Exercise custom berhasil ditambahkan.");
+        toast(currentLanguage()==="en" ? "Custom exercise added successfully." : "Exercise custom berhasil ditambahkan.");
       };
 
       document.getElementById("day-picker").onclick=e=>{
@@ -1593,11 +1867,11 @@ const KEY = "gymflow-v3";
         const daysSelected = Array.from(document.querySelectorAll("#day-picker .day-chip.active")).map(c => c.dataset.day);
 
         if (!name) {
-          toast("Nama routine wajib diisi!");
+          toast(currentLanguage()==="en" ? "Routine name is required!" : "Nama routine wajib diisi!");
           return;
         }
         if (selectedRoutineExercises.length === 0) {
-          toast("Pilih minimal 1 exercise!");
+          toast(currentLanguage()==="en" ? "Select at least 1 exercise!" : "Pilih minimal 1 exercise!");
           return;
         }
 
@@ -1621,6 +1895,6 @@ const KEY = "gymflow-v3";
         closeModal("routine-modal");
         renderRoutines();
         renderDashboard();
-        toast("Routine berhasil disimpan!");
+        toast(currentLanguage()==="en" ? "Routine saved successfully!" : "Routine berhasil disimpan!");
       };
     });
