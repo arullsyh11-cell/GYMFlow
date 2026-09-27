@@ -2113,25 +2113,52 @@ function renderExercises(){
               </div>
               <button type="button" class="icon-btn" data-gf-close="analytics-export-modal" aria-label="Tutup export"><i data-lucide="x"></i></button>
             </div>
-            <div class="grid md:grid-cols-3 gap-3 mb-4">
-              <div><label class="gf-form-label">Report</label><select id="export-report-type" class="field">
-                <option value="daily">Workout Hari Ini</option>
-                <option value="summary">Workout Summary</option>
-                <option value="body">Muscle / Body Statistics</option>
-                <option value="load">Training Load / Volume</option>
-                <option value="full" selected>Full Report</option>
-              </select></div>
-              <div><label class="gf-form-label">Format</label><select id="export-format" class="field">
-                <option value="png">PNG</option>
-                <option value="jpg">JPG</option>
-                <option value="pdf" selected>PDF</option>
-              </select></div>
-              <div><label class="gf-form-label">Size</label><select id="export-size" class="field">
-                <option value="auto" selected>Auto</option>
-                <option value="square">Social Square · 1080×1080</option>
-                <option value="portrait">Social Portrait · 1080×1350</option>
-                <option value="story">Story · 1080×1920</option>
-              </select></div>
+            <div class="gf-export-controls-grid mb-4">
+              <div class="gf-export-select-group">
+                <label class="gf-form-label" for="export-report-type">Report</label>
+                <div id="export-report-type" class="custom-select-wrapper gf-export-select">
+                  <div class="field custom-select-trigger gf-export-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="selected-label">Full Report</span>
+                    <i data-lucide="chevron-down" class="gf-export-select-chevron" aria-hidden="true"></i>
+                  </div>
+                  <div class="custom-options" role="listbox">
+                    <div class="custom-option" data-value="daily" role="option">Workout Hari Ini</div>
+                    <div class="custom-option" data-value="summary" role="option">Workout Summary</div>
+                    <div class="custom-option" data-value="body" role="option">Muscle Statistics</div>
+                    <div class="custom-option" data-value="load" role="option">Training Load / Volume</div>
+                    <div class="custom-option selected" data-value="full" role="option">Full Report</div>
+                  </div>
+                </div>
+              </div>
+              <div class="gf-export-select-group">
+                <label class="gf-form-label" for="export-format">Format</label>
+                <div id="export-format" class="custom-select-wrapper gf-export-select">
+                  <div class="field custom-select-trigger gf-export-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="selected-label">PDF</span>
+                    <i data-lucide="chevron-down" class="gf-export-select-chevron" aria-hidden="true"></i>
+                  </div>
+                  <div class="custom-options" role="listbox">
+                    <div class="custom-option" data-value="png" role="option">PNG <span class="gf-export-option-note">Transparent</span></div>
+                    <div class="custom-option" data-value="jpg" role="option">JPG <span class="gf-export-option-note">Solid background</span></div>
+                    <div class="custom-option selected" data-value="pdf" role="option">PDF <span class="gf-export-option-note">A4 report</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="gf-export-select-group">
+                <label class="gf-form-label" for="export-size">Size</label>
+                <div id="export-size" class="custom-select-wrapper gf-export-select">
+                  <div class="field custom-select-trigger gf-export-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="selected-label">Auto</span>
+                    <i data-lucide="chevron-down" class="gf-export-select-chevron" aria-hidden="true"></i>
+                  </div>
+                  <div class="custom-options" role="listbox">
+                    <div class="custom-option selected" data-value="auto" role="option">Auto <span class="gf-export-option-note">Fit report</span></div>
+                    <div class="custom-option" data-value="square" role="option">Social Square <span class="gf-export-option-note">1080×1080</span></div>
+                    <div class="custom-option" data-value="portrait" role="option">Social Portrait <span class="gf-export-option-note">1080×1350</span></div>
+                    <div class="custom-option" data-value="story" role="option">Story <span class="gf-export-option-note">1080×1920</span></div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div id="analytics-export-preview" class="gf-export-preview"></div>
             <div class="flex flex-col sm:flex-row gap-2 mt-4">
@@ -2140,21 +2167,99 @@ function renderExercises(){
             </div>
           </div>
         </div>
+
+        <div id="photo-workout-export-modal" class="modal-layer gf-photo-export-layer" role="dialog" aria-modal="true" aria-labelledby="photo-workout-export-title">
+          <div class="modal gf-photo-export-modal">
+            <div class="gf-photo-export-header">
+              <div>
+                <span class="gf-eyebrow">PHOTO WORKOUT EXPORT</span>
+                <h2 id="photo-workout-export-title" class="font-extrabold text-xl tracking-tight">Share your workout</h2>
+                <p class="gf-photo-export-subtitle">1080×1080 social graphic · data dari GYMFlow</p>
+              </div>
+              <button type="button" class="icon-btn" data-gf-close="photo-workout-export-modal" aria-label="Tutup photo export"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="gf-photo-export-layout">
+              <div class="gf-photo-export-stage-wrap">
+                <div id="gf-photo-export-preview" class="gf-photo-export-preview">
+                  <canvas id="gf-photo-export-canvas" width="1080" height="1080" aria-label="Preview workout export 1080 by 1080"></canvas>
+                  <div id="gf-photo-export-empty" class="gf-photo-export-empty">
+                    <i data-lucide="image-plus"></i>
+                    <strong>Upload a workout photo</strong>
+                    <span>Portrait, landscape, atau square. Foto tidak akan diubah rasio aslinya.</span>
+                    <button id="gf-photo-export-empty-upload" type="button" class="lime-btn px-4">Choose Photo</button>
+                  </div>
+                </div>
+                <div class="gf-photo-export-stage-meta">
+                  <span>1080 × 1080 px</span>
+                  <span id="gf-photo-export-live-meta">Classic · JPG</span>
+                </div>
+              </div>
+
+              <div class="gf-photo-export-controls">
+                <input id="gf-photo-export-file" type="file" accept="image/jpeg,image/png,image/webp,image/*" hidden>
+
+                <section class="gf-photo-control-group">
+                  <div class="gf-photo-control-head"><span>Photo</span><span class="muted text-xs">position & zoom</span></div>
+                  <div class="flex gap-2">
+                    <button id="gf-photo-export-upload" type="button" class="secondary-btn flex-1"><i data-lucide="upload" class="w-4 h-4 inline mr-1"></i> Import Photo</button>
+                    <button id="gf-photo-export-reset" type="button" class="secondary-btn" title="Reset photo"><i data-lucide="scan"></i></button>
+                  </div>
+                  <div class="gf-photo-zoom-row">
+                    <button id="gf-photo-export-zoom-out" type="button" class="icon-btn !w-10 !h-10" aria-label="Zoom out"><i data-lucide="minus"></i></button>
+                    <input id="gf-photo-export-zoom" type="range" min="0.85" max="2.2" step="0.01" value="1" aria-label="Photo zoom">
+                    <button id="gf-photo-export-zoom-in" type="button" class="icon-btn !w-10 !h-10" aria-label="Zoom in"><i data-lucide="plus"></i></button>
+                  </div>
+                  <small id="gf-photo-export-zoom-label" class="muted text-xs">Zoom 100%</small>
+                </section>
+
+                <section class="gf-photo-control-group">
+                  <div class="gf-photo-control-head"><span>Template</span><span class="muted text-xs">overlay layout</span></div>
+                  <div id="gf-photo-export-templates" class="gf-photo-template-grid">
+                    <button type="button" class="gf-photo-template active" data-template="classic"><strong>Classic</strong><span>Balanced stats</span></button>
+                    <button type="button" class="gf-photo-template" data-template="minimal"><strong>Minimal</strong><span>Clean & bold</span></button>
+                    <button type="button" class="gf-photo-template" data-template="performance"><strong>Performance</strong><span>Load & PR</span></button>
+                    <button type="button" class="gf-photo-template" data-template="full"><strong>Full Stats</strong><span>More data</span></button>
+                  </div>
+                </section>
+
+                <section class="gf-photo-control-group">
+                  <div class="gf-photo-control-head"><span>Export</span><span class="muted text-xs">final 1080×1080</span></div>
+                  <div class="gf-photo-format-grid">
+                    <button type="button" class="gf-photo-format active" data-format="jpg"><strong>JPG</strong><span>Photo background</span></button>
+                    <button type="button" class="gf-photo-format" data-format="png"><strong>PNG</strong><span>Alpha supported</span></button>
+                  </div>
+                  <label class="gf-photo-transparent-row">
+                    <input id="gf-photo-export-transparent" type="checkbox">
+                    <span>Transparent PNG (hide photo background)</span>
+                  </label>
+                </section>
+
+                <div class="gf-photo-export-actions">
+                  <button id="gf-photo-export-download" type="button" class="lime-btn flex-1"><i data-lucide="download" class="w-4 h-4 inline mr-1"></i> Download</button>
+                  <button id="gf-photo-export-share" type="button" class="secondary-btn flex-1"><i data-lucide="share-2" class="w-4 h-4 inline mr-1"></i> Share</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       `);
 
       document.querySelectorAll("[data-gf-close]").forEach(btn=>{
         btn.addEventListener("click",()=>closeModal(btn.dataset.gfClose));
       });
-      document.getElementById("statistics-export-btn")?.addEventListener("click",()=>openExportModal("full"));
+      document.getElementById("statistics-export-btn")?.addEventListener("click",()=>openPhotoWorkoutExportModal());
       document.getElementById("summary-export-btn").addEventListener("click",()=>{
         const entry = window.__gfLastWorkoutSummary;
         openExportModal("summary", entry);
       });
-      ["export-report-type","export-format","export-size"].forEach(id=>{
-        document.getElementById(id)?.addEventListener("change",()=>renderExportPreview());
-      });
+      initCustomSelect("export-report-type", () => renderExportPreview());
+      initCustomSelect("export-format", () => renderExportPreview());
+      initCustomSelect("export-size", () => renderExportPreview());
+      syncExportCustomSelects();
       document.getElementById("analytics-export-download").addEventListener("click",downloadAnalyticsExport);
       document.getElementById("analytics-export-share").addEventListener("click",shareAnalyticsExport);
+      initPhotoWorkoutExport();
       lucide.createIcons();
     }
 
@@ -2175,107 +2280,250 @@ function renderExercises(){
       return state.history[0] || null;
     }
 
+function buildExportBrandMark(size = 38) {
+  const s = Number(size) || 38;
+
+  return `
+    <img
+      class="gf-export-logo-mark"
+      src="new_logoprofile.png"
+      alt="GYMFlow"
+      width="${s}"
+      height="${s}"
+    >
+  `;
+}
+
     function buildExportCard(type, specificSession=null) {
       const model = buildAnalyticsModel(analyticsPeriod);
       const session = type === "summary" && specificSession ? specificSession : (type === "daily" ? getTodaySession() : getLatestSession());
       const titleMap = {
-        daily:"Workout Hari Ini", summary:"Workout Summary", body:"Muscle / Body Statistics",
+        daily:"Workout Hari Ini", summary:"Workout Summary", body:"Muscle Statistics",
         load:"Training Load / Volume", full:"GYMFlow Full Report"
       };
       const title = titleMap[type] || "GYMFlow Report";
       const userName = state.settings.userName || "GYMFlow User";
+      const exportDate = new Date().toLocaleDateString(
+        currentLanguage()==="en" ? "en-US" : "id-ID",
+        { dateStyle:"medium" }
+      );
 
       let bodyHtml = "";
+
       if ((type==="daily" || type==="summary") && session) {
         const sm = calculateSessionMetrics(session, state.history.filter(s=>s.id!==session.id));
         bodyHtml = `
-          <div class="gf-export-section">
+          <section class="gf-export-section gf-export-feature-card">
+            <div class="gf-export-section-head">
+              <div>
+                <span class="gf-eyebrow">WORKOUT OVERVIEW</span>
+                <h2 class="gf-export-section-title">${esc(title)}</h2>
+              </div>
+              <span class="gf-export-period">${exportDate}</span>
+            </div>
+
             <div class="gf-export-kpis">
-              <div><small>Duration</small><b>${formatTimeDetailed(session.duration||0)}</b></div>
-              <div><small>Volume</small><b>${analyticsFormatVolume(sm.totalVolume)}</b></div>
-              <div><small>Sets</small><b>${sm.totalSets}</b></div>
-              <div><small>Exercises</small><b>${sm.totalExercises}</b></div>
-              <div><small>PR</small><b>${sm.personalRecords.length}</b></div>
+              <div><small>Duration</small><b>${formatTimeDetailed(session.duration||0)}</b><span class="gf-export-kpi-icon">◷</span></div>
+              <div><small>Volume</small><b>${analyticsFormatVolume(sm.totalVolume)}</b><span class="gf-export-kpi-icon">↗</span></div>
+              <div><small>Sets</small><b>${sm.totalSets}</b><span class="gf-export-kpi-icon">◫</span></div>
+              <div><small>Exercises</small><b>${sm.totalExercises}</b><span class="gf-export-kpi-icon">✦</span></div>
+              <div><small>Personal Records</small><b>${sm.personalRecords.length}</b><span class="gf-export-kpi-icon">★</span></div>
             </div>
-            <div class="gf-export-section"><span class="gf-eyebrow">MUSCLE GROUPS</span><p class="gf-export-text">${sm.muscleGroups.map(k=>ANALYTICS_LABELS[k]).join(" · ") || "—"}</p></div>
-            <div class="gf-export-section"><span class="gf-eyebrow">EXERCISES</span>
-              <div class="gf-export-list">${sm.exercises.map(e=>`<div><span>${esc(e.name)}</span><b>${e.sets} sets · ${e.reps} reps · ${analyticsFormatVolume(e.volume)}</b></div>`).join("") || "<div>—</div>"}</div>
+
+            <div class="gf-export-two-col">
+              <div class="gf-export-subcard">
+                <span class="gf-eyebrow">MUSCLE GROUPS</span>
+                <div class="gf-export-tags">
+                  ${sm.muscleGroups.map(k=>`<span>${esc(ANALYTICS_LABELS[k])}</span>`).join("") || "<span>—</span>"}
+                </div>
+              </div>
+              <div class="gf-export-subcard">
+                <span class="gf-eyebrow">WORKOUT DATE</span>
+                <strong class="gf-export-date-value">${new Date(session.endedAt||Date.now()).toLocaleDateString(currentLanguage()==="en"?"en-US":"id-ID",{dateStyle:"long"})}</strong>
+              </div>
             </div>
-          </div>`;
+
+            <div class="gf-export-section-inner">
+              <div class="gf-export-section-head">
+                <span class="gf-eyebrow">EXERCISES</span>
+                <span class="gf-export-meta">${sm.totalExercises} exercise</span>
+              </div>
+              <div class="gf-export-list">
+                ${sm.exercises.map(e=>`<div><span>${esc(e.name)}</span><b>${e.sets} sets · ${e.reps} reps · ${analyticsFormatVolume(e.volume)}</b></div>`).join("") || "<div>—</div>"}
+              </div>
+            </div>
+          </section>`;
+      } else if (type==="daily" || type==="summary") {
+        bodyHtml = `
+          <section class="gf-export-empty-card">
+            <span class="gf-eyebrow">WORKOUT OVERVIEW</span>
+            <strong>Belum ada workout untuk report ini.</strong>
+            <p>Selesaikan workout terlebih dahulu agar ringkasan dapat diekspor.</p>
+          </section>`;
       }
 
       if (type==="body" || type==="full") {
         const topMuscles = model.muscleStats.filter(m=>m.sets>0).slice(0,8);
         bodyHtml += `
-          <div class="gf-export-section">
+          <section class="gf-export-section gf-export-feature-card">
             <div class="gf-export-section-head">
-              <span class="gf-eyebrow">MUSCLE STATISTICS</span>
-              <span class="gf-export-meta">${analyticsPeriodLabel()}</span>
+              <div>
+                <span class="gf-eyebrow">MUSCLE ANALYTICS</span>
+                <h2 class="gf-export-section-title">Muscle Statistics</h2>
+              </div>
+              <span class="gf-export-period">${analyticsPeriodLabel()}</span>
             </div>
-            <div class="gf-export-list mt-2">
-              ${topMuscles.map(m=>`<div><span>${ANALYTICS_LABELS[m.key]}</span><b>${m.sets} sets · ${m.workouts} workouts · ${analyticsFormatVolume(m.volume)}</b></div>`).join("") || "<div>No muscle data</div>"}
+
+            <div class="gf-export-list gf-export-ranked-list">
+              ${topMuscles.map((m,idx)=>`
+                <div>
+                  <span><i class="gf-export-rank">${idx+1}</i>${esc(ANALYTICS_LABELS[m.key])}</span>
+                  <b>${m.sets} sets · ${m.workouts} workouts · ${analyticsFormatVolume(m.volume)}</b>
+                </div>
+              `).join("") || "<div>No muscle data</div>"}
             </div>
-          </div>`;
+          </section>`;
       }
 
       if (type==="load" || type==="full") {
         const sessions = [...model.sessions].sort((a,b)=>new Date(a.endedAt)-new Date(b.endedAt)).slice(-8);
         bodyHtml += `
-          <div class="gf-export-section">
-            <div class="gf-export-section-head"><span class="gf-eyebrow">TRAINING LOAD</span><span class="gf-export-meta">${analyticsPeriodLabel()}</span></div>
-            <div class="gf-export-kpis">
+          <section class="gf-export-section gf-export-feature-card">
+            <div class="gf-export-section-head">
+              <div>
+                <span class="gf-eyebrow">TRAINING LOAD</span>
+                <h2 class="gf-export-section-title">Training Load & Volume</h2>
+              </div>
+              <span class="gf-export-period">${analyticsPeriodLabel()}</span>
+            </div>
+
+            <div class="gf-export-kpis gf-export-kpis-5">
               <div><small>Total volume</small><b>${analyticsFormatVolume(model.totalVolume)}</b></div>
               <div><small>Total sets</small><b>${analyticsStatNumber(model.totalSets)}</b></div>
               <div><small>Total reps</small><b>${analyticsStatNumber(model.totalReps)}</b></div>
               <div><small>Workouts</small><b>${analyticsStatNumber(model.totalWorkouts)}</b></div>
-              <div><small>Duration</small><b>${formatTimeDetailed(model.totalDuration)}</b></div>
+              <div><small>Total duration</small><b>${formatTimeDetailed(model.totalDuration)}</b></div>
             </div>
-            <div class="gf-export-list mt-3">
-              ${sessions.map(s=>{
-                const sm=calculateSessionMetrics(s,[]);
-                const d=new Date(s.endedAt);
-                return `<div><span>${d.toLocaleDateString(currentLanguage()==="en"?"en-US":"id-ID",{day:"numeric",month:"short"})}</span><b>${analyticsFormatVolume(sm.totalVolume)}</b></div>`;
-              }).join("") || "<div>No training load data</div>"}
+
+            <div class="gf-export-section-inner">
+              <div class="gf-export-section-head">
+                <span class="gf-eyebrow">RECENT SESSIONS</span>
+                <span class="gf-export-meta">${sessions.length} sessions</span>
+              </div>
+              <div class="gf-export-list">
+                ${sessions.map(s=>{
+                  const sm=calculateSessionMetrics(s,[]);
+                  const d=new Date(s.endedAt);
+                  return `<div><span>${d.toLocaleDateString(currentLanguage()==="en"?"en-US":"id-ID",{day:"numeric",month:"short",year:"numeric"})}</span><b>${analyticsFormatVolume(sm.totalVolume)}</b></div>`;
+                }).join("") || "<div>No training load data</div>"}
+              </div>
             </div>
-          </div>`;
+          </section>`;
       }
 
       if (type==="full") {
         bodyHtml += `
-          <div class="gf-export-section">
-            <div class="gf-export-section-head"><span class="gf-eyebrow">PERSONAL RECORDS</span><span class="gf-export-meta">${model.personalRecords.length} PR</span></div>
-            <div class="gf-export-list">${model.personalRecords.map(pr=>`<div><span>${esc(pr.name)}</span><b>${analyticsStatNumber(pr.weight)} kg</b></div>`).join("") || "<div>No PR data</div>"}</div>
-          </div>`;
+          <section class="gf-export-section gf-export-feature-card">
+            <div class="gf-export-section-head">
+              <div>
+                <span class="gf-eyebrow">PERSONAL RECORDS</span>
+                <h2 class="gf-export-section-title">Latest Personal Records</h2>
+              </div>
+              <span class="gf-export-period">${model.personalRecords.length} PR</span>
+            </div>
+            <div class="gf-export-list">
+              ${model.personalRecords.map(pr=>`<div><span>${esc(pr.name)}</span><b>${analyticsStatNumber(pr.weight)} kg</b></div>`).join("") || "<div>No PR data</div>"}
+            </div>
+          </section>`;
       }
 
       return `
         <div class="gf-export-canvas" data-export-type="${type}">
           <header class="gf-export-header">
-            <div>
-              <span class="gf-export-brand">GYMFlow</span>
-              <h1>${esc(title)}</h1>
-              <p>${analyticsPeriodLabel()} · ${new Date().toLocaleDateString(currentLanguage()==="en"?"en-US":"id-ID",{dateStyle:"medium"})}</p>
+            <div class="gf-export-brand-lockup">
+              ${buildExportBrandMark(44)}
+              <div>
+                <span class="gf-export-brand">GYMFlow</span>
+                <span class="gf-export-tagline">YOUR FITNESS JOURNEY</span>
+              </div>
             </div>
-            <div class="gf-export-user">${esc(userName)}</div>
+            <div class="gf-export-header-meta">
+              <span class="gf-export-meta-label">EXPORT DATE</span>
+              <strong>${exportDate}</strong>
+              <span class="gf-export-user">${esc(userName)}</span>
+            </div>
           </header>
-          ${bodyHtml || `<div class="gf-export-empty">Belum ada data untuk report ini.</div>`}
-          <footer class="gf-export-footer">Generated with GYMFlow · Your Fitness Journey</footer>
+
+          <div class="gf-export-intro">
+            <span class="gf-eyebrow">GYMFLOW REPORT</span>
+            <h1>${esc(title)}</h1>
+            <p>${analyticsPeriodLabel()} <span>•</span> Performance summary generated from your workout data.</p>
+          </div>
+
+          ${bodyHtml || `<div class="gf-export-empty-card"><strong>Belum ada data untuk report ini.</strong></div>`}
+
+          <footer class="gf-export-footer">
+            <div class="gf-export-footer-brand">
+              ${buildExportBrandMark(24)}
+              <span>GYMFlow</span>
+            </div>
+            <span>Your Fitness Journey · ${exportDate}</span>
+          </footer>
         </div>`;
+    }
+
+
+    function getCustomSelectValue(wrapperId, fallback="") {
+      const wrapper = document.getElementById(wrapperId);
+      if (!wrapper) return fallback;
+      return wrapper.querySelector(".custom-option.selected")?.dataset.value || fallback;
+    }
+
+    function setCustomSelectValue(wrapperId, value) {
+      const wrapper = document.getElementById(wrapperId);
+      if (!wrapper) return;
+      const options = wrapper.querySelectorAll(".custom-option");
+      let selected = null;
+      options.forEach(option => {
+        const isSelected = option.dataset.value === value;
+        option.classList.toggle("selected", isSelected);
+        if (isSelected) selected = option;
+      });
+      if (selected) {
+        const label = wrapper.querySelector(".selected-label");
+        if (label) label.textContent = selected.childNodes[0]?.textContent?.trim() || selected.textContent.trim();
+      }
+      const trigger = wrapper.querySelector(".custom-select-trigger");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      wrapper.classList.remove("open");
+    }
+
+    function syncExportCustomSelects() {
+      const type = document.getElementById("export-report-type");
+      const format = document.getElementById("export-format");
+      const size = document.getElementById("export-size");
+      if (!type || !format || !size) return;
+      setCustomSelectValue("export-report-type", type.querySelector(".custom-option.selected")?.dataset.value || "full");
+      setCustomSelectValue("export-format", format.querySelector(".custom-option.selected")?.dataset.value || "pdf");
+      setCustomSelectValue("export-size", size.querySelector(".custom-option.selected")?.dataset.value || "auto");
     }
 
     function openExportModal(type="full", session=null) {
       ensureAnalyticsModals();
-      document.getElementById("export-report-type").value = type;
-      document.getElementById("export-format").value = "pdf";
+      setCustomSelectValue("export-report-type", type);
+      setCustomSelectValue("export-format", "pdf");
+      setCustomSelectValue("export-size", "auto");
       window.__gfExportSession = session || null;
       renderExportPreview();
       openModal("analytics-export-modal");
     }
 
     function renderExportPreview() {
-      const type = document.getElementById("export-report-type")?.value || "full";
+      const type = getCustomSelectValue("export-report-type", "full");
+      const format = getCustomSelectValue("export-format", "pdf");
       const preview = document.getElementById("analytics-export-preview");
       if (!preview) return;
+      preview.classList.toggle("gf-export-preview-transparent", format === "png");
       preview.innerHTML = buildExportCard(type, window.__gfExportSession || null);
     }
 
@@ -2285,12 +2533,12 @@ function renderExercises(){
     }
 
     
-    async function buildCaptureNode() {
+    async function buildCaptureNode(exportFormat="pdf") {
       const preview = document.querySelector("#analytics-export-preview .gf-export-canvas");
       if (!preview) throw new Error("Preview tidak tersedia.");
 
       const clone = preview.cloneNode(true);
-      const size = document.getElementById("export-size")?.value || "auto";
+      const size = getCustomSelectValue("export-size", "auto");
       const map = {
         square:[1080,1080],
         portrait:[1080,1350],
@@ -2304,16 +2552,18 @@ function renderExercises(){
       clone.style.maxWidth = "none";
       clone.style.minHeight = h ? `${h}px` : "0";
       clone.style.height = "auto";
-      clone.style.position = "absolute";
-      clone.style.left = "-100000px";
+      clone.style.position = "fixed";
+      clone.style.left = "0";
       clone.style.top = "0";
-      clone.style.zIndex = "-1";
+      clone.style.zIndex = "-2";
       clone.style.pointerEvents = "none";
       clone.style.visibility = "visible";
       clone.style.opacity = "1";
       clone.style.transform = "none";
       clone.style.overflow = "visible";
       clone.style.boxSizing = "border-box";
+      clone.classList.add("gf-export-capture");
+      if (exportFormat === "png") clone.classList.add("gf-export-transparent");
 
       document.body.appendChild(clone);
 
@@ -2344,8 +2594,9 @@ function renderExercises(){
         scale: Math.min(2, Math.max(1.5, window.devicePixelRatio || 1)),
         width,
         height,
-        backgroundColor:"#ffffff",
+        backgroundColor:target.classList.contains("gf-export-transparent") ? null : "#ffffff",
         useCORS:true,
+        foreignObjectRendering:false,
         allowTaint:false,
         logging:false,
         scrollX:0,
@@ -2410,9 +2661,9 @@ function renderExercises(){
     async function downloadAnalyticsExport() {
       let target = null;
       try {
-        const type = document.getElementById("export-report-type")?.value || "full";
-        const format = document.getElementById("export-format")?.value || "pdf";
-        target = await buildCaptureNode();
+        const type = getCustomSelectValue("export-report-type", "full");
+        const format = getCustomSelectValue("export-format", "pdf");
+        target = await buildCaptureNode(format);
         const canvas = await renderExportCanvas(target);
 
         if (format === "pdf") {
@@ -2421,8 +2672,19 @@ function renderExercises(){
         } else {
           const mime = format === "jpg" ? "image/jpeg" : "image/png";
           const ext = format === "jpg" ? "jpg" : "png";
+          let exportCanvas = canvas;
+          if (format === "jpg") {
+            const opaque = document.createElement("canvas");
+            opaque.width = canvas.width;
+            opaque.height = canvas.height;
+            const ctx = opaque.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, opaque.width, opaque.height);
+            ctx.drawImage(canvas, 0, 0);
+            exportCanvas = opaque;
+          }
           const blob = await new Promise((resolve, reject) => {
-            canvas.toBlob(b => b ? resolve(b) : reject(new Error("Gagal membuat file gambar.")), mime, 0.95);
+            exportCanvas.toBlob(b => b ? resolve(b) : reject(new Error("Gagal membuat file gambar.")), mime, 0.95);
           });
           triggerBlobDownload(blob, getExportFilename(type, ext));
         }
@@ -2444,9 +2706,9 @@ function renderExercises(){
           return;
         }
 
-        const type = document.getElementById("export-report-type")?.value || "full";
-        const format = document.getElementById("export-format")?.value === "pdf" ? "pdf" : "png";
-        target = await buildCaptureNode();
+        const type = getCustomSelectValue("export-report-type", "full");
+        const format = getCustomSelectValue("export-format", "pdf") === "pdf" ? "pdf" : "png";
+        target = await buildCaptureNode(format);
         const canvas = await renderExportCanvas(target);
 
         let blob, mime, ext;
@@ -2481,6 +2743,462 @@ function renderExercises(){
     }
 
 
+    /* ===== GYMFlow Photo Workout Export =====
+       1080x1080 canvas-first renderer: the exact same canvas drives preview,
+       download and share, so what the user sees is what gets exported. */
+    function photoExportFormatNumber(n){
+      const v = Number(n) || 0;
+      const sign = v < 0 ? "-" : "";
+      const a = Math.abs(v);
+      if (a >= 1000000) return sign + (a/1000000).toFixed(a >= 10000000 ? 0 : 1).replace(/\.0$/,'') + "m";
+      if (a >= 1000) return sign + (a/1000).toFixed(a >= 100000 ? 0 : 1).replace(/\.0$/,'') + "k";
+      return sign + new Intl.NumberFormat("en-US", {maximumFractionDigits:0}).format(a);
+    }
+
+    function photoExportPeriodTitle(session=null){
+      if (session?.endedAt) {
+        return new Date(session.endedAt).toLocaleDateString("en-US", {month:"long", year:"numeric"});
+      }
+      const now = new Date();
+      const map = {"7d":"LAST 7 DAYS","30d":now.toLocaleDateString("en-US",{month:"long",year:"numeric"}),"90d":"LAST 3 MONTHS","1y":"LAST 12 MONTHS","all":"ALL TIME"};
+      return map[analyticsPeriod] || now.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+    }
+
+    function getPhotoWorkoutData(sessionOverride=null){
+      if (sessionOverride) {
+        const m = calculateSessionMetrics(sessionOverride, (state.history || []).filter(s=>s.id!==sessionOverride.id));
+        return {
+          period: photoExportPeriodTitle(sessionOverride),
+          workouts: 1,
+          duration: Number(sessionOverride.duration)||0,
+          volume: m.totalVolume,
+          sets: m.totalSets,
+          exercises: m.totalExercises,
+          prs: m.personalRecords.length,
+          topMuscle: m.muscleGroups?.[0] ? (ANALYTICS_LABELS[m.muscleGroups[0]] || m.muscleGroups[0]) : "—",
+          muscleGroups: (m.muscleGroups || []).map(k => ANALYTICS_LABELS[k] || k),
+          routineName: routineById(sessionOverride.routineId)?.name || "Workout"
+        };
+      }
+
+      const model = buildAnalyticsModel(analyticsPeriod);
+      return {
+        period: photoExportPeriodTitle(),
+        workouts: model.totalWorkouts,
+        duration: model.totalDuration,
+        volume: model.totalVolume,
+        sets: model.totalSets,
+        exercises: model.totalExercises,
+        prs: model.personalRecords.length,
+        topMuscle: model.topMuscle ? (ANALYTICS_LABELS[model.topMuscle.key] || model.topMuscle.key) : "—",
+        muscleGroups: model.muscleStats.filter(m=>m.sets>0).slice(0,4).map(m => ANALYTICS_LABELS[m.key] || m.key),
+        routineName: ""
+      };
+    }
+
+    function gfCanvasText(ctx, text, x, y, size, weight=800, color="#ffffff", align="left", maxWidth=null){
+      ctx.save();
+      ctx.font = `${weight} ${size}px "DM Sans", Arial, sans-serif`;
+      ctx.textAlign = align;
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = color;
+      ctx.shadowColor = "rgba(0,0,0,.48)";
+      ctx.shadowBlur = 14;
+      ctx.shadowOffsetY = 3;
+      const value = String(text ?? "");
+      if (maxWidth) ctx.fillText(value, x, y, maxWidth);
+      else ctx.fillText(value, x, y);
+      ctx.restore();
+    }
+
+    function gfCanvasLabel(ctx, label, x, y, align="left"){
+      ctx.save();
+      ctx.font = `800 22px "DM Sans", Arial, sans-serif`;
+      ctx.textAlign = align;
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "rgba(255,255,255,.84)";
+      ctx.shadowColor = "rgba(0,0,0,.6)";
+      ctx.shadowBlur = 10;
+      ctx.fillText(String(label).toUpperCase(), x, y);
+      ctx.restore();
+      const w = Math.min(54, Math.max(30, ctx.measureText(String(label).toUpperCase()).width * .26));
+      ctx.save();
+      ctx.fillStyle = "#88F914";
+      ctx.fillRect(align === "right" ? x - w : x, y + 12, w, 4);
+      ctx.restore();
+    }
+
+    function gfCanvasMetric(ctx, x, y, label, value, side="left", valueSize=62){
+      const align = side === "right" ? "right" : "left";
+      gfCanvasLabel(ctx, label, x, y, align);
+      gfCanvasText(ctx, value, x, y + 72, valueSize, 900, "#ffffff", align, 470);
+    }
+
+    function gfCanvasBrand(ctx, x, y, username, logoImage=null){
+      if (logoImage?.complete && logoImage.naturalWidth) {
+        ctx.save();
+        ctx.drawImage(logoImage,x,y-33,38,38);
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.fillStyle = "#88F914";
+        ctx.fillRect(x, y-28, 32, 32);
+        ctx.fillStyle = "#0a0f0b";
+        ctx.font = `900 20px Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("G", x+16, y-12);
+        ctx.restore();
+      }
+      gfCanvasText(ctx, "GYMFlow", x+48, y-4, 25, 900, "#ffffff", "left");
+      gfCanvasText(ctx, username ? `@${username.replace(/^@+/,"")}` : "@gymflow", x+48, y+24, 18, 700, "rgba(255,255,255,.72)", "left");
+    }
+
+    function drawPhotoWorkoutCanvas(){
+      const editor = window.__gfPhotoExportEditor;
+      const canvas = document.getElementById("gf-photo-export-canvas");
+      if (!editor || !canvas) return;
+      const ctx = canvas.getContext("2d", {alpha:true});
+      const W = 1080, H = 1080;
+      ctx.clearRect(0,0,W,H);
+
+      const transparent = editor.format === "png" && editor.transparent;
+      if (!transparent) {
+        if (editor.image) {
+          const img = editor.image;
+          const fitScale = Math.max(W/img.naturalWidth, H/img.naturalHeight);
+          const scale = fitScale * editor.zoom;
+          const drawW = img.naturalWidth * scale;
+          const drawH = img.naturalHeight * scale;
+          ctx.save();
+          ctx.translate(W/2 + editor.offsetX, H/2 + editor.offsetY);
+          ctx.drawImage(img, -drawW/2, -drawH/2, drawW, drawH);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = "#090d13";
+          ctx.fillRect(0,0,W,H);
+        }
+
+        const leftFade = ctx.createLinearGradient(0,0,W*0.76,0);
+        leftFade.addColorStop(0,"rgba(0,0,0,.76)");
+        leftFade.addColorStop(.42,"rgba(0,0,0,.31)");
+        leftFade.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.fillStyle = leftFade;
+        ctx.fillRect(0,0,W,H);
+
+        const bottomFade = ctx.createLinearGradient(0,H*.58,0,H);
+        bottomFade.addColorStop(0,"rgba(0,0,0,0)");
+        bottomFade.addColorStop(1,"rgba(0,0,0,.78)");
+        ctx.fillStyle = bottomFade;
+        ctx.fillRect(0,H*.48,W,H*.52);
+
+        const vignette = ctx.createRadialGradient(W/2,H/2,360,W/2,H/2,760);
+        vignette.addColorStop(0,"rgba(0,0,0,0)");
+        vignette.addColorStop(1,"rgba(0,0,0,.34)");
+        ctx.fillStyle = vignette;
+        ctx.fillRect(0,0,W,H);
+      } else {
+        // PNG transparency mode intentionally leaves the background fully alpha.
+        ctx.clearRect(0,0,W,H);
+      }
+
+      // Subtle GYMFlow watermark / identity.
+      ctx.save();
+      ctx.translate(W*0.67,H*0.57);
+      ctx.rotate(-Math.PI/12);
+      ctx.globalAlpha = transparent ? 0.04 : 0.065;
+      ctx.fillStyle = transparent ? "#88F914" : "#ffffff";
+      ctx.font = `900 114px "DM Sans", Arial, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText("GYMFlow",0,0);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+
+      const session = editor.sessionOverride;
+      const data = getPhotoWorkoutData(session);
+      const username = state.settings.userName || "GYMFlow User";
+      const template = editor.template;
+
+      // Header — no card, just typography directly over the image.
+      gfCanvasText(ctx, data.period, 72, 82, 27, 600, "rgba(255,255,255,.78)", "left");
+      gfCanvasText(ctx, template === "performance" ? "PERFORMANCE" : "WORKOUTS", 72, 128, 18, 900, "#88F914", "left");
+      gfCanvasText(ctx, `@${username.replace(/^@+/,"")}`, W-72, 82, 19, 700, "rgba(255,255,255,.82)", "right");
+
+      if (template === "minimal") {
+        gfCanvasLabel(ctx,"WORKOUTS",72,300,"left");
+        gfCanvasText(ctx,String(data.workouts),72,470,188,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"TOTAL DURATION",72,560,"left");
+        gfCanvasText(ctx,formatTimeDetailed(data.duration),72,632,54,850,"#ffffff","left");
+        gfCanvasLabel(ctx,"VOLUME",72,718,"left");
+        gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",72,788,60,900,"#ffffff","left");
+        gfCanvasMetric(ctx,W-72,718,"SETS",String(data.sets),"right",60);
+        gfCanvasMetric(ctx,W-72,842,"PRs",String(data.prs),"right",54);
+      } else if (template === "performance") {
+        gfCanvasLabel(ctx,"VOLUME",72,280,"left");
+        gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",72,410,118,900,"#ffffff","left");
+        gfCanvasText(ctx,"TOTAL TRAINING LOAD",72,450,18,800,"rgba(255,255,255,.70)","left");
+        gfCanvasMetric(ctx,72,560,"DURATION",formatTimeDetailed(data.duration),"left",60);
+        gfCanvasMetric(ctx,W-72,560,"SETS",String(data.sets),"right",60);
+        gfCanvasMetric(ctx,72,760,"PERSONAL RECORDS",String(data.prs),"left",60);
+        gfCanvasMetric(ctx,W-72,760,"EXERCISES",String(data.exercises),"right",60);
+        if (data.topMuscle && data.topMuscle !== "—") {
+          gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,72,915,20,800,"#88F914","left");
+        }
+      } else if (template === "full") {
+        gfCanvasLabel(ctx,"WORKOUTS",72,270,"left");
+        gfCanvasText(ctx,String(data.workouts),72,340,86,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"DURATION",570,270,"left");
+        gfCanvasText(ctx,formatTimeDetailed(data.duration),570,340,72,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"VOLUME",72,480,"left");
+        gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",72,550,74,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"SETS",570,480,"left");
+        gfCanvasText(ctx,String(data.sets),570,550,74,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"EXERCISES",72,685,"left");
+        gfCanvasText(ctx,String(data.exercises),72,755,66,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"PERSONAL RECORDS",570,685,"left");
+        gfCanvasText(ctx,String(data.prs),570,755,66,900,"#ffffff","left");
+        if (data.topMuscle && data.topMuscle !== "—") {
+          gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,72,870,20,800,"#88F914","left");
+        }
+        if (data.muscleGroups?.length) {
+          gfCanvasText(ctx,data.muscleGroups.join("  ·  ").toUpperCase(),72,905,19,700,"rgba(255,255,255,.72)","left",900);
+        }
+      } else {
+        // Classic — closest to the supplied social-sharing composition.
+        gfCanvasMetric(ctx,72,270,"WORKOUTS",String(data.workouts),"left",74);
+        gfCanvasMetric(ctx,W-72,270,"DURATION",formatTimeDetailed(data.duration),"right",62);
+        gfCanvasMetric(ctx,72,500,"VOLUME",photoExportFormatNumber(data.volume)+" kg","left",66);
+        gfCanvasMetric(ctx,W-72,500,"SETS",String(data.sets),"right",66);
+        gfCanvasMetric(ctx,72,730,"EXERCISES",String(data.exercises),"left",62);
+        gfCanvasMetric(ctx,W-72,730,"PERSONAL RECORDS",String(data.prs),"right",54);
+      }
+
+      // Footer lockup.
+      gfCanvasBrand(ctx,72,1006,username,editor.logoImage);
+      gfCanvasText(ctx,"YOUR FITNESS JOURNEY",W-72,1014,15,800,"rgba(255,255,255,.55)","right");
+    }
+
+    function updatePhotoWorkoutControls(){
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return;
+      document.querySelectorAll(".gf-photo-template").forEach(btn=>btn.classList.toggle("active",btn.dataset.template===editor.template));
+      document.querySelectorAll(".gf-photo-format").forEach(btn=>btn.classList.toggle("active",btn.dataset.format===editor.format));
+      const transparent = document.getElementById("gf-photo-export-transparent");
+      if (transparent) {
+        transparent.disabled = editor.format !== "png";
+        transparent.closest("label")?.classList.toggle("is-disabled",editor.format !== "png");
+        transparent.checked = editor.transparent;
+      }
+      const zoom = document.getElementById("gf-photo-export-zoom");
+      const zoomLabel = document.getElementById("gf-photo-export-zoom-label");
+      if (zoom) zoom.value = String(editor.zoom);
+      if (zoomLabel) zoomLabel.textContent = `Zoom ${Math.round(editor.zoom*100)}%`;
+      const meta = document.getElementById("gf-photo-export-live-meta");
+      if (meta) meta.textContent = `${editor.template === "classic" ? "Classic" : editor.template === "minimal" ? "Minimal" : editor.template === "performance" ? "Performance" : "Full Stats"} · ${editor.format.toUpperCase()}${editor.format === "png" && editor.transparent ? " · Transparent" : ""}`;
+      const preview = document.getElementById("gf-photo-export-preview");
+      if (preview) preview.classList.toggle("is-transparent",editor.format === "png" && editor.transparent);
+      const empty = document.getElementById("gf-photo-export-empty");
+      if (empty) empty.classList.toggle("hidden",!!editor.image);
+      const actions = document.querySelectorAll("#gf-photo-export-download,#gf-photo-export-share");
+      actions.forEach(btn => btn.disabled = !editor.image);
+      drawPhotoWorkoutCanvas();
+    }
+
+    function loadPhotoWorkoutImage(file){
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        toast(currentLanguage()==="en" ? "Please choose an image file." : "Pilih file gambar.");
+        return;
+      }
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return;
+      if (editor.objectUrl) URL.revokeObjectURL(editor.objectUrl);
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        editor.image = img;
+        editor.objectUrl = objectUrl;
+        editor.offsetX = 0;
+        editor.offsetY = 0;
+        editor.zoom = 1;
+        updatePhotoWorkoutControls();
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        toast(currentLanguage()==="en" ? "Image could not be loaded." : "Foto tidak bisa dimuat.");
+      };
+      img.src = objectUrl;
+    }
+
+    function setPhotoWorkoutZoom(next){
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return;
+      editor.zoom = Math.min(2.2, Math.max(1, Number(next)||1));
+      updatePhotoWorkoutControls();
+    }
+
+    function initPhotoWorkoutExport(){
+      if (window.__gfPhotoExportEditor) return;
+      window.__gfPhotoExportEditor = {
+        template:"classic",
+        format:"jpg",
+        transparent:false,
+        zoom:1,
+        offsetX:0,
+        offsetY:0,
+        image:null,
+        objectUrl:null,
+        sessionOverride:null,
+        logoImage:null,
+        dragging:false,
+        lastPointer:null
+      };
+
+      const logo = new Image();
+      logo.onload = () => { window.__gfPhotoExportEditor.logoImage = logo; drawPhotoWorkoutCanvas(); };
+      logo.src = "new_logoprofile.png";
+
+      const file = document.getElementById("gf-photo-export-file");
+      const upload = document.getElementById("gf-photo-export-upload");
+      const emptyUpload = document.getElementById("gf-photo-export-empty-upload");
+      upload?.addEventListener("click",()=>file?.click());
+      emptyUpload?.addEventListener("click",()=>file?.click());
+      file?.addEventListener("change",e=>loadPhotoWorkoutImage(e.target.files?.[0]));
+
+      document.querySelectorAll(".gf-photo-template").forEach(btn=>btn.addEventListener("click",()=>{
+        window.__gfPhotoExportEditor.template = btn.dataset.template || "classic";
+        updatePhotoWorkoutControls();
+      }));
+      document.querySelectorAll(".gf-photo-format").forEach(btn=>btn.addEventListener("click",()=>{
+        const editor = window.__gfPhotoExportEditor;
+        editor.format = btn.dataset.format || "jpg";
+        if (editor.format !== "png") editor.transparent = false;
+        updatePhotoWorkoutControls();
+      }));
+      document.getElementById("gf-photo-export-transparent")?.addEventListener("change",e=>{
+        const editor = window.__gfPhotoExportEditor;
+        editor.transparent = !!e.target.checked;
+        drawPhotoWorkoutCanvas();
+      });
+      document.getElementById("gf-photo-export-reset")?.addEventListener("click",()=>{
+        const editor = window.__gfPhotoExportEditor;
+        editor.offsetX=0; editor.offsetY=0; editor.zoom=1;
+        updatePhotoWorkoutControls();
+      });
+      document.getElementById("gf-photo-export-zoom")?.addEventListener("input",e=>setPhotoWorkoutZoom(e.target.value));
+      document.getElementById("gf-photo-export-zoom-out")?.addEventListener("click",()=>setPhotoWorkoutZoom((window.__gfPhotoExportEditor?.zoom||1)-.05));
+      document.getElementById("gf-photo-export-zoom-in")?.addEventListener("click",()=>setPhotoWorkoutZoom((window.__gfPhotoExportEditor?.zoom||1)+.05));
+
+      const canvas = document.getElementById("gf-photo-export-canvas");
+      if (canvas) {
+        const pointerPos = (ev) => {
+          const r = canvas.getBoundingClientRect();
+          return {x:(ev.clientX-r.left)*(1080/r.width), y:(ev.clientY-r.top)*(1080/r.height)};
+        };
+        canvas.addEventListener("pointerdown",ev=>{
+          const editor=window.__gfPhotoExportEditor;
+          if (!editor.image) return;
+          editor.dragging=true;
+          editor.lastPointer=pointerPos(ev);
+          canvas.setPointerCapture?.(ev.pointerId);
+        });
+        canvas.addEventListener("pointermove",ev=>{
+          const editor=window.__gfPhotoExportEditor;
+          if (!editor.dragging || !editor.lastPointer) return;
+          const p=pointerPos(ev);
+          editor.offsetX += p.x-editor.lastPointer.x;
+          editor.offsetY += p.y-editor.lastPointer.y;
+          editor.lastPointer=p;
+          drawPhotoWorkoutCanvas();
+        });
+        const stop=ev=>{
+          const editor=window.__gfPhotoExportEditor;
+          editor.dragging=false;
+          editor.lastPointer=null;
+          try{canvas.releasePointerCapture?.(ev.pointerId);}catch(_){ }
+        };
+        canvas.addEventListener("pointerup",stop);
+        canvas.addEventListener("pointercancel",stop);
+        canvas.addEventListener("dblclick",()=>{
+          const editor=window.__gfPhotoExportEditor;
+          editor.offsetX=0; editor.offsetY=0;
+          editor.zoom=1;
+          updatePhotoWorkoutControls();
+        });
+      }
+
+      document.getElementById("gf-photo-export-download")?.addEventListener("click",downloadPhotoWorkoutExport);
+      document.getElementById("gf-photo-export-share")?.addEventListener("click",sharePhotoWorkoutExport);
+      updatePhotoWorkoutControls();
+    }
+
+    function openPhotoWorkoutExportModal(sessionOverride=null){
+      ensureAnalyticsModals();
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return;
+      editor.sessionOverride = sessionOverride || null;
+      updatePhotoWorkoutControls();
+      openModal("photo-workout-export-modal");
+      requestAnimationFrame(()=>drawPhotoWorkoutCanvas());
+    }
+
+    function getPhotoWorkoutFilename(ext){
+      const date = new Date().toISOString().slice(0,10);
+      return `GYMFlow-Workout-${date}.${ext}`;
+    }
+
+    function getPhotoWorkoutCanvasBlob(canvas, format){
+      const mime = format === "jpg" ? "image/jpeg" : "image/png";
+      return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Gagal membuat file gambar.")),mime,0.96));
+    }
+
+    async function downloadPhotoWorkoutExport(){
+      const editor = window.__gfPhotoExportEditor;
+      const canvas = document.getElementById("gf-photo-export-canvas");
+      if (!editor?.image || !canvas) {
+        toast(currentLanguage()==="en" ? "Upload a photo first." : "Upload foto terlebih dahulu.");
+        return;
+      }
+      try {
+        drawPhotoWorkoutCanvas();
+        const blob = await getPhotoWorkoutCanvasBlob(canvas,editor.format);
+        triggerBlobDownload(blob,getPhotoWorkoutFilename(editor.format));
+        toast(currentLanguage()==="en" ? "Workout photo exported." : "Workout photo berhasil diexport.");
+      } catch(err) {
+        console.error("[GYMFlow Photo Export]",err);
+        toast(err.message || "Export gagal.");
+      }
+    }
+
+    async function sharePhotoWorkoutExport(){
+      const editor = window.__gfPhotoExportEditor;
+      const canvas = document.getElementById("gf-photo-export-canvas");
+      if (!editor?.image || !canvas) {
+        toast(currentLanguage()==="en" ? "Upload a photo first." : "Upload foto terlebih dahulu.");
+        return;
+      }
+      try {
+        if (!navigator.share) {
+          await downloadPhotoWorkoutExport();
+          return;
+        }
+        drawPhotoWorkoutCanvas();
+        const blob = await getPhotoWorkoutCanvasBlob(canvas,editor.format);
+        const ext = editor.format;
+        const mime = editor.format === "jpg" ? "image/jpeg" : "image/png";
+        const file = new File([blob],getPhotoWorkoutFilename(ext),{type:mime});
+        if (navigator.canShare && navigator.canShare({files:[file]})) {
+          await navigator.share({title:"GYMFlow Workout",text:"My GYMFlow workout",files:[file]});
+        } else {
+          await downloadPhotoWorkoutExport();
+        }
+      } catch(err) {
+        if (err?.name === "AbortError") return;
+        console.error("[GYMFlow Photo Share]",err);
+        toast(err.message || "Share gagal.");
+      }
+    }
+
     function exportPDF() {
       if (state.history.length === 0) {
         toast(currentLanguage()==="en" ? "No workout history available to export." : "Belum ada data history latihan untuk didownload.");
@@ -2512,6 +3230,10 @@ function renderExercises(){
       }, 2500);
 
       populateSelects();
+
+      // Inisialisasi modal/export lebih awal supaya tombol Export di tab Statistics
+      // langsung punya event handler, tanpa harus klik Export di header terlebih dahulu.
+      ensureAnalyticsModals();
       
       initCustomSelect("custom-muscle-filter", () => renderExercises());
       initCustomSelect("custom-exercise-muscle-select", (val) => {
