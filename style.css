@@ -1214,7 +1214,32 @@ body.light {
   .gf-export-kpis b{font-size:15px}
 }
 
-/* ===== GYMFlow Photo Workout Export — 1080x1080 social sharing editor ===== */
+/* ===== GYMFlow Photo Workout Export — flexible canvas sharing editor ===== */
+.gf-photo-size-mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gf-photo-size-mode{min-height:68px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#121815;color:#93a29a;text-align:left;transition:transform .16s ease,border-color .16s ease,background .16s ease,color .16s ease}
+.gf-photo-size-mode:hover{border-color:rgba(136,249,20,.4);transform:translateY(-1px)}
+.gf-photo-size-mode.active{border-color:rgba(136,249,20,.55);background:rgba(136,249,20,.11);color:#f1f7f1;box-shadow:0 0 0 1px rgba(136,249,20,.12) inset}
+.gf-photo-size-mode strong{display:block;color:inherit;font-size:13px;font-weight:900}
+.gf-photo-size-mode span{display:block;margin-top:3px;color:#718279;font-size:10px;font-weight:700}
+.gf-photo-size-mode.active span{color:#a6c68e}
+.gf-photo-custom-size-panel{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
+.gf-photo-custom-size-panel.hidden{display:none}
+.gf-photo-preset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gf-photo-preset{min-height:60px;padding:9px 10px;border-radius:13px;border:1px solid rgba(255,255,255,.07);background:#101612;color:#93a29a;text-align:left}
+.gf-photo-preset:hover{border-color:rgba(136,249,20,.36);color:#f1f7f1}
+.gf-photo-preset.active{border-color:rgba(136,249,20,.5);background:rgba(136,249,20,.09);color:#f1f7f1}
+.gf-photo-preset strong{display:block;font-size:12px;font-weight:900}
+.gf-photo-preset span{display:block;margin-top:2px;font-size:10px;font-weight:700;color:#718279}
+.gf-photo-preset.active span{color:#a6c68e}
+.gf-photo-dimensions-grid{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:7px;align-items:end;margin-top:10px}
+.gf-photo-dimensions-grid label{display:flex;flex-direction:column;gap:5px;color:#84958c;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.gf-photo-dimensions-grid input{width:100%;min-height:42px;background:#0e1310;border:1px solid rgba(255,255,255,.08);border-radius:11px;color:#eef5ef;padding:0 10px;font-size:13px;font-weight:800;outline:none;box-sizing:border-box}
+.gf-photo-dimensions-grid input:focus{border-color:rgba(136,249,20,.5);box-shadow:0 0 0 2px rgba(136,249,20,.08)}
+.gf-photo-dimensions-x{align-self:end;color:#64766d;font-size:16px;font-weight:900;text-align:center;padding-bottom:11px}
+.gf-photo-ratio-note{margin-top:8px;color:#6f8178;font-size:10px;font-weight:700}
+.gf-photo-ratio-note strong{color:#a5b5ad}
+
+/* ===== GYMFlow Photo Workout Export — shared canvas styling ===== */
 .gf-photo-export-layer{padding:12px;overflow:auto;background:rgba(3,7,5,.78);backdrop-filter:blur(14px)}
 .gf-photo-export-modal{width:min(1180px,100%);max-width:1180px;margin:18px auto;background:#0c1110;border:1px solid rgba(136,249,20,.16);border-radius:26px;padding:22px;box-shadow:0 28px 90px rgba(0,0,0,.52);color:#edf5f1}
 .gf-photo-export-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
@@ -1223,7 +1248,7 @@ body.light {
 .gf-photo-export-stage-wrap{min-width:0}
 .gf-photo-export-preview{position:relative;width:min(100%,720px);margin:0 auto;background:#050806;border:1px solid rgba(255,255,255,.09);border-radius:22px;overflow:hidden;box-shadow:0 26px 65px rgba(0,0,0,.38)}
 .gf-photo-export-preview.is-transparent{background:repeating-conic-gradient(#232925 0% 25%,#151a17 0% 50%) 50%/22px 22px}
-.gf-photo-export-preview canvas{display:block;width:100%;height:auto;aspect-ratio:1/1;cursor:grab;touch-action:none;user-select:none}
+.gf-photo-export-preview canvas{display:block;width:100%;height:auto;aspect-ratio:var(--gf-export-ratio,16/9);cursor:grab;touch-action:none;user-select:none}
 .gf-photo-export-preview canvas:active{cursor:grabbing}
 .gf-photo-export-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:26px;text-align:center;background:linear-gradient(180deg,rgba(5,8,6,.52),rgba(5,8,6,.82));pointer-events:none}
 .gf-photo-export-empty.hidden{display:none}
@@ -1266,4 +1291,5 @@ body.light {
   .gf-photo-export-preview{border-radius:18px}
   .gf-photo-template-grid,.gf-photo-format-grid{grid-template-columns:1fr 1fr}
   .gf-photo-export-stage-meta{font-size:10px}
+  .gf-photo-size-mode-grid,.gf-photo-preset-grid{grid-template-columns:1fr 1fr}
 }
