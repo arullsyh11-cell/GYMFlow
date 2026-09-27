@@ -332,50 +332,74 @@
 
         <!-- KONTEN TAB OVERVIEW -->
         <div id="progress-overview-content" class="space-y-5">
-          <section class="panel p-5 relative overflow-hidden bg-gradient-to-r from-[var(--surface)] to-[var(--surface-2)]">
-            <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-[var(--lime)] opacity-10 blur-xl pointer-events-none"></div>
-            <div class="relative z-10">
-              <span class="gf-eyebrow">PROGRESS OVERVIEW</span>
-              <h3 class="font-extrabold text-2xl md:text-3xl tracking-tight mt-1">Your Training Progress</h3>
-              <p class="muted text-sm mt-1 max-w-2xl">Ringkasan workout dan progres latihanmu. Untuk analisis muscle dan training load yang lebih detail, buka tab Statistics.</p>
+          <section class="gf-progress-hero panel">
+            <div class="gf-progress-hero-glow" aria-hidden="true"></div>
+            <div class="gf-progress-hero-copy">
+              <span class="gf-eyebrow">TRAINING ANALYTICS</span>
+              <h3>Your training, at a glance.</h3>
+              <p>Track consistency, volume, calories, and time without losing the clarity of the workout data.</p>
+              <div class="gf-progress-pulse-row">
+                <div class="gf-progress-pulse-item">
+                  <span>THIS WEEK</span>
+                  <strong id="progress-this-week">0</strong>
+                  <small>workouts</small>
+                </div>
+                <div class="gf-progress-pulse-item">
+                  <span>CURRENT STREAK</span>
+                  <strong id="progress-current-streak">0</strong>
+                  <small>days</small>
+                </div>
+              </div>
+            </div>
+            <div class="gf-progress-hero-stat">
+              <span>TOTAL WORKOUTS</span>
+              <strong id="history-session-count">0</strong>
+              <small id="progress-workouts-logged-copy">0 workouts logged</small>
             </div>
           </section>
 
-          <section>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div class="metric flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-2"><span class="text-lime-300"><i data-lucide="calendar-check" class="w-5 h-5"></i></span></div>
-                <div><strong id="history-session-count" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0</strong><p class="muted text-xs font-bold mt-0.5">Total Workouts</p></div>
-              </div>
-              <div class="metric flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-2"><span class="text-orange-400"><i data-lucide="flame" class="w-5 h-5"></i></span></div>
-                <div><strong id="history-calories" class="block text-2xl md:text-3xl font-extrabold tracking-tight text-lime-300">0 kkal</strong><p class="muted text-xs font-bold mt-0.5">Total Calories</p></div>
-              </div>
-              <div class="metric flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-2"><span class="text-indigo-400"><i data-lucide="timer" class="w-5 h-5"></i></span></div>
-                <div><strong id="history-total-time" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong><p class="muted text-xs font-bold mt-0.5">Total Time</p></div>
-              </div>
-              <div class="metric flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-2"><span class="text-cyan-400"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></span></div>
-                <div><strong id="history-avg-duration" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong><p class="muted text-xs font-bold mt-0.5">Avg Duration</p></div>
-              </div>
+          <section class="gf-progress-metrics-strip" aria-label="Training metrics">
+            <div class="gf-progress-metric">
+              <span>CALORIES</span>
+              <strong id="history-calories">0 kkal</strong>
+              <small>Total burned</small>
+            </div>
+            <div class="gf-progress-metric">
+              <span>TRAINING TIME</span>
+              <strong id="history-total-time">0m</strong>
+              <small>Total duration</small>
+            </div>
+            <div class="gf-progress-metric">
+              <span>AVG DURATION</span>
+              <strong id="history-avg-duration">0m</strong>
+              <small>Per workout</small>
             </div>
           </section>
 
-          <section class="panel p-5">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <div><span class="gf-eyebrow">CONSISTENCY</span><h3 class="font-extrabold text-lg tracking-tight mt-0.5">Workouts per Week</h3></div>
-              <span class="gf-soft-badge">Last 5 weeks</span>
-            </div>
-            <div id="workouts-per-week-chart" class="h-48 w-full"></div>
+          <section class="gf-chart-grid">
+            <article class="panel gf-chart-card gf-chart-card-large">
+              <div class="gf-chart-head">
+                <div><span class="gf-eyebrow">CONSISTENCY</span><h3>Workouts per week</h3></div>
+                <span class="gf-soft-badge">5 weeks</span>
+              </div>
+              <div id="workouts-per-week-chart" class="gf-chart-area"></div>
+            </article>
+
+            <article class="panel gf-chart-card">
+              <div class="gf-chart-head">
+                <div><span class="gf-eyebrow">CALORIES</span><h3>Per workout</h3></div>
+                <span class="muted text-xs">Recent</span>
+              </div>
+              <div id="calories-per-workout-chart" class="gf-chart-area"></div>
+            </article>
           </section>
 
-          <section class="panel p-5">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <div><span class="gf-eyebrow">CALORIES</span><h3 class="font-extrabold text-lg tracking-tight mt-0.5">Calories per Workout</h3></div>
-              <span class="muted text-xs">Recent sessions</span>
+          <section class="panel gf-chart-card">
+            <div class="gf-chart-head">
+              <div><span class="gf-eyebrow">TRAINING LOAD</span><h3>Volume trend</h3></div>
+              <span class="muted text-xs">Last 8 sessions</span>
             </div>
-            <div id="calories-per-workout-chart" class="h-48 w-full"></div>
+            <div id="volume-trend-chart" class="gf-chart-area gf-chart-area-volume"></div>
           </section>
         </div>
 
@@ -632,16 +656,20 @@
 
       <!-- Appearance Section -->
       <div class="space-y-3 pt-4 mt-4 border-t border-[var(--line)]">
-        <h3 class="text-xs font-bold uppercase tracking-wider muted">Appearance</h3>
-        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
-          <div>
-            <p class="font-bold text-sm">Dark Mode</p>
-            <p id="dark-mode-desc" class="muted text-xs">Currently dark</p>
-          </div>
-          <button type="button" id="profile-dark-toggle" class="w-12 h-6 rounded-full bg-lime-300 p-1 transition-colors relative" onclick="toggleProfileDarkMode()">
-            <div id="dark-mode-thumb" class="w-4 h-4 rounded-full bg-slate-950 transition-transform translate-x-6"></div>
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider muted">Appearance</h3>
+          <p id="dark-mode-desc" class="muted text-xs mt-1">Currently dark</p>
+        </div>
+        <div class="gf-theme-switcher" role="group" aria-label="Appearance theme">
+          <button type="button" id="theme-dark-option" class="gf-theme-option active" onclick="setProfileTheme('dark')" aria-pressed="true">
+            <i data-lucide="moon"></i> Dark
+          </button>
+          <button type="button" id="theme-light-option" class="gf-theme-option" onclick="setProfileTheme('light')" aria-pressed="false">
+            <i data-lucide="sun"></i> Light
           </button>
         </div>
+        <!-- Hidden compatibility hook for older calls -->
+        <button type="button" id="profile-dark-toggle" class="sr-only" tabindex="-1" aria-hidden="true" onclick="toggleProfileDarkMode()"><span id="dark-mode-thumb"></span></button>
       </div>
 
       <!-- Language Section -->
