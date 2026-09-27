@@ -2174,7 +2174,7 @@ function renderExercises(){
               <div>
                 <span class="gf-eyebrow">PHOTO WORKOUT EXPORT</span>
                 <h2 id="photo-workout-export-title" class="font-extrabold text-xl tracking-tight">Share your workout</h2>
-                <p class="gf-photo-export-subtitle">1080×1080 social graphic · data dari GYMFlow</p>
+                <p id="gf-photo-export-subtitle" class="gf-photo-export-subtitle">Fullscreen · data dari GYMFlow</p>
               </div>
               <button type="button" class="icon-btn" data-gf-close="photo-workout-export-modal" aria-label="Tutup photo export"><i data-lucide="x"></i></button>
             </div>
@@ -2182,7 +2182,7 @@ function renderExercises(){
             <div class="gf-photo-export-layout">
               <div class="gf-photo-export-stage-wrap">
                 <div id="gf-photo-export-preview" class="gf-photo-export-preview">
-                  <canvas id="gf-photo-export-canvas" width="1080" height="1080" aria-label="Preview workout export 1080 by 1080"></canvas>
+                  <canvas id="gf-photo-export-canvas" width="1920" height="1080" aria-label="Preview workout export fullscreen"></canvas>
                   <div id="gf-photo-export-empty" class="gf-photo-export-empty">
                     <i data-lucide="image-plus"></i>
                     <strong>Upload a workout photo</strong>
@@ -2191,7 +2191,7 @@ function renderExercises(){
                   </div>
                 </div>
                 <div class="gf-photo-export-stage-meta">
-                  <span>1080 × 1080 px</span>
+                  <span id="gf-photo-export-size-meta">Fullscreen · 1920 × 1080 px</span>
                   <span id="gf-photo-export-live-meta">Classic · JPG</span>
                 </div>
               </div>
@@ -2207,7 +2207,7 @@ function renderExercises(){
                   </div>
                   <div class="gf-photo-zoom-row">
                     <button id="gf-photo-export-zoom-out" type="button" class="icon-btn !w-10 !h-10" aria-label="Zoom out"><i data-lucide="minus"></i></button>
-                    <input id="gf-photo-export-zoom" type="range" min="0.85" max="2.2" step="0.01" value="1" aria-label="Photo zoom">
+                    <input id="gf-photo-export-zoom" type="range" min="1" max="2.2" step="0.01" value="1" aria-label="Photo zoom">
                     <button id="gf-photo-export-zoom-in" type="button" class="icon-btn !w-10 !h-10" aria-label="Zoom in"><i data-lucide="plus"></i></button>
                   </div>
                   <small id="gf-photo-export-zoom-label" class="muted text-xs">Zoom 100%</small>
@@ -2224,7 +2224,32 @@ function renderExercises(){
                 </section>
 
                 <section class="gf-photo-control-group">
-                  <div class="gf-photo-control-head"><span>Export</span><span class="muted text-xs">final 1080×1080</span></div>
+                  <div class="gf-photo-control-head"><span>Canvas</span><span id="gf-photo-size-helper" class="muted text-xs">auto device aspect</span></div>
+                  <div class="gf-photo-size-mode-grid">
+                    <button type="button" class="gf-photo-size-mode active" data-size-mode="fullscreen"><strong>Fullscreen</strong><span>Match your device</span></button>
+                    <button type="button" class="gf-photo-size-mode" data-size-mode="custom"><strong>Custom Size</strong><span>Choose pixels</span></button>
+                  </div>
+
+                  <div id="gf-photo-custom-size-panel" class="gf-photo-custom-size-panel hidden">
+                    <div class="gf-photo-preset-grid">
+                      <button type="button" class="gf-photo-preset active" data-preset="square"><strong>Square</strong><span>1080×1080</span></button>
+                      <button type="button" class="gf-photo-preset" data-preset="portrait"><strong>Portrait</strong><span>1080×1350</span></button>
+                      <button type="button" class="gf-photo-preset" data-preset="story"><strong>Story</strong><span>1080×1920</span></button>
+                      <button type="button" class="gf-photo-preset" data-preset="landscape"><strong>Landscape</strong><span>1920×1080</span></button>
+                      <button type="button" class="gf-photo-preset" data-preset="custom"><strong>Custom</strong><span>Set your own size</span></button>
+                    </div>
+
+                    <div class="gf-photo-dimensions-grid">
+                      <label><span>Width</span><input id="gf-photo-export-width" type="number" min="320" max="8192" step="1" value="1080" inputmode="numeric"></label>
+                      <span class="gf-photo-dimensions-x">×</span>
+                      <label><span>Height</span><input id="gf-photo-export-height" type="number" min="320" max="8192" step="1" value="1080" inputmode="numeric"></label>
+                    </div>
+                    <div class="gf-photo-ratio-note">Aspect ratio <strong id="gf-photo-export-ratio">1:1</strong></div>
+                  </div>
+                </section>
+
+                <section class="gf-photo-control-group">
+                  <div class="gf-photo-control-head"><span>Format</span><span id="gf-photo-format-helper" class="muted text-xs">image export</span></div>
                   <div class="gf-photo-format-grid">
                     <button type="button" class="gf-photo-format active" data-format="jpg"><strong>JPG</strong><span>Photo background</span></button>
                     <button type="button" class="gf-photo-format" data-format="png"><strong>PNG</strong><span>Alpha supported</span></button>
@@ -2811,20 +2836,23 @@ function buildExportBrandMark(size = 38) {
       ctx.restore();
     }
 
-    function gfCanvasLabel(ctx, label, x, y, align="left"){
+    function gfCanvasLabel(ctx, label, x, y, align="left", scale=1){
+      const labelScale = Math.max(.72, scale || 1);
+      const text = String(label).toUpperCase();
       ctx.save();
-      ctx.font = `800 22px "DM Sans", Arial, sans-serif`;
+      ctx.font = `800 ${22*labelScale}px "DM Sans", Arial, sans-serif`;
       ctx.textAlign = align;
       ctx.textBaseline = "alphabetic";
       ctx.fillStyle = "rgba(255,255,255,.84)";
       ctx.shadowColor = "rgba(0,0,0,.6)";
-      ctx.shadowBlur = 10;
-      ctx.fillText(String(label).toUpperCase(), x, y);
+      ctx.shadowBlur = 10*labelScale;
+      ctx.fillText(text, x, y);
+      const textWidth = ctx.measureText(text).width;
       ctx.restore();
-      const w = Math.min(54, Math.max(30, ctx.measureText(String(label).toUpperCase()).width * .26));
+      const w = Math.min(54*labelScale, Math.max(30*labelScale, textWidth * .26));
       ctx.save();
       ctx.fillStyle = "#88F914";
-      ctx.fillRect(align === "right" ? x - w : x, y + 12, w, 4);
+      ctx.fillRect(align === "right" ? x - w : x, y + 12*labelScale, w, 4*labelScale);
       ctx.restore();
     }
 
@@ -2834,173 +2862,236 @@ function buildExportBrandMark(size = 38) {
       gfCanvasText(ctx, value, x, y + 72, valueSize, 900, "#ffffff", align, 470);
     }
 
-    function gfCanvasBrand(ctx, x, y, username, logoImage=null){
+    function gfCanvasBrand(ctx, x, y, username, logoImage=null, scale=1){
+      const mark = 38*scale;
       if (logoImage?.complete && logoImage.naturalWidth) {
         ctx.save();
-        ctx.drawImage(logoImage,x,y-33,38,38);
+        ctx.drawImage(logoImage,x,y-mark*.86,mark,mark);
         ctx.restore();
       } else {
         ctx.save();
         ctx.fillStyle = "#88F914";
-        ctx.fillRect(x, y-28, 32, 32);
+        ctx.fillRect(x,y-mark*.74,32*scale,32*scale);
         ctx.fillStyle = "#0a0f0b";
-        ctx.font = `900 20px Arial, sans-serif`;
+        ctx.font = `900 ${20*scale}px Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("G", x+16, y-12);
+        ctx.fillText("G",x+16*scale,y-mark*.38);
         ctx.restore();
       }
-      gfCanvasText(ctx, "GYMFlow", x+48, y-4, 25, 900, "#ffffff", "left");
-      gfCanvasText(ctx, username ? `@${username.replace(/^@+/,"")}` : "@gymflow", x+48, y+24, 18, 700, "rgba(255,255,255,.72)", "left");
+      gfCanvasText(ctx,"GYMFlow",x+48*scale,y-4*scale,25*scale,900,"#ffffff","left");
+      gfCanvasText(ctx,username ? `@${username.replace(/^@+/,"")}` : "@gymflow",x+48*scale,y+24*scale,18*scale,700,"rgba(255,255,255,.72)","left");
+    }
+
+    function getPhotoExportFullscreenSize(){
+      const vv = window.visualViewport;
+      const viewportW = Number(vv?.width || window.innerWidth || 16);
+      const viewportH = Number(vv?.height || window.innerHeight || 9);
+      const ratio = Math.max(0.35, Math.min(3.2, viewportW / Math.max(1, viewportH)));
+      const longEdge = 1920;
+      let width, height;
+      if (ratio >= 1) {
+        width = longEdge;
+        height = Math.max(540, Math.round(longEdge / ratio));
+      } else {
+        height = longEdge;
+        width = Math.max(540, Math.round(longEdge * ratio));
+      }
+      return {width, height};
+    }
+
+    function getPhotoExportSize(){
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return {width:1920,height:1080};
+      if (editor.sizeMode === "custom") return {width:editor.width,height:editor.height};
+      return getPhotoExportFullscreenSize();
+    }
+
+    function clampPhotoDimension(v, fallback=1080){
+      return Math.max(320, Math.min(8192, Math.round(Number(v) || fallback)));
+    }
+
+    function photoExportAspectRatio(width,height){
+      const w = Math.max(1, Math.round(Number(width)||1));
+      const h = Math.max(1, Math.round(Number(height)||1));
+      const gcd = (a,b) => b ? gcd(b, a % b) : a;
+      const g = gcd(w,h);
+      return `${Math.round(w/g)}:${Math.round(h/g)}`;
+    }
+
+    function syncPhotoExportSizeFromInputs(preset=null){
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return;
+      const presets = {square:[1080,1080],portrait:[1080,1350],story:[1080,1920],landscape:[1920,1080]};
+      if (preset && presets[preset]) {
+        [editor.width, editor.height] = presets[preset];
+        editor.preset = preset;
+      } else {
+        editor.width = clampPhotoDimension(document.getElementById("gf-photo-export-width")?.value, editor.width || 1080);
+        editor.height = clampPhotoDimension(document.getElementById("gf-photo-export-height")?.value, editor.height || 1080);
+        editor.preset = "custom";
+      }
+      updatePhotoWorkoutControls();
+    }
+
+    function setPhotoExportSizeMode(mode){
+      const editor = window.__gfPhotoExportEditor;
+      if (!editor) return;
+      if (mode === "custom" && editor.sizeMode !== "custom") {
+        editor.width = 1080;
+        editor.height = 1080;
+        editor.preset = "square";
+      }
+      editor.sizeMode = mode === "custom" ? "custom" : "fullscreen";
+      updatePhotoWorkoutControls();
+    }
+
+    function getPhotoCanvasLayout(W,H){
+      const s = Math.min(W,H) / 1080;
+      return {s,left:W*.0666667,right:W*.9333333,headerY:H*.0759,titleY:H*.1185,row1:H*.255,row2:H*.47,row3:H*.68,row4:H*.83,footerY:H*.931};
+    }
+
+    function gfCanvasMetricResponsive(ctx, layout, x, y, label, value, side="left", valueSize=62, maxWidth=null){
+      const align = side === "right" ? "right" : "left";
+      gfCanvasLabel(ctx,label,x,y,align,layout.s);
+      gfCanvasText(ctx,value,x,y+72*layout.s,valueSize*layout.s,900,"#ffffff",align,maxWidth || .43*Math.max(x,1));
     }
 
     function drawPhotoWorkoutCanvas(){
       const editor = window.__gfPhotoExportEditor;
       const canvas = document.getElementById("gf-photo-export-canvas");
       if (!editor || !canvas) return;
-      const ctx = canvas.getContext("2d", {alpha:true});
-      const W = 1080, H = 1080;
+      const {width:W,height:H} = getPhotoExportSize();
+      if (canvas.width !== W) canvas.width=W;
+      if (canvas.height !== H) canvas.height=H;
+      canvas.style.aspectRatio=`${W}/${H}`;
+      canvas.setAttribute("aria-label",`Preview workout export ${W} by ${H}`);
+      const ctx=canvas.getContext("2d",{alpha:true});
+      if(!ctx) return;
       ctx.clearRect(0,0,W,H);
-
-      const transparent = editor.format === "png" && editor.transparent;
-      if (!transparent) {
-        if (editor.image) {
-          const img = editor.image;
-          const fitScale = Math.max(W/img.naturalWidth, H/img.naturalHeight);
-          const scale = fitScale * editor.zoom;
-          const drawW = img.naturalWidth * scale;
-          const drawH = img.naturalHeight * scale;
+      const transparent=editor.format==="png"&&editor.transparent;
+      if(!transparent){
+        if(editor.image){
+          const img=editor.image;
+          const fitScale=Math.max(W/img.naturalWidth,H/img.naturalHeight);
+          const scale=fitScale*editor.zoom;
+          const drawW=img.naturalWidth*scale, drawH=img.naturalHeight*scale;
           ctx.save();
-          ctx.translate(W/2 + editor.offsetX, H/2 + editor.offsetY);
-          ctx.drawImage(img, -drawW/2, -drawH/2, drawW, drawH);
+          ctx.translate(W/2+editor.offsetX*W,H/2+editor.offsetY*H);
+          ctx.drawImage(img,-drawW/2,-drawH/2,drawW,drawH);
           ctx.restore();
-        } else {
-          ctx.fillStyle = "#090d13";
-          ctx.fillRect(0,0,W,H);
-        }
-
-        const leftFade = ctx.createLinearGradient(0,0,W*0.76,0);
-        leftFade.addColorStop(0,"rgba(0,0,0,.76)");
-        leftFade.addColorStop(.42,"rgba(0,0,0,.31)");
-        leftFade.addColorStop(1,"rgba(0,0,0,0)");
-        ctx.fillStyle = leftFade;
-        ctx.fillRect(0,0,W,H);
-
-        const bottomFade = ctx.createLinearGradient(0,H*.58,0,H);
-        bottomFade.addColorStop(0,"rgba(0,0,0,0)");
-        bottomFade.addColorStop(1,"rgba(0,0,0,.78)");
-        ctx.fillStyle = bottomFade;
-        ctx.fillRect(0,H*.48,W,H*.52);
-
-        const vignette = ctx.createRadialGradient(W/2,H/2,360,W/2,H/2,760);
-        vignette.addColorStop(0,"rgba(0,0,0,0)");
-        vignette.addColorStop(1,"rgba(0,0,0,.34)");
-        ctx.fillStyle = vignette;
-        ctx.fillRect(0,0,W,H);
-      } else {
-        // PNG transparency mode intentionally leaves the background fully alpha.
-        ctx.clearRect(0,0,W,H);
+        }else{ctx.fillStyle="#090d13";ctx.fillRect(0,0,W,H);}
+        const leftFade=ctx.createLinearGradient(0,0,W*.76,0);leftFade.addColorStop(0,"rgba(0,0,0,.76)");leftFade.addColorStop(.42,"rgba(0,0,0,.31)");leftFade.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=leftFade;ctx.fillRect(0,0,W,H);
+        const bottomFade=ctx.createLinearGradient(0,H*.58,0,H);bottomFade.addColorStop(0,"rgba(0,0,0,0)");bottomFade.addColorStop(1,"rgba(0,0,0,.78)");ctx.fillStyle=bottomFade;ctx.fillRect(0,H*.48,W,H*.52);
+        const vignette=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.34,W/2,H/2,Math.min(W,H)*.72);vignette.addColorStop(0,"rgba(0,0,0,0)");vignette.addColorStop(1,"rgba(0,0,0,.34)");ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
       }
+      const data=getPhotoWorkoutData(editor.sessionOverride), username=state.settings.userName||"GYMFlow User", template=editor.template, layout=getPhotoCanvasLayout(W,H), s=layout.s;
+      const tallCanvas = H / Math.max(1,W) > 1.15;
+      const compactUnit = Math.min(W,H);
+      const compactRows = tallCanvas ? {
+        row1: compactUnit * .30,
+        row2: compactUnit * .52,
+        row3: compactUnit * .70,
+        row4: compactUnit * .84
+      } : {
+        row1: layout.row1,
+        row2: layout.row2,
+        row3: layout.row3,
+        row4: layout.row4
+      };
+      gfCanvasText(ctx,data.period,layout.left,layout.headerY,Math.max(18,27*s),600,"rgba(255,255,255,.78)","left");
+      gfCanvasText(ctx,template==="performance"?"PERFORMANCE":"WORKOUTS",layout.left,layout.titleY,Math.max(13,18*s),900,"#88F914","left");
+      gfCanvasText(ctx,`@${username.replace(/^@+/,"")}`,layout.right,layout.headerY,Math.max(14,19*s),700,"rgba(255,255,255,.82)","right");
+      if(template==="minimal"){
+        gfCanvasLabel(ctx,"WORKOUTS",layout.left,layout.row1,"left",s);gfCanvasText(ctx,String(data.workouts),layout.left,layout.row1+170*s,188*s,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"TOTAL DURATION",layout.left,layout.row2-20*s,"left",s);gfCanvasText(ctx,formatTimeDetailed(data.duration),layout.left,layout.row2+52*s,54*s,850,"#ffffff","left");
+        gfCanvasLabel(ctx,"VOLUME",layout.left,layout.row3-30*s,"left",s);gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",layout.left,layout.row3+42*s,60*s,900,"#ffffff","left");
+        gfCanvasMetricResponsive(ctx,layout,layout.right,layout.row3-30*s,"SETS",String(data.sets),"right",60,.3*W);gfCanvasMetricResponsive(ctx,layout,layout.right,layout.row4-35*s,"PRs",String(data.prs),"right",54,.3*W);
+      }else if(template==="performance"){
+        const perfRow1 = compactRows.row1, perfRow2 = compactRows.row2, perfRow3 = compactRows.row3, perfRow4 = compactRows.row4;
+        gfCanvasLabel(ctx,"VOLUME",layout.left,perfRow1,"left",s);gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",layout.left,perfRow1+130*s,118*s,900,"#ffffff","left",.7*W);gfCanvasText(ctx,"TOTAL TRAINING LOAD",layout.left,perfRow1+172*s,18*s,800,"rgba(255,255,255,.70)","left");
+        gfCanvasMetricResponsive(ctx,layout,layout.left,perfRow2-10*s,"DURATION",formatTimeDetailed(data.duration),"left",60,.38*W);gfCanvasMetricResponsive(ctx,layout,layout.right,perfRow2-10*s,"SETS",String(data.sets),"right",60,.3*W);
+        gfCanvasMetricResponsive(ctx,layout,layout.left,perfRow3-10*s,"PERSONAL RECORDS",String(data.prs),"left",60,.4*W);gfCanvasMetricResponsive(ctx,layout,layout.right,perfRow3-10*s,"EXERCISES",String(data.exercises),"right",60,.3*W);
+        if(data.topMuscle&&data.topMuscle!=="—")gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,layout.left,perfRow4,20*s,800,"#88F914","left",.8*W);
+      }else if(template==="full"){
+        const fullRow1 = compactRows.row1, fullRow2 = compactRows.row2, fullRow3 = compactRows.row3, fullRow4 = compactRows.row4;
+        gfCanvasLabel(ctx,"WORKOUTS",layout.left,fullRow1,"left",s);gfCanvasText(ctx,String(data.workouts),layout.left,fullRow1+72*s,86*s,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"DURATION",W*.53,fullRow1,"left",s);gfCanvasText(ctx,formatTimeDetailed(data.duration),W*.53,fullRow1+72*s,72*s,900,"#ffffff","left",.4*W);
+        gfCanvasLabel(ctx,"VOLUME",layout.left,fullRow2,"left",s);gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",layout.left,fullRow2+72*s,74*s,900,"#ffffff","left",.43*W);
+        gfCanvasLabel(ctx,"SETS",W*.53,fullRow2,"left",s);gfCanvasText(ctx,String(data.sets),W*.53,fullRow2+72*s,74*s,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"EXERCISES",layout.left,fullRow3,"left",s);gfCanvasText(ctx,String(data.exercises),layout.left,fullRow3+68*s,66*s,900,"#ffffff","left");
+        gfCanvasLabel(ctx,"PERSONAL RECORDS",W*.53,fullRow3,"left",s);gfCanvasText(ctx,String(data.prs),W*.53,fullRow3+68*s,66*s,900,"#ffffff","left");
+        if(data.topMuscle&&data.topMuscle!=="—")gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,layout.left,fullRow4,20*s,800,"#88F914","left",.8*W);
+        if(data.muscleGroups?.length)gfCanvasText(ctx,data.muscleGroups.join("  ·  ").toUpperCase(),layout.left,fullRow4+34*s,19*s,700,"rgba(255,255,255,.72)","left",.86*W);
+      }else{
+        // CLASSIC — match the reference: clean 2×2 stat grid, large values,
+        // generous spacing, and no extra dashboard-style stat blocks.
+        // CLASSIC uses a compact reference-style 2-column grid.
+        // Horizontal positions follow the reference composition (~18% / ~53%),
+        // while vertical spacing is capped from canvas height so tall fullscreen
+        // exports do not stretch the stats apart.
+        const statScale = Math.min(1.18, Math.max(.72, layout.s));
+        const statLeft = W * .177;
+        const statRight = W * .529;
+        // Keep the 2×2 block compact on tall/fullscreen canvases. Its vertical
+        // rhythm follows the short edge (same visual density as the reference),
+        // instead of expanding with the full portrait height.
+        const classicRow1 = compactRows.row1;
+        const classicRow2 = compactRows.row2;
 
-      // Subtle GYMFlow watermark / identity.
-      ctx.save();
-      ctx.translate(W*0.67,H*0.57);
-      ctx.rotate(-Math.PI/12);
-      ctx.globalAlpha = transparent ? 0.04 : 0.065;
-      ctx.fillStyle = transparent ? "#88F914" : "#ffffff";
-      ctx.font = `900 114px "DM Sans", Arial, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.fillText("GYMFlow",0,0);
-      ctx.restore();
-      ctx.globalAlpha = 1;
+        function drawClassicReferenceStat(label, value, x, y, align="left", valueSize=72){
+          ctx.save();
+          ctx.font = `600 ${Math.max(16, 21*statScale)}px "DM Sans", Arial, sans-serif`;
+          ctx.textAlign = align;
+          ctx.textBaseline = "alphabetic";
+          ctx.fillStyle = "rgba(255,255,255,.88)";
+          ctx.shadowColor = "rgba(0,0,0,.58)";
+          ctx.shadowBlur = 9*statScale;
+          ctx.shadowOffsetY = 2;
+          ctx.fillText(label, x, y);
+          ctx.restore();
 
-      const session = editor.sessionOverride;
-      const data = getPhotoWorkoutData(session);
-      const username = state.settings.userName || "GYMFlow User";
-      const template = editor.template;
-
-      // Header — no card, just typography directly over the image.
-      gfCanvasText(ctx, data.period, 72, 82, 27, 600, "rgba(255,255,255,.78)", "left");
-      gfCanvasText(ctx, template === "performance" ? "PERFORMANCE" : "WORKOUTS", 72, 128, 18, 900, "#88F914", "left");
-      gfCanvasText(ctx, `@${username.replace(/^@+/,"")}`, W-72, 82, 19, 700, "rgba(255,255,255,.82)", "right");
-
-      if (template === "minimal") {
-        gfCanvasLabel(ctx,"WORKOUTS",72,300,"left");
-        gfCanvasText(ctx,String(data.workouts),72,470,188,900,"#ffffff","left");
-        gfCanvasLabel(ctx,"TOTAL DURATION",72,560,"left");
-        gfCanvasText(ctx,formatTimeDetailed(data.duration),72,632,54,850,"#ffffff","left");
-        gfCanvasLabel(ctx,"VOLUME",72,718,"left");
-        gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",72,788,60,900,"#ffffff","left");
-        gfCanvasMetric(ctx,W-72,718,"SETS",String(data.sets),"right",60);
-        gfCanvasMetric(ctx,W-72,842,"PRs",String(data.prs),"right",54);
-      } else if (template === "performance") {
-        gfCanvasLabel(ctx,"VOLUME",72,280,"left");
-        gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",72,410,118,900,"#ffffff","left");
-        gfCanvasText(ctx,"TOTAL TRAINING LOAD",72,450,18,800,"rgba(255,255,255,.70)","left");
-        gfCanvasMetric(ctx,72,560,"DURATION",formatTimeDetailed(data.duration),"left",60);
-        gfCanvasMetric(ctx,W-72,560,"SETS",String(data.sets),"right",60);
-        gfCanvasMetric(ctx,72,760,"PERSONAL RECORDS",String(data.prs),"left",60);
-        gfCanvasMetric(ctx,W-72,760,"EXERCISES",String(data.exercises),"right",60);
-        if (data.topMuscle && data.topMuscle !== "—") {
-          gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,72,915,20,800,"#88F914","left");
+          gfCanvasText(
+            ctx,
+            value,
+            x,
+            y + 63*statScale,
+            Math.max(42, valueSize*statScale),
+            900,
+            "#ffffff",
+            align,
+            .43*W
+          );
         }
-      } else if (template === "full") {
-        gfCanvasLabel(ctx,"WORKOUTS",72,270,"left");
-        gfCanvasText(ctx,String(data.workouts),72,340,86,900,"#ffffff","left");
-        gfCanvasLabel(ctx,"DURATION",570,270,"left");
-        gfCanvasText(ctx,formatTimeDetailed(data.duration),570,340,72,900,"#ffffff","left");
-        gfCanvasLabel(ctx,"VOLUME",72,480,"left");
-        gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",72,550,74,900,"#ffffff","left");
-        gfCanvasLabel(ctx,"SETS",570,480,"left");
-        gfCanvasText(ctx,String(data.sets),570,550,74,900,"#ffffff","left");
-        gfCanvasLabel(ctx,"EXERCISES",72,685,"left");
-        gfCanvasText(ctx,String(data.exercises),72,755,66,900,"#ffffff","left");
-        gfCanvasLabel(ctx,"PERSONAL RECORDS",570,685,"left");
-        gfCanvasText(ctx,String(data.prs),570,755,66,900,"#ffffff","left");
-        if (data.topMuscle && data.topMuscle !== "—") {
-          gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,72,870,20,800,"#88F914","left");
-        }
-        if (data.muscleGroups?.length) {
-          gfCanvasText(ctx,data.muscleGroups.join("  ·  ").toUpperCase(),72,905,19,700,"rgba(255,255,255,.72)","left",900);
-        }
-      } else {
-        // Classic — closest to the supplied social-sharing composition.
-        gfCanvasMetric(ctx,72,270,"WORKOUTS",String(data.workouts),"left",74);
-        gfCanvasMetric(ctx,W-72,270,"DURATION",formatTimeDetailed(data.duration),"right",62);
-        gfCanvasMetric(ctx,72,500,"VOLUME",photoExportFormatNumber(data.volume)+" kg","left",66);
-        gfCanvasMetric(ctx,W-72,500,"SETS",String(data.sets),"right",66);
-        gfCanvasMetric(ctx,72,730,"EXERCISES",String(data.exercises),"left",62);
-        gfCanvasMetric(ctx,W-72,730,"PERSONAL RECORDS",String(data.prs),"right",54);
+
+        drawClassicReferenceStat("Workouts", String(data.workouts), statLeft, classicRow1, "left", 76);
+        drawClassicReferenceStat("Duration", formatTimeDetailed(data.duration), statRight, classicRow1, "left", 61);
+        drawClassicReferenceStat("Volume", photoExportFormatNumber(data.volume)+" kg", statLeft, classicRow2, "left", 63);
+        drawClassicReferenceStat("Sets", String(data.sets), statRight, classicRow2, "left", 63);
       }
-
-      // Footer lockup.
-      gfCanvasBrand(ctx,72,1006,username,editor.logoImage);
-      gfCanvasText(ctx,"YOUR FITNESS JOURNEY",W-72,1014,15,800,"rgba(255,255,255,.55)","right");
+      gfCanvasBrand(ctx,layout.left,layout.footerY,username,editor.logoImage,s);gfCanvasText(ctx,"YOUR FITNESS JOURNEY",layout.right,layout.footerY+8*s,15*s,800,"rgba(255,255,255,.55)","right",.35*W);
     }
 
     function updatePhotoWorkoutControls(){
-      const editor = window.__gfPhotoExportEditor;
-      if (!editor) return;
+      const editor=window.__gfPhotoExportEditor;if(!editor)return;
+      const {width,height}=getPhotoExportSize();
       document.querySelectorAll(".gf-photo-template").forEach(btn=>btn.classList.toggle("active",btn.dataset.template===editor.template));
       document.querySelectorAll(".gf-photo-format").forEach(btn=>btn.classList.toggle("active",btn.dataset.format===editor.format));
-      const transparent = document.getElementById("gf-photo-export-transparent");
-      if (transparent) {
-        transparent.disabled = editor.format !== "png";
-        transparent.closest("label")?.classList.toggle("is-disabled",editor.format !== "png");
-        transparent.checked = editor.transparent;
-      }
-      const zoom = document.getElementById("gf-photo-export-zoom");
-      const zoomLabel = document.getElementById("gf-photo-export-zoom-label");
-      if (zoom) zoom.value = String(editor.zoom);
-      if (zoomLabel) zoomLabel.textContent = `Zoom ${Math.round(editor.zoom*100)}%`;
-      const meta = document.getElementById("gf-photo-export-live-meta");
-      if (meta) meta.textContent = `${editor.template === "classic" ? "Classic" : editor.template === "minimal" ? "Minimal" : editor.template === "performance" ? "Performance" : "Full Stats"} · ${editor.format.toUpperCase()}${editor.format === "png" && editor.transparent ? " · Transparent" : ""}`;
-      const preview = document.getElementById("gf-photo-export-preview");
-      if (preview) preview.classList.toggle("is-transparent",editor.format === "png" && editor.transparent);
-      const empty = document.getElementById("gf-photo-export-empty");
-      if (empty) empty.classList.toggle("hidden",!!editor.image);
-      const actions = document.querySelectorAll("#gf-photo-export-download,#gf-photo-export-share");
-      actions.forEach(btn => btn.disabled = !editor.image);
+      document.querySelectorAll(".gf-photo-size-mode").forEach(btn=>btn.classList.toggle("active",btn.dataset.sizeMode===editor.sizeMode));
+      document.querySelectorAll(".gf-photo-preset").forEach(btn=>btn.classList.toggle("active",editor.sizeMode==="custom"&&btn.dataset.preset===editor.preset));
+      document.getElementById("gf-photo-custom-size-panel")?.classList.toggle("hidden",editor.sizeMode!=="custom");
+      const helper=document.getElementById("gf-photo-size-helper");if(helper)helper.textContent=editor.sizeMode==="fullscreen"?"auto device aspect":"custom canvas";
+      const wi=document.getElementById("gf-photo-export-width"),hi=document.getElementById("gf-photo-export-height");if(wi)wi.value=String(editor.width);if(hi)hi.value=String(editor.height);
+      const ratio=document.getElementById("gf-photo-export-ratio");if(ratio)ratio.textContent=photoExportAspectRatio(width,height);
+      const transparent=document.getElementById("gf-photo-export-transparent");if(transparent){transparent.disabled=editor.format!=="png";transparent.closest("label")?.classList.toggle("is-disabled",editor.format!=="png");transparent.checked=editor.transparent;}
+      const zoom=document.getElementById("gf-photo-export-zoom"),zoomLabel=document.getElementById("gf-photo-export-zoom-label");if(zoom)zoom.value=String(editor.zoom);if(zoomLabel)zoomLabel.textContent=`Zoom ${Math.round(editor.zoom*100)}%`;
+      const subtitle=document.getElementById("gf-photo-export-subtitle");if(subtitle)subtitle.textContent=`${editor.sizeMode==="fullscreen"?"Fullscreen":`${width}×${height}`} · data dari GYMFlow`;
+      const stageMeta=document.getElementById("gf-photo-export-size-meta");if(stageMeta)stageMeta.textContent=editor.sizeMode==="fullscreen"?`Fullscreen · ${width} × ${height} px`:`${width} × ${height} px`;
+      const meta=document.getElementById("gf-photo-export-live-meta");if(meta)meta.textContent=`${editor.template==="classic"?"Classic":editor.template==="minimal"?"Minimal":editor.template==="performance"?"Performance":"Full Stats"} · ${editor.format.toUpperCase()}${editor.format==="png"&&editor.transparent?" · Transparent":""}`;
+      const fh=document.getElementById("gf-photo-format-helper");if(fh)fh.textContent=editor.format==="png"?"PNG with alpha":"JPG photo background";
+      document.getElementById("gf-photo-export-preview")?.classList.toggle("is-transparent",editor.format==="png"&&editor.transparent);
+      document.getElementById("gf-photo-export-empty")?.classList.toggle("hidden",!!editor.image);
+      document.querySelectorAll("#gf-photo-export-download,#gf-photo-export-share").forEach(btn=>btn.disabled=!editor.image);
       drawPhotoWorkoutCanvas();
     }
 
@@ -3039,6 +3130,7 @@ function buildExportBrandMark(size = 38) {
 
     function initPhotoWorkoutExport(){
       if (window.__gfPhotoExportEditor) return;
+      const fullscreen = getPhotoExportFullscreenSize();
       window.__gfPhotoExportEditor = {
         template:"classic",
         format:"jpg",
@@ -3051,7 +3143,11 @@ function buildExportBrandMark(size = 38) {
         sessionOverride:null,
         logoImage:null,
         dragging:false,
-        lastPointer:null
+        lastPointer:null,
+        sizeMode:"fullscreen",
+        width:fullscreen.width,
+        height:fullscreen.height,
+        preset:"square"
       };
 
       const logo = new Image();
@@ -3075,10 +3171,20 @@ function buildExportBrandMark(size = 38) {
         if (editor.format !== "png") editor.transparent = false;
         updatePhotoWorkoutControls();
       }));
+      document.querySelectorAll(".gf-photo-size-mode").forEach(btn=>btn.addEventListener("click",()=>setPhotoExportSizeMode(btn.dataset.sizeMode)));
+      document.querySelectorAll(".gf-photo-preset").forEach(btn=>btn.addEventListener("click",()=>{
+        const preset=btn.dataset.preset||"square";
+        if(preset==="custom"){
+          const editor=window.__gfPhotoExportEditor;editor.sizeMode="custom";editor.preset="custom";updatePhotoWorkoutControls();document.getElementById("gf-photo-export-width")?.focus();document.getElementById("gf-photo-export-width")?.select?.();return;
+        }
+        setPhotoExportSizeMode("custom");
+        syncPhotoExportSizeFromInputs(preset);
+      }));
+      ["gf-photo-export-width","gf-photo-export-height"].forEach(id=>document.getElementById(id)?.addEventListener("input",()=>{const editor=window.__gfPhotoExportEditor;editor.sizeMode="custom";syncPhotoExportSizeFromInputs();}));
       document.getElementById("gf-photo-export-transparent")?.addEventListener("change",e=>{
         const editor = window.__gfPhotoExportEditor;
         editor.transparent = !!e.target.checked;
-        drawPhotoWorkoutCanvas();
+        updatePhotoWorkoutControls();
       });
       document.getElementById("gf-photo-export-reset")?.addEventListener("click",()=>{
         const editor = window.__gfPhotoExportEditor;
@@ -3093,7 +3199,7 @@ function buildExportBrandMark(size = 38) {
       if (canvas) {
         const pointerPos = (ev) => {
           const r = canvas.getBoundingClientRect();
-          return {x:(ev.clientX-r.left)*(1080/r.width), y:(ev.clientY-r.top)*(1080/r.height)};
+          return {x:(ev.clientX-r.left)/Math.max(1,r.width), y:(ev.clientY-r.top)/Math.max(1,r.height)};
         };
         canvas.addEventListener("pointerdown",ev=>{
           const editor=window.__gfPhotoExportEditor;
@@ -3127,6 +3233,14 @@ function buildExportBrandMark(size = 38) {
         });
       }
 
+      const onFullscreenResize=()=>{
+        const editor=window.__gfPhotoExportEditor;if(!editor||editor.sizeMode!=="fullscreen")return;
+        const next=getPhotoExportFullscreenSize();
+        if(editor.width!==next.width||editor.height!==next.height){editor.width=next.width;editor.height=next.height;updatePhotoWorkoutControls();}
+      };
+      window.addEventListener("resize",onFullscreenResize,{passive:true});
+      window.visualViewport?.addEventListener?.("resize",onFullscreenResize,{passive:true});
+
       document.getElementById("gf-photo-export-download")?.addEventListener("click",downloadPhotoWorkoutExport);
       document.getElementById("gf-photo-export-share")?.addEventListener("click",sharePhotoWorkoutExport);
       updatePhotoWorkoutControls();
@@ -3144,7 +3258,10 @@ function buildExportBrandMark(size = 38) {
 
     function getPhotoWorkoutFilename(ext){
       const date = new Date().toISOString().slice(0,10);
-      return `GYMFlow-Workout-${date}.${ext}`;
+      const editor = window.__gfPhotoExportEditor;
+      const {width,height} = getPhotoExportSize();
+      const suffix = editor?.sizeMode === "fullscreen" ? `fullscreen-${width}x${height}` : `${width}x${height}`;
+      return `GYMFlow-Workout-${date}-${suffix}.${ext}`;
     }
 
     function getPhotoWorkoutCanvasBlob(canvas, format){
