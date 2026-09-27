@@ -11,6 +11,8 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
   <!-- Library html2pdf untuk ekspor PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
@@ -27,7 +29,7 @@
     <aside class="sidebar" aria-label="Navigasi utama desktop">
       <div class="flex items-center gap-3 px-3 mb-10">
         <div class="w-10 h-10 rounded-xl overflow-hidden bg-lime-300 text-slate-950 grid place-items-center">
-          <img src="new_logo.png" alt="Logo" class="w-full h-full object-cover">
+          <img src="new_logoprofile.png" alt="Logo" class="w-full h-full object-cover">
         </div>
         <span class="font-extrabold text-xl tracking-tight">GYMFlow</span>
       </div>
@@ -320,69 +322,145 @@
           </div>
         </div>
 
-        <!-- Filter Tab Pill Interaktif (Overview | Weight | History) -->
+        <!-- Filter Tab Pill Interaktif (Overview | Weight | History | Statistics) -->
         <div class="flex items-center p-1 bg-[var(--surface-2)] border border-[var(--line)] rounded-xl mb-5">
           <button type="button" id="tab-overview-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg bg-[var(--surface)] text-[var(--text)] shadow-sm transition-all" onclick="switchProgressTab('overview')">Overview</button>
           <button type="button" id="tab-weight-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('weight')">Weight</button>
           <button type="button" id="tab-history-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('history')">History</button>
+          <button type="button" id="tab-statistics-btn" class="flex-1 py-2 text-xs font-bold text-center rounded-lg muted hover:text-[var(--text)] transition-all" onclick="switchProgressTab('statistics')">Statistics</button>
         </div>
 
         <!-- KONTEN TAB OVERVIEW -->
         <div id="progress-overview-content" class="space-y-5">
-          <!-- Kotak Metrik 2x2 Berdampingan (Grid 2 Kolom) -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="metric flex flex-col justify-between">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-amber-400"><i data-lucide="flame" class="w-5 h-5"></i></span>
+          <section class="panel p-5 relative overflow-hidden bg-gradient-to-r from-[var(--surface)] to-[var(--surface-2)]">
+            <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-[var(--lime)] opacity-10 blur-xl pointer-events-none"></div>
+            <div class="relative z-10">
+              <span class="gf-eyebrow">PROGRESS OVERVIEW</span>
+              <h3 class="font-extrabold text-2xl md:text-3xl tracking-tight mt-1">Your Training Progress</h3>
+              <p class="muted text-sm mt-1 max-w-2xl">Ringkasan workout dan progres latihanmu. Untuk analisis muscle dan training load yang lebih detail, buka tab Statistics.</p>
+            </div>
+          </section>
+
+          <section>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="metric flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2"><span class="text-lime-300"><i data-lucide="calendar-check" class="w-5 h-5"></i></span></div>
+                <div><strong id="history-session-count" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0</strong><p class="muted text-xs font-bold mt-0.5">Total Workouts</p></div>
               </div>
-              <div>
-                <strong id="history-session-count" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0</strong>
-                <p class="muted text-xs font-bold mt-0.5">Total Workouts</p>
+              <div class="metric flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2"><span class="text-orange-400"><i data-lucide="flame" class="w-5 h-5"></i></span></div>
+                <div><strong id="history-calories" class="block text-2xl md:text-3xl font-extrabold tracking-tight text-lime-300">0 kkal</strong><p class="muted text-xs font-bold mt-0.5">Total Calories</p></div>
+              </div>
+              <div class="metric flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2"><span class="text-indigo-400"><i data-lucide="timer" class="w-5 h-5"></i></span></div>
+                <div><strong id="history-total-time" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong><p class="muted text-xs font-bold mt-0.5">Total Time</p></div>
+              </div>
+              <div class="metric flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2"><span class="text-cyan-400"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></span></div>
+                <div><strong id="history-avg-duration" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong><p class="muted text-xs font-bold mt-0.5">Avg Duration</p></div>
               </div>
             </div>
+          </section>
 
-            <div class="metric flex flex-col justify-between">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-orange-400"><i data-lucide="flame" class="w-5 h-5"></i></span>
-              </div>
-              <div>
-                <strong id="history-calories" class="block text-2xl md:text-3xl font-extrabold tracking-tight text-lime-300">0 kkal</strong>
-                <p class="muted text-xs font-bold mt-0.5">Total Calories</p>
-              </div>
+          <section class="panel p-5">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div><span class="gf-eyebrow">CONSISTENCY</span><h3 class="font-extrabold text-lg tracking-tight mt-0.5">Workouts per Week</h3></div>
+              <span class="gf-soft-badge">Last 5 weeks</span>
             </div>
-
-            <div class="metric flex flex-col justify-between">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-indigo-400"><i data-lucide="timer" class="w-5 h-5"></i></span>
-              </div>
-              <div>
-                <strong id="history-total-time" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong>
-                <p class="muted text-xs font-bold mt-0.5">Total Time</p>
-              </div>
-            </div>
-
-            <div class="metric flex flex-col justify-between">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-cyan-400"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></span>
-              </div>
-              <div>
-                <strong id="history-avg-duration" class="block text-2xl md:text-3xl font-extrabold tracking-tight">0m</strong>
-                <p class="muted text-xs font-bold mt-0.5">Avg Duration</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Grafik Workouts per Week -->
-          <div class="panel p-5">
-            <h3 class="font-extrabold text-lg mb-4">Workouts per Week</h3>
             <div id="workouts-per-week-chart" class="h-48 w-full"></div>
-          </div>
+          </section>
 
-          <!-- Grafik Calories per Workout -->
-          <div class="panel p-5">
-            <h3 class="font-extrabold text-lg mb-4">Calories per Workout</h3>
+          <section class="panel p-5">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div><span class="gf-eyebrow">CALORIES</span><h3 class="font-extrabold text-lg tracking-tight mt-0.5">Calories per Workout</h3></div>
+              <span class="muted text-xs">Recent sessions</span>
+            </div>
             <div id="calories-per-workout-chart" class="h-48 w-full"></div>
-          </div>
+          </section>
+        </div>
+
+        <!-- KONTEN TAB STATISTICS / WORKOUT STATISTICS -->
+        <div id="progress-statistics-content" class="space-y-5 hidden">
+          <section class="gf-stat-hero panel">
+            <div>
+              <span class="gf-eyebrow">WORKOUT STATISTICS</span>
+              <h3 class="gf-stat-title">Body & Progress</h3>
+              <p class="muted text-sm mt-1 max-w-2xl">Lihat otot yang paling sering dilatih dan statistik workout utama tanpa memenuhi layar.</p>
+            </div>
+            <div class="gf-stat-toolbar">
+              <div id="statistics-period-select" class="custom-select-wrapper gf-stat-period-picker">
+                <div class="field custom-select-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                  <span class="selected-label">30 hari</span>
+                  <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)]"></i>
+                </div>
+                <div class="custom-options" role="listbox">
+                  <div class="custom-option" data-value="7d">7 hari</div>
+                  <div class="custom-option selected" data-value="30d">30 hari</div>
+                  <div class="custom-option" data-value="90d">3 bulan</div>
+                  <div class="custom-option" data-value="1y">1 tahun</div>
+                  <div class="custom-option" data-value="all">All time</div>
+                </div>
+              </div>
+              <input type="hidden" id="statistics-period" value="30d" />
+              <button id="statistics-export-btn" class="lime-btn gf-export-btn" type="button">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Export
+              </button>
+            </div>
+          </section>
+
+          <section>
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <span class="gf-eyebrow">KEY STATS</span>
+                <h3 class="font-extrabold text-lg tracking-tight mt-0.5">Workout Overview</h3>
+              </div>
+              <span id="statistics-data-label" class="muted text-xs"></span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div class="metric gf-stat-metric compact"><span class="gf-metric-icon"><i data-lucide="calendar-check"></i></span><strong id="stat-total-workouts">0</strong><small>Workouts</small></div>
+              <div class="metric gf-stat-metric compact"><span class="gf-metric-icon"><i data-lucide="layers-3"></i></span><strong id="stat-total-sets">0</strong><small>Sets</small></div>
+              <div class="metric gf-stat-metric compact"><span class="gf-metric-icon"><i data-lucide="scale"></i></span><strong id="stat-total-volume">0 kg</strong><small>Total volume</small></div>
+              <div class="metric gf-stat-metric compact"><span class="gf-metric-icon"><i data-lucide="trophy"></i></span><strong id="stat-pr-count">0</strong><small>Personal records</small></div>
+            </div>
+          </section>
+
+          <section class="panel p-5">
+            <div class="gf-section-heading">
+              <div>
+                <span class="gf-eyebrow">ADVANCED STATISTICS</span>
+                <h3 class="font-extrabold text-xl tracking-tight">The Highlights</h3>
+              </div>
+            </div>
+            <div class="gf-highlight-grid mt-4">
+              <div class="gf-highlight-card">
+                <span class="gf-highlight-label">TOP MUSCLE</span>
+                <strong id="stat-top-muscle">—</strong>
+                <small>Most completed sets</small>
+              </div>
+              <div class="gf-highlight-card">
+                <span class="gf-highlight-label">AVG VOLUME</span>
+                <strong id="stat-avg-volume">0 kg</strong>
+                <small>Per workout</small>
+              </div>
+              <div class="gf-highlight-card">
+                <span class="gf-highlight-label">TOP EXERCISE</span>
+                <strong id="stat-top-exercise">—</strong>
+                <small>Most frequently trained</small>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel p-5">
+            <div class="gf-section-heading">
+              <div>
+                <span class="gf-eyebrow">MAIN EXERCISES</span>
+                <h3 class="font-extrabold text-xl tracking-tight">Most Trained</h3>
+              </div>
+              <span class="muted text-xs">Top 5</span>
+            </div>
+            <div id="main-exercises-list" class="space-y-2 mt-4"></div>
+          </section>
         </div>
 
         <!-- KONTEN TAB WEIGHT (BERSIH DARI DATA DUMMY) -->
@@ -467,7 +545,7 @@
         <button type="button" class="icon-btn close-modal" data-close="weight-modal" aria-label="Tutup form berat badan"><i data-lucide="x"></i></button>
       </div>
       
-      <label class="block text-sm font-bold" for="weight-input-val">Berat Badan (kg)</label>
+      <label class="block text-sm font-bold" for="weight-input-val">Berat (kg)</label>
       <input id="weight-input-val" class="field mt-2" type="number" step="0.1" min="20" max="300" required placeholder="Contoh: 65.0"> 
 
       <label class="block text-sm font-bold mt-4" for="weight-date-val">Tanggal</label>
