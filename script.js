@@ -409,11 +409,17 @@ const KEY = "gymflow-v3";
       document.getElementById("unit-lbs").className = unit === 'lbs' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
     }
 
-    function toggleProfileDarkMode() {
-      state.settings.theme = state.settings.theme === "dark" ? "light" : "dark";
+    function setProfileTheme(theme) {
+      const nextTheme = theme === "light" ? "light" : "dark";
+      state.settings.theme = nextTheme;
       save();
       setTheme();
       renderProfileModal();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function toggleProfileDarkMode() {
+      setProfileTheme(state.settings.theme === "dark" ? "light" : "dark");
     }
 
     function updateHeaderInitial() {
@@ -448,17 +454,16 @@ const KEY = "gymflow-v3";
         p.classList.toggle("active", val === state.settings.weeklyGoal);
       });
 
-      // Dark mode status
+      // Refined theme controls
       const isDark = state.settings.theme !== "light";
       document.getElementById("dark-mode-desc").textContent = isDark ? tr("Currently dark") : tr("Currently light");
-      const thumb = document.getElementById("dark-mode-thumb");
-      const toggleBtn = document.getElementById("profile-dark-toggle");
-      if(isDark) {
-        toggleBtn.style.background = "var(--lime)";
-        thumb.style.transform = "translateX(24px)";
-      } else {
-        toggleBtn.style.background = "var(--line)";
-        thumb.style.transform = "translateX(2px)";
+      const darkOption = document.getElementById("theme-dark-option");
+      const lightOption = document.getElementById("theme-light-option");
+      if(darkOption && lightOption){
+        darkOption.classList.toggle("active", isDark);
+        lightOption.classList.toggle("active", !isDark);
+        darkOption.setAttribute("aria-pressed", String(isDark));
+        lightOption.setAttribute("aria-pressed", String(!isDark));
       }
       
       updateHeaderInitial();
@@ -554,6 +559,7 @@ const KEY = "gymflow-v3";
 
       if (tabName === "overview") {
         renderOverviewMetrics();
+        setTimeout(gfRefreshProgressMotion, 30);
       } else if (tabName === "weight") {
         renderWeightTab();
       } else if (tabName === "history") {
@@ -809,8 +815,17 @@ const KEY = "gymflow-v3";
     });
 
     function setTheme(){
-      document.body.classList.toggle("light",state.settings.theme==="light");
-      document.documentElement.style.colorScheme=state.settings.theme==="light"?"light":"dark";
+      const light = state.settings.theme === "light";
+      document.body.classList.toggle("light", light);
+      document.documentElement.style.colorScheme = light ? "light" : "dark";
+      let meta = document.querySelector('meta[name="theme-color"]');
+      if(!meta){
+        meta = document.createElement("meta");
+        meta.name = "theme-color";
+        document.head.appendChild(meta);
+      }
+      meta.content = light ? "#f4f7f4" : "#080d0a";
+      document.body.dataset.theme = light ? "light" : "dark";
     }
     
     function navigate(tab){
@@ -1367,13 +1382,16 @@ function renderExercises(){
         if (el) el.textContent = value;
       };
 
-      setText("workouts-logged-count", currentLanguage()==="en"
+      const loggedCopy = currentLanguage()==="en"
         ? `${sessions.length} workouts logged`
-        : `${sessions.length} workout tercatat`);
+        : `${sessions.length} workout tercatat`;
+      setText("workouts-logged-count", loggedCopy);
+      setText("progress-workouts-logged-copy", loggedCopy);
       setText("history-session-count", sessions.length);
       setText("history-calories", fmtKkal(totalCalories));
       setText("history-total-time", formatTimeDetailed(totalSeconds));
       setText("history-avg-duration", formatTimeDetailed(avgSeconds));
+      renderProgressPulse(sessions);
 
       renderOverviewCharts();
     }
@@ -1432,6 +1450,46 @@ function renderExercises(){
     function renderOverviewCharts() {
       renderWorkoutsPerWeekChart();
       renderCaloriesPerWorkoutChart();
+      renderVolumeTrendChart();
+    }
+
+    function renderProgressPulse(sessions) {
+      const safe = Array.isArray(sessions) ? sessions : [];
+      const thisWeekEl = document.getElementById("progress-this-week");
+      const streakEl = document.getElementById("progress-current-streak");
+      if (!thisWeekEl || !streakEl) return;
+
+      const now = new Date();
+      const day = now.getDay();
+      const mondayOffset = day === 0 ? -6 : 1 - day;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() + mondayOffset);
+      monday.setHours(0, 0, 0, 0);
+      const weekCount = safe.filter(s => {
+        const d = new Date(s.endedAt);
+        return !Number.isNaN(d.getTime()) && d >= monday;
+      }).length;
+
+      const uniqueDays = [...new Set(safe
+        .map(s => { const d = new Date(s.endedAt); return Number.isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); })
+        .filter(Boolean))].sort((a,b)=>b-a);
+
+      let streak = 0;
+      if (uniqueDays.length) {
+        const latest = new Date(uniqueDays[0]);
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const gap = Math.round((todayMidnight - latest) / 86400000);
+        if (gap <= 1) {
+          streak = 1;
+          for (let i=1;i<uniqueDays.length;i++) {
+            const diff = Math.round((uniqueDays[i-1] - uniqueDays[i]) / 86400000);
+            if (diff === 1) streak++; else break;
+          }
+        }
+      }
+
+      thisWeekEl.textContent = weekCount;
+      streakEl.textContent = streak;
     }
 
     function renderWorkoutsPerWeekChart() {
@@ -1493,6 +1551,58 @@ function renderExercises(){
       });
       svgContent += `</svg>`;
       area.innerHTML = svgContent;
+    }
+
+    function renderVolumeTrendChart() {
+      const area = document.getElementById("volume-trend-chart");
+      if (!area) return;
+      const history = [...state.history].sort((a,b)=>new Date(a.endedAt)-new Date(b.endedAt)).slice(-8);
+      if (!history.length) {
+        area.innerHTML = `<div class="gf-chart-empty">Belum ada data volume workout.</div>`;
+        return;
+      }
+
+      const getVolume = (s) => {
+        if (s.stats?.totalVolume != null) return Number(s.stats.totalVolume)||0;
+        return (s.exercises||[]).reduce((sum, ex) => {
+          const info = analyticsExerciseInfo(ex.exerciseId, ex.name);
+          return sum + (ex.sets||[]).filter(x=>x.completedAt).reduce((n,x)=>{
+            if (info.muscle === "Cardio") return n;
+            return n + (Number(x.reps)||0) * (Number(x.weight)||0);
+          },0);
+        },0);
+      };
+
+      const values = history.map(getVolume);
+      const max = Math.max(1,...values);
+      const w=720,h=220,padX=34,padY=26;
+      const plotW=w-padX*2, plotH=h-padY-34;
+      const step=history.length===1 ? 0 : plotW/(history.length-1);
+      const points=values.map((v,i)=>{
+        const x=padX + step*i;
+        const y=(h-34) - (v/max)*plotH;
+        return {x,y,v,date:new Date(history[i].endedAt)};
+      });
+      const coords=points.map(p=>`${p.x},${p.y}`).join(" ");
+      const areaPoints=`${padX},${h-34} ${coords} ${padX+step*(history.length-1)},${h-34}`;
+      const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+      area.innerHTML=`
+        <svg viewBox="0 0 ${w} ${h}" class="gf-premium-chart" role="img" aria-label="Volume trend">
+          <defs>
+            <linearGradient id="gfVolumeFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#88F914" stop-opacity="0.26"/>
+              <stop offset="100%" stop-color="#88F914" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="${padX}" y1="${h-34}" x2="${w-padX}" y2="${h-34}" stroke="var(--line)"/>
+          <line x1="${padX}" y1="${padY+plotH*0.5}" x2="${w-padX}" y2="${padY+plotH*0.5}" stroke="var(--line)" stroke-dasharray="4 5" opacity=".65"/>
+          <polygon points="${areaPoints}" fill="url(#gfVolumeFill)"/>
+          <polyline points="${coords}" fill="none" stroke="#88F914" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          ${points.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#0c100d" stroke="#88F914" stroke-width="2.5"><title>${analyticsFormatVolume(p.v)}</title></circle>`).join("")}
+          ${points.map(p=>`<text x="${p.x}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="10">${p.date.getDate()} ${monthNames[p.date.getMonth()]}</text>`).join("")}
+          <text x="${padX}" y="${padY-6}" fill="var(--muted)" font-size="10">${analyticsFormatVolume(max)}</text>
+        </svg>`;
     }
 
     function renderCaloriesPerWorkoutChart() {
@@ -3130,7 +3240,8 @@ function buildExportBrandMark(size = 38) {
 
     function initPhotoWorkoutExport(){
       if (window.__gfPhotoExportEditor) return;
-      const fullscreen = getPhotoExportFullscreenSize();
+      // Photo Workout Export opens with the compact 1080×1080 square preset by default.
+      // Fullscreen remains available as an explicit user choice.
       window.__gfPhotoExportEditor = {
         template:"classic",
         format:"jpg",
@@ -3144,9 +3255,9 @@ function buildExportBrandMark(size = 38) {
         logoImage:null,
         dragging:false,
         lastPointer:null,
-        sizeMode:"fullscreen",
-        width:fullscreen.width,
-        height:fullscreen.height,
+        sizeMode:"custom",
+        width:1080,
+        height:1080,
         preset:"square"
       };
 
@@ -3667,3 +3778,83 @@ function buildExportBrandMark(size = 38) {
         toast(currentLanguage()==="en" ? "Routine saved successfully!" : "Routine berhasil disimpan!");
       };
     });
+
+
+/* ==================== PHASE 4 MOTION HELPERS ==================== */
+function gfAnimateNumber(el, targetText, duration=520){
+  if(!el) return;
+  const raw=String(targetText ?? "");
+  const match=raw.match(/^\s*([\d.,]+)(.*)$/);
+  if(!match){el.textContent=raw;return;}
+  const numberText=match[1];
+  const suffix=match[2]||"";
+  const normalized=numberText.replace(/\./g, "").replace(/,/g, ".");
+  const target=Number(normalized);
+  if(!Number.isFinite(target)){el.textContent=raw;return;}
+  const hasDecimal=numberText.includes(",") || (/\.\d+/.test(normalized));
+  const decimals=hasDecimal ? Math.min(1,(numberText.split(/[.,]/)[1]||"").length) : 0;
+  const start=performance.now();
+  const formatter = value => {
+    if(decimals>0){
+      const fixed=value.toFixed(decimals).replace(".",",");
+      return fixed.replace(/\B(?=(\d{3})+(?!\d))/g,".");
+    }
+    return Math.round(value).toLocaleString("id-ID");
+  };
+  function tick(now){
+    const p=Math.min(1,(now-start)/duration);
+    const eased=1-Math.pow(1-p,3);
+    el.textContent=formatter(target*eased)+suffix;
+    if(p<1) requestAnimationFrame(tick); else el.textContent=raw;
+  }
+  el.textContent=formatter(0)+suffix;
+  requestAnimationFrame(tick);
+}
+
+function gfRunProgressMotion(root=document){
+  const selectors=[
+    "#history-session-count",
+    "#progress-this-week",
+    "#progress-current-streak",
+    "#history-calories",
+    "#history-total-time",
+    "#history-avg-duration",
+    "#stat-total-workouts",
+    "#stat-total-sets",
+    "#stat-total-volume",
+    "#stat-pr-count"
+  ];
+  selectors.forEach(sel=>{
+    const el=root.querySelector(sel);
+    if(!el || el.dataset.gfMotionDone==="1") return;
+    const observer=new MutationObserver(()=>{
+      const latest=el.textContent.trim();
+      if(!latest) return;
+      el.dataset.gfMotionDone="1";
+      gfAnimateNumber(el,latest);
+      observer.disconnect();
+    });
+    observer.observe(el,{childList:true,characterData:true,subtree:true});
+    if(el.textContent.trim()){
+      const latest=el.textContent.trim();
+      el.dataset.gfMotionDone="1";
+      gfAnimateNumber(el,latest);
+      observer.disconnect();
+    }
+  });
+}
+
+function gfRefreshProgressMotion(){
+  const history=document.getElementById("history");
+  if(!history) return;
+  history.classList.remove("gf-motion-reset");
+  void history.offsetWidth;
+  history.classList.add("gf-motion-reset");
+  gfRunProgressMotion(history);
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>{
+    if(typeof gfRefreshProgressMotion === "function") gfRefreshProgressMotion();
+  },120);
+});
