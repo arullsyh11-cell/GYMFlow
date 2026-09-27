@@ -737,18 +737,18 @@ body.light {
 }
 
 
-/* ===== Exercise Directory: reference-style list cards ===== */
+/* ===== Exercise Directory: compact responsive cards ===== */
 #exercise-list{
-  grid-template-columns: 1fr !important;
-  gap: 28px !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:18px !important;
 }
 .exercise-directory-card{
   width:100%;
-  min-height:356px;
-  border-radius:32px !important;
+  min-height:0;
+  border-radius:18px !important;
   overflow:hidden;
   background:var(--surface) !important;
-  border:2px solid var(--line) !important;
+  border:1px solid var(--line) !important;
   box-shadow:none !important;
   transition:border-color .18s ease, transform .18s ease;
 }
@@ -757,8 +757,8 @@ body.light {
   transform:translateY(-1px);
 }
 .exercise-directory-inner{
-  padding:56px 56px 54px;
-  min-height:356px;
+  padding:24px 24px 22px;
+  min-height:0;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
@@ -767,29 +767,29 @@ body.light {
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
-  gap:16px;
+  gap:12px;
 }
 .exercise-directory-title{
   margin:0;
   color:var(--text);
-  font-size:34px;
-  line-height:1.15;
+  font-size:21px;
+  line-height:1.2;
   font-weight:800;
-  letter-spacing:-.035em;
+  letter-spacing:-.03em;
 }
 .exercise-directory-equipment{
-  margin:26px 0 0;
+  margin:14px 0 0;
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:8px;
   color:var(--muted);
-  font-size:28px;
-  line-height:1.2;
+  font-size:15px;
+  line-height:1.25;
   font-weight:500;
 }
 .exercise-wrench-icon{
-  width:28px;
-  height:28px;
+  width:18px;
+  height:18px;
   color:var(--lime);
   flex:0 0 auto;
   stroke-width:2.2;
@@ -797,25 +797,25 @@ body.light {
 .exercise-directory-divider{
   width:100%;
   height:1px;
-  margin:44px 0 30px;
+  margin:22px 0 16px;
   background:var(--line);
 }
 .exercise-directory-footer{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:8px;
   flex-wrap:wrap;
 }
 .exercise-directory-chip{
   display:inline-flex;
   align-items:center;
-  min-height:52px;
-  padding:0 22px;
-  border:2px solid var(--line);
-  border-radius:18px;
+  min-height:34px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
   background:transparent;
   color:var(--muted);
-  font-size:24px;
+  font-size:13px;
   font-weight:600;
 }
 .exercise-custom-chip{
@@ -825,52 +825,17 @@ body.light {
 }
 .exercise-delete-btn{flex:0 0 auto}
 
-@media (max-width: 899px){
-  #exercise-list{gap:16px !important}
-  .exercise-directory-card{
-    min-height:148px;
-    border-radius:18px !important;
-    border-width:1.5px !important;
-  }
-  .exercise-directory-inner{
-    min-height:148px;
-    padding:22px 22px 20px;
-  }
-  .exercise-directory-title{
-    font-size:20px;
-    line-height:1.2;
-    letter-spacing:-.025em;
-  }
-  .exercise-directory-equipment{
-    margin-top:12px;
-    font-size:15px;
-    gap:8px;
-  }
-  .exercise-wrench-icon{
-    width:16px;
-    height:16px;
-  }
-  .exercise-directory-divider{
-    margin:16px 0 14px;
-  }
-  .exercise-directory-chip{
-    min-height:34px;
-    padding:0 12px;
-    border-width:1px;
-    border-radius:11px;
-    font-size:13px;
-  }
-  .exercise-delete-btn{
-    width:34px !important;
-    height:34px !important;
-  }
+@media (max-width: 1180px){
+  #exercise-list{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:16px !important}
 }
-
-@media (max-width: 520px){
-  .exercise-directory-inner{padding:20px 18px 18px}
-  .exercise-directory-title{font-size:18px}
-  .exercise-directory-equipment{font-size:13px}
-  .exercise-directory-chip{font-size:12px;min-height:32px}
+@media (max-width: 899px){
+  #exercise-list{grid-template-columns:1fr !important;gap:14px !important}
+  .exercise-directory-card{border-radius:16px !important}
+  .exercise-directory-inner{padding:20px 20px 18px}
+  .exercise-directory-title{font-size:19px}
+  .exercise-directory-equipment{margin-top:11px;font-size:14px}
+  .exercise-directory-divider{margin:16px 0 13px}
+  .exercise-directory-chip{min-height:32px;font-size:12px;padding:0 11px}
 }
 
 /* ===== More muscular body map ===== */
@@ -1292,4 +1257,321 @@ body.light {
   .gf-photo-template-grid,.gf-photo-format-grid{grid-template-columns:1fr 1fr}
   .gf-photo-export-stage-meta{font-size:10px}
   .gf-photo-size-mode-grid,.gf-photo-preset-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ===== PHASE 2 — Progress & Analytics refresh ===== */
+.gf-progress-hero{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 220px;
+  gap:24px;
+  padding:26px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(136,249,20,.13), transparent 36%),
+    linear-gradient(140deg,var(--surface),var(--surface-2));
+  border-color:rgba(136,249,20,.18);
+}
+.gf-progress-hero-glow{
+  position:absolute;inset:auto -70px -90px auto;width:220px;height:220px;
+  border-radius:50%;background:rgba(136,249,20,.08);filter:blur(14px);pointer-events:none;
+}
+.gf-progress-hero-copy{position:relative;z-index:1;min-width:0}
+.gf-progress-hero-copy h3{margin:5px 0 0;font-size:clamp(30px,4vw,46px);line-height:.98;letter-spacing:-.055em;font-weight:800;max-width:620px}
+.gf-progress-hero-copy p{margin:10px 0 0;max-width:650px;color:var(--muted);font-size:13px;line-height:1.5}
+.gf-progress-pulse-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.gf-progress-pulse-item{min-width:132px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(10,15,11,.28)}
+.gf-progress-pulse-item span,.gf-progress-hero-stat span{display:block;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.1em}
+.gf-progress-pulse-item strong{display:inline-block;margin-top:4px;font-size:24px;line-height:1;font-weight:800;letter-spacing:-.04em}
+.gf-progress-pulse-item small{display:inline-block;margin-left:4px;color:var(--muted);font-size:10px}
+.gf-progress-hero-stat{position:relative;z-index:1;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;border-left:1px solid var(--line);min-width:0}
+.gf-progress-hero-stat strong{font-size:clamp(56px,8vw,92px);line-height:.86;letter-spacing:-.07em;font-weight:800;color:var(--text);margin:8px 0 6px}
+.gf-progress-hero-stat small{font-size:10px;color:var(--muted)}
+.gf-progress-metrics-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--surface),var(--surface-2));overflow:hidden;box-shadow:var(--shadow)}
+.gf-progress-metric{position:relative;min-width:0;padding:18px 20px 17px}
+.gf-progress-metric + .gf-progress-metric{border-left:1px solid var(--line)}
+.gf-progress-metric span{display:block;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.12em}
+.gf-progress-metric strong{display:block;margin-top:10px;font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.045em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gf-progress-metric small{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+.gf-chart-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:10px}
+.gf-chart-card{padding:18px;min-width:0}
+.gf-chart-card-large{min-height:320px}
+.gf-chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.gf-chart-head h3{margin:3px 0 0;font-size:18px;letter-spacing:-.03em;font-weight:800}
+.gf-chart-area{height:220px;width:100%;min-width:0}
+.gf-chart-card-large .gf-chart-area{height:230px}
+.gf-chart-area-volume{height:230px}
+.gf-premium-chart{width:100%;height:100%;display:block;overflow:visible}
+.gf-chart-empty{height:100%;display:grid;place-items:center;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:11px;padding:20px;text-align:center}
+#workouts-per-week-chart svg text,#calories-per-workout-chart svg text{font-family:"DM Sans",sans-serif}
+#workouts-per-week-chart rect{filter:drop-shadow(0 4px 10px rgba(136,249,20,.12))}
+#calories-per-workout-chart polyline{filter:drop-shadow(0 4px 10px rgba(136,249,20,.14))}
+@media(max-width:899px){
+  .gf-progress-hero{grid-template-columns:1fr;gap:18px}
+  .gf-progress-hero-stat{border-left:0;border-top:1px solid var(--line);padding:16px 0 0}
+  .gf-progress-hero-stat strong{font-size:60px}
+  .gf-chart-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .gf-progress-hero{padding:20px}
+  .gf-progress-hero-copy h3{font-size:31px}
+  .gf-progress-pulse-row{display:grid;grid-template-columns:1fr 1fr}
+  .gf-progress-pulse-item{min-width:0}
+  .gf-progress-metrics-strip{grid-template-columns:1fr}
+  .gf-progress-metric + .gf-progress-metric{border-left:0;border-top:1px solid var(--line)}
+  .gf-chart-card{padding:15px}
+  .gf-chart-area,.gf-chart-card-large .gf-chart-area,.gf-chart-area-volume{height:190px}
+}
+
+
+/* ===== PHASE 4 — Micro-interactions & visual polish ===== */
+:root{
+  --gf-ease-out:cubic-bezier(.22,1,.36,1);
+  --gf-ease-spring:cubic-bezier(.16,1,.3,1);
+}
+
+html{scroll-behavior:smooth}
+body{position:relative;isolation:isolate;overflow-x:hidden}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.18;
+  background:
+    radial-gradient(circle at 14% 8%, rgba(136,249,20,.07), transparent 28%),
+    radial-gradient(circle at 86% 18%, rgba(136,249,20,.05), transparent 24%),
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+  background-size:auto,auto,32px 32px,32px 32px;
+}
+
+.tab.active{animation:gfTabIn .4s var(--gf-ease-out)}
+@keyframes gfTabIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.panel,.metric,.gf-progress-metric,.gf-progress-pulse-item,.gf-chart-card,.gf-stat-metric,.gf-highlight-card{
+  transition:
+    transform .22s var(--gf-ease-out),
+    border-color .22s ease,
+    box-shadow .22s ease,
+    background-color .22s ease;
+}
+
+.gf-chart-card:hover,
+.gf-progress-pulse-item:hover,
+.gf-progress-metric:hover,
+.gf-highlight-card:hover,
+.gf-stat-metric:hover{
+  transform:translateY(-2px);
+  border-color:rgba(136,249,20,.28);
+  box-shadow:0 12px 28px rgba(0,0,0,.12),0 0 0 1px rgba(136,249,20,.04) inset;
+}
+
+.lime-btn,.secondary-btn,.icon-btn,.nav-item,.mobile-nav-btn,.custom-option,.field{
+  transition:
+    transform .18s var(--gf-ease-out),
+    background-color .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease;
+}
+
+.lime-btn:hover{transform:translateY(-1px) scale(1.005);box-shadow:0 10px 24px rgba(136,249,20,.14)}
+.lime-btn:active,.secondary-btn:active,.icon-btn:active{transform:translateY(0) scale(.985)}
+.nav-item:not(.active):hover{transform:translateX(2px);color:var(--text)!important;background:rgba(136,249,20,.055)!important}
+.nav-item.active:after{
+  content:"";
+  position:absolute;
+  inset:6px 8px 6px 6px;
+  border-radius:9px;
+  background:linear-gradient(90deg,rgba(136,249,20,.09),transparent 70%);
+  pointer-events:none;
+}
+
+/* subtle reveal for analytics blocks */
+.gf-progress-hero,
+.gf-progress-metrics-strip,
+.gf-chart-grid,
+.gf-chart-card,
+.gf-stat-hero{
+  position:relative;
+}
+.gf-progress-hero::after,
+.gf-chart-card::after,
+.gf-stat-hero::after{
+  content:"";
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  background:linear-gradient(120deg,transparent 15%,rgba(255,255,255,.045) 45%,transparent 70%);
+  background-size:220% 100%;
+  transition:opacity .25s ease;
+}
+.gf-progress-hero:hover::after,
+.gf-chart-card:hover::after,
+.gf-stat-hero:hover::after{opacity:1;animation:gfSheen 1.1s var(--gf-ease-out)}
+@keyframes gfSheen{from{background-position:220% 0}to{background-position:-20% 0}}
+
+/* animated analytics charts */
+#workouts-per-week-chart rect{transform-box:fill-box;transform-origin:center bottom;animation:gfBarRise .65s var(--gf-ease-out) both}
+#workouts-per-week-chart rect:nth-of-type(2){animation-delay:.04s}
+#workouts-per-week-chart rect:nth-of-type(3){animation-delay:.08s}
+#workouts-per-week-chart rect:nth-of-type(4){animation-delay:.12s}
+#workouts-per-week-chart rect:nth-of-type(5){animation-delay:.16s}
+#calories-per-workout-chart polyline,
+#volume-trend-chart polyline{stroke-dasharray:1000;stroke-dashoffset:1000;animation:gfLineDraw 1s var(--gf-ease-out) forwards}
+#calories-per-workout-chart circle,
+#volume-trend-chart circle{animation:gfPointIn .4s var(--gf-ease-out) both}
+@keyframes gfBarRise{from{transform:scaleY(0);opacity:.15}to{transform:scaleY(1);opacity:1}}
+@keyframes gfLineDraw{to{stroke-dashoffset:0}}
+@keyframes gfPointIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+.gf-progress-metric strong,
+.gf-progress-pulse-item strong,
+.gf-progress-hero-stat strong,
+.gf-stat-metric strong,
+.gf-highlight-card strong{font-variant-numeric:tabular-nums lining-nums}
+
+.gf-progress-metrics-strip{box-shadow:0 12px 26px rgba(0,0,0,.08)}
+.gf-progress-metric{overflow:hidden}
+.gf-progress-metric::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:2px;
+  background:linear-gradient(180deg,transparent,var(--lime),transparent);
+  opacity:.35;
+}
+
+/* accessible focus polish */
+button:focus-visible,.field:focus-visible,.custom-select-trigger:focus-visible{
+  outline:2px solid rgba(136,249,20,.5);
+  outline-offset:3px;
+  box-shadow:0 0 0 5px rgba(136,249,20,.08);
+}
+
+@media(max-width:899px){
+  body::before{opacity:.1}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.001ms!important;
+  }
+}
+
+
+/* ==================== PHASE 5 THEME REFINEMENT ==================== */
+:root{
+  --bg:#080d0a;
+  --surface:#101612;
+  --surface-2:#151d17;
+  --line:#28392a;
+  --text:#f0f6f1;
+  --muted:#91a198;
+  --lime:#88F914;
+  --lime-soft:rgba(136,249,20,.10);
+  --focus-ring:rgba(136,249,20,.20);
+  --shadow:0 18px 48px rgba(0,0,0,.22);
+  --theme-control-bg:rgba(255,255,255,.035);
+}
+
+body.light{
+  --bg:#f4f7f4;
+  --surface:#ffffff;
+  --surface-2:#eef3ee;
+  --line:#d7e0d8;
+  --text:#18231c;
+  --muted:#647269;
+  --lime:#72d20d;
+  --lime-soft:rgba(114,210,13,.11);
+  --focus-ring:rgba(114,210,13,.18);
+  --shadow:0 16px 38px rgba(24,35,28,.08);
+  --theme-control-bg:rgba(24,35,28,.035);
+}
+
+html{background:var(--bg)!important;transition:background-color .28s ease;color-scheme:dark}
+html[style*="color-scheme: light"]{color-scheme:light}
+body,
+.sidebar,
+.main-area,
+.panel,
+.metric,
+.modal,
+.custom-options,
+.bottom-nav,
+.field,
+.gf-progress-hero,
+.gf-progress-metric,
+.gf-progress-pulse-item,
+.gf-chart-card,
+.gf-highlight-card,
+.gf-stat-hero,
+.gf-muscle-detail,
+.gf-body-view{
+  transition:
+    background-color .28s ease,
+    border-color .28s ease,
+    color .22s ease,
+    box-shadow .28s ease;
+}
+
+/* Keep the brand green readable in both themes. */
+body.light .text-lime-300{color:#579d0a!important}
+body.light .text-lime-300\/80{color:#579d0a!important}
+body.light .bg-lime-300\/10{background:rgba(114,210,13,.10)!important}
+body.light .border-lime-500\/20{border-color:rgba(114,210,13,.26)!important}
+body.light .nav-item.active{color:#17300b!important;background:var(--surface-2)!important}
+body.light .nav-item.active:before{background:#72d20d!important}
+body.light .secondary-btn{background:#f6f8f6!important}
+body.light .toast{background:#18231c;border-color:#72d20d;color:#baf77a}
+
+/* Refined appearance control */
+.gf-theme-switcher{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:4px;
+  background:var(--theme-control-bg);
+  border:1px solid var(--line);
+  border-radius:14px;
+}
+.gf-theme-option{
+  min-height:38px;
+  border:0;
+  border-radius:10px;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  transition:background .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.gf-theme-option:hover{color:var(--text);transform:translateY(-1px)}
+.gf-theme-option.active{
+  color:var(--text);
+  background:var(--surface);
+  box-shadow:0 4px 14px rgba(0,0,0,.10);
+}
+.gf-theme-option svg{width:14px;height:14px}
+
+/* Inputs and selected controls are easier to read in both modes. */
+.field:focus,
+.gf-stat-select:focus,
+.gf-photo-dimensions-grid input:focus{
+  box-shadow:0 0 0 3px var(--focus-ring)!important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  html,body,*{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
