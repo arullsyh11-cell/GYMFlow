@@ -1575,3 +1575,312 @@ body.light .toast{background:#18231c;border-color:#72d20d;color:#baf77a}
 @media (prefers-reduced-motion: reduce){
   html,body,*{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
+
+/* ================================================================
+   GYMFlow — Unified Premium Visual Layer (layout-preserving)
+   Visual refinement only. Existing layout, workflow, data and JS are kept.
+   ================================================================ */
+:root{
+  --bg:#080d0a;
+  --surface:#101612;
+  --surface-2:#151d17;
+  --surface-3:#19221a;
+  --line:rgba(145,174,149,.15);
+  --line-strong:rgba(136,249,20,.28);
+  --text:#f1f6f2;
+  --muted:#8f9d94;
+  --muted-2:#6f7c74;
+  --lime:#88F914;
+  --lime-soft:rgba(136,249,20,.08);
+  --lime-glow:rgba(136,249,20,.14);
+  --shadow-soft:0 14px 34px rgba(0,0,0,.16);
+  --shadow-lift:0 18px 38px rgba(0,0,0,.20);
+}
+
+html{background:var(--bg)!important}
+body{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(136,249,20,.028),transparent 24%),
+    radial-gradient(circle at 92% 10%,rgba(136,249,20,.018),transparent 20%),
+    var(--bg)!important;
+  color:var(--text);
+}
+
+/* Keep the existing layout geometry. Refine surfaces only. */
+.panel,
+.metric,
+.gf-progress-metric,
+.gf-progress-pulse-item,
+.gf-chart-card,
+.gf-stat-metric,
+.gf-highlight-card,
+.gf-muscle-detail,
+.gf-body-view,
+.gf-stat-hero{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.022),rgba(255,255,255,.006)),
+    var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:var(--shadow-soft)!important;
+}
+
+.panel:hover,
+.metric:hover,
+.gf-progress-metric:hover,
+.gf-progress-pulse-item:hover,
+.gf-chart-card:hover,
+.gf-stat-metric:hover,
+.gf-highlight-card:hover{
+  border-color:rgba(136,249,20,.20)!important;
+  box-shadow:var(--shadow-lift)!important;
+}
+
+/* Navigation: same footprint, richer state. */
+.nav-item{
+  background:transparent!important;
+  color:var(--muted)!important;
+  border:1px solid transparent!important;
+}
+.nav-item:hover:not(.active){
+  background:rgba(136,249,20,.045)!important;
+  color:var(--text)!important;
+}
+.nav-item.active{
+  background:
+    linear-gradient(90deg,rgba(136,249,20,.10),rgba(136,249,20,.025))!important;
+  color:var(--text)!important;
+  border-color:rgba(136,249,20,.09)!important;
+  box-shadow:inset 0 0 18px rgba(136,249,20,.02)!important;
+}
+.nav-item.active:before{
+  background:var(--lime)!important;
+  box-shadow:0 0 12px rgba(136,249,20,.48);
+}
+
+/* Header/profile button. */
+.main-area>header{
+  border-bottom-color:var(--line)!important;
+}
+#open-profile-btn{
+  box-shadow:0 0 22px rgba(136,249,20,.12)!important;
+}
+
+/* Buttons. */
+.lime-btn{
+  background:linear-gradient(180deg,#96ff22,#7fe814)!important;
+  color:#122008!important;
+  box-shadow:0 8px 20px rgba(136,249,20,.10)!important;
+}
+.lime-btn:hover{filter:brightness(1.035);box-shadow:0 12px 26px rgba(136,249,20,.15)!important}
+.secondary-btn,
+.icon-btn{
+  background:rgba(255,255,255,.022)!important;
+  border-color:var(--line)!important;
+}
+.secondary-btn:hover,
+.icon-btn:hover{
+  background:rgba(136,249,20,.045)!important;
+  border-color:rgba(136,249,20,.18)!important;
+}
+
+/* Inputs / dropdowns. */
+.field{
+  background:rgba(255,255,255,.018)!important;
+  border-color:var(--line)!important;
+}
+.field:hover{border-color:rgba(136,249,20,.16)!important}
+.field:focus{border-color:rgba(136,249,20,.36)!important}
+.custom-options{
+  background:#101711!important;
+  border-color:var(--line)!important;
+  box-shadow:0 18px 38px rgba(0,0,0,.28)!important;
+}
+.custom-option:hover{background:rgba(136,249,20,.05)!important}
+.custom-option.selected{background:rgba(136,249,20,.085)!important;color:var(--lime)!important}
+
+/* Dashboard: preserve the existing composition, add depth to its blocks. */
+#weekly-target-container{
+  background:
+    radial-gradient(circle at 92% 100%,rgba(136,249,20,.095),transparent 34%),
+    linear-gradient(145deg,rgba(255,255,255,.022),rgba(255,255,255,.006)),
+    var(--surface)!important;
+}
+#weekly-target-container > .mt-4.p-4{
+  background:rgba(255,255,255,.014)!important;
+  border-color:rgba(136,249,20,.09)!important;
+}
+#weekly-pill-count{
+  background:rgba(136,249,20,.09)!important;
+  color:var(--lime)!important;
+  border:1px solid rgba(136,249,20,.12);
+}
+#dashboard > .panel:nth-child(2),
+#dashboard > .panel:nth-child(3){
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.018),rgba(255,255,255,.004)),
+    var(--surface)!important;
+}
+
+/* Exercises / Routines: preserve existing grids, only refine surfaces. */
+#routines > .panel:first-child,
+#exercises > .panel:first-child{
+  background:
+    radial-gradient(circle at 88% 12%,rgba(136,249,20,.055),transparent 28%),
+    linear-gradient(145deg,rgba(255,255,255,.022),rgba(255,255,255,.006)),
+    var(--surface)!important;
+  border-color:var(--line)!important;
+}
+.exercise-directory-card,
+#routine-list > .panel{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.020),rgba(255,255,255,.005)),
+    var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:var(--shadow-soft)!important;
+}
+.exercise-directory-card:hover,
+#routine-list > .panel:hover{
+  border-color:rgba(136,249,20,.17)!important;
+  box-shadow:var(--shadow-lift)!important;
+}
+
+/* Workout surfaces. */
+#workout-start-state,
+#workout-live-state article.panel,
+#rest-timer-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.020),rgba(255,255,255,.005)),
+    var(--surface)!important;
+  border-color:var(--line)!important;
+}
+#set-list > div{
+  background:rgba(255,255,255,.014)!important;
+  border-color:var(--line)!important;
+}
+
+/* Progress / Statistics: reference-inspired surfaces without changing geometry. */
+.gf-progress-hero{
+  background:
+    radial-gradient(circle at 94% 92%,rgba(136,249,20,.11),transparent 31%),
+    radial-gradient(circle at 8% 0%,rgba(255,255,255,.024),transparent 28%),
+    var(--surface)!important;
+}
+.gf-progress-metrics-strip{
+  background:rgba(255,255,255,.012)!important;
+  border-color:var(--line)!important;
+}
+.gf-chart-card,.gf-stat-metric,.gf-highlight-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.018),rgba(255,255,255,.004)),
+    var(--surface)!important;
+}
+.gf-soft-badge{
+  background:rgba(136,249,20,.05)!important;
+  border-color:rgba(136,249,20,.12)!important;
+  color:var(--lime)!important;
+}
+
+/* Forms / modal depth. */
+.modal-layer{
+  background:rgba(2,5,3,.70)!important;
+  backdrop-filter:blur(10px) saturate(112%);
+}
+.modal{
+  background:
+    radial-gradient(circle at 94% 0%,rgba(136,249,20,.045),transparent 28%),
+    var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.38)!important;
+}
+.toast{backdrop-filter:blur(12px)}
+
+/* Mobile bottom nav: same layout footprint, elevated surface. */
+.bottom-nav{
+  background:rgba(15,21,17,.93)!important;
+  border-color:var(--line)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.30)!important;
+  backdrop-filter:blur(16px) saturate(135%);
+}
+.mobile-nav-btn.active:not(.center-fab-btn){color:var(--lime)!important}
+.mobile-nav-btn.center-fab-btn .fab-circle{
+  background:linear-gradient(180deg,#96ff22,#7ee814)!important;
+  box-shadow:0 8px 20px rgba(136,249,20,.16)!important;
+}
+
+/* Photo Workout Export: visual polish only, preserve size controls and renderer. */
+.gf-photo-export-modal,.gf-summary-modal,.gf-export-modal{
+  box-shadow:0 28px 90px rgba(0,0,0,.42)!important;
+}
+.gf-photo-export-preview{
+  border-color:var(--line)!important;
+  background:#050806!important;
+}
+.gf-photo-control-group{
+  background:rgba(255,255,255,.016)!important;
+  border-color:var(--line)!important;
+}
+.gf-photo-template,.gf-photo-size-mode,.gf-photo-format,.gf-photo-preset{
+  background:rgba(255,255,255,.013)!important;
+  border-color:var(--line)!important;
+}
+.gf-photo-template.active,.gf-photo-size-mode.active,.gf-photo-format.active,.gf-photo-preset.active{
+  background:rgba(136,249,20,.065)!important;
+  border-color:rgba(136,249,20,.34)!important;
+  box-shadow:0 0 0 1px rgba(136,249,20,.05) inset!important;
+}
+
+/* Theme refinement — visual only. */
+body.light{
+  --bg:#f1f5f1;
+  --surface:#ffffff;
+  --surface-2:#edf2ed;
+  --surface-3:#e8efe8;
+  --line:rgba(56,78,61,.13);
+  --line-strong:rgba(91,158,15,.22);
+  --text:#172019;
+  --muted:#66736b;
+  --muted-2:#7a877f;
+  --lime:#72d20d;
+  --lime-soft:rgba(114,210,13,.08);
+  --lime-glow:rgba(114,210,13,.11);
+  --shadow-soft:0 12px 28px rgba(26,40,30,.07);
+  --shadow-lift:0 16px 34px rgba(26,40,30,.10);
+}
+body.light{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(114,210,13,.028),transparent 24%),
+    radial-gradient(circle at 90% 10%,rgba(114,210,13,.020),transparent 20%),
+    var(--bg)!important;
+}
+body.light .panel,
+body.light .metric,
+body.light .gf-progress-metric,
+body.light .gf-progress-pulse-item,
+body.light .gf-chart-card,
+body.light .gf-stat-metric,
+body.light .gf-highlight-card,
+body.light .gf-muscle-detail,
+body.light .gf-body-view{
+  background:
+    linear-gradient(145deg,rgba(0,0,0,.010),rgba(255,255,255,.70)),
+    var(--surface)!important;
+}
+body.light .field{background:rgba(24,36,29,.018)!important}
+body.light .bottom-nav{background:rgba(255,255,255,.94)!important}
+body.light .custom-options{background:#fff!important}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+
+/* Progress Overview — neutral silver meta labels */
+#progress-overview-content .gf-chart-grid > article:first-child .gf-soft-badge,
+#progress-overview-content .gf-chart-grid > article:nth-child(2) .gf-chart-head > .muted,
+#progress-overview-content + .panel .gf-chart-head > .muted{
+  color:#b8c0c8!important;
+  border-color:rgba(184,192,200,.22)!important;
+  text-shadow:0 0 10px rgba(184,192,200,.08);
+}
+#progress-overview-content .gf-chart-grid > article:first-child .gf-soft-badge{
+  background:rgba(184,192,200,.055)!important;
+}
