@@ -258,97 +258,139 @@ body {
     .progress-line { height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
     .progress-line > span { display:block; height:100%; border-radius:inherit; background:#88F914; transition:width .25s; }
     
-    .bottom-nav { 
-      position: fixed; 
-      bottom: 20px;
-      left: 16px;
-      right: 16px;
-      max-width: 480px;
+    .bottom-nav {
+      position: fixed;
+      bottom: 18px;
+      left: 14px;
+      right: 14px;
+      max-width: 500px;
       margin: 0 auto;
-      height: 72px;
-      background: var(--surface); 
-      border: 1px solid var(--line);
-      border-radius: 999px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-around; 
-      padding: 0 12px; 
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+      height: 74px;
+      background: #0d1410;
+      border: 1px solid rgba(55,70,41,.78);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7px;
+      box-shadow: 0 14px 34px rgba(0,0,0,.36);
       z-index: 50;
+      overflow: visible;
     }
-    
-    .mobile-nav-btn { 
+
+    .mobile-nav-btn {
+      position: relative;
+      min-width: 0;
+      width: 20%;
+      height: 58px;
+      padding: 0 4px;
       background: transparent;
       border: none;
-      color: var(--muted);
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      flex: 1;
-      height: 100%;
+      color: #89958d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
       cursor: pointer;
-      transition: color 0.2s ease, transform 0.2s ease;
-      font-size: 11px; 
-      font-weight: 600; 
-      gap: 3px; 
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 700;
+      transition: color .22s ease, transform .22s ease;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .mobile-nav-btn span { 
-      display: block !important; 
+    .mobile-nav-btn span:last-child {
+      display: block !important;
       font-size: 10px;
-      letter-spacing: -0.01em;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      transition: opacity .22s ease, transform .22s ease, color .22s ease;
     }
 
-    .mobile-nav-btn svg {
-      width: 20px;
-      height: 20px;
+    .mobile-nav-btn > svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.15;
+      transition: transform .22s cubic-bezier(.2,.85,.25,1), color .22s ease;
+    }
+
+    .mobile-nav-btn.active:not(.center-fab-btn) {
+      color: var(--lime) !important;
+      transform: translateY(-1px);
+    }
+
+    .mobile-nav-btn.active:not(.center-fab-btn) > svg {
+      transform: scale(1.08);
+    }
+
+    .mobile-nav-btn.active:not(.center-fab-btn) span:last-child {
+      color: var(--lime);
+      transform: translateY(-.5px);
+    }
+
+    .mobile-nav-btn:focus-visible {
+      outline: 2px solid rgba(136,249,20,.65);
+      outline-offset: -2px;
+      border-radius: 16px;
     }
 
     .mobile-nav-btn.center-fab-btn {
       position: relative;
       overflow: visible;
+      z-index: 2;
+      color: #89958d;
     }
 
     .mobile-nav-btn.center-fab-btn .fab-circle {
       position: absolute;
-      top: -10px; 
-      width: 38px; 
-      height: 38px;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 62px;
+      height: 62px;
       background: var(--lime);
       color: #142009;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(188, 240, 74, 0.25);
-      border: 2px solid var(--bg); 
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease;
+      display: grid;
+      place-items: center;
+      border: 4px solid #0b100d;
+      box-shadow: 0 7px 18px rgba(0,0,0,.34), 0 0 0 1px rgba(136,249,20,.18);
+      transition: transform .24s cubic-bezier(.2,.85,.25,1), box-shadow .24s ease, filter .2s ease;
     }
 
     .mobile-nav-btn.center-fab-btn .fab-circle svg {
-      width: 16px; 
-      height: 16px;
-      stroke-width: 2.2px;
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.35px;
     }
 
-    .mobile-nav-btn.center-fab-btn span {
-      margin-top: 6px; 
+    .mobile-nav-btn.center-fab-btn span:last-child {
+      margin-top: 23px;
     }
 
-    .mobile-nav-btn.center-fab-btn:hover .fab-circle {
-      transform: translateY(-2px);
-      filter: brightness(1.05);
-    }
-
-    .mobile-nav-btn.active:not(.center-fab-btn) { 
-      color: var(--lime) !important;
-      transform: translateY(-4px);
+    .mobile-nav-btn.center-fab-btn:hover .fab-circle,
+    .mobile-nav-btn.center-fab-btn:focus-visible .fab-circle {
+      transform: translateX(-50%) translateY(-1px);
+      filter: brightness(1.04);
     }
 
     .mobile-nav-btn.center-fab-btn.active .fab-circle {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(188, 240, 74, 0.4);
+      transform: translateX(-50%) translateY(-3px);
+      box-shadow: 0 9px 20px rgba(0,0,0,.38), 0 0 0 1px rgba(136,249,20,.24);
+    }
+
+    .mobile-nav-btn.center-fab-btn.active span:last-child {
+      color: var(--text);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mobile-nav-btn,
+      .mobile-nav-btn > svg,
+      .mobile-nav-btn span:last-child,
+      .mobile-nav-btn.center-fab-btn .fab-circle {
+        transition: none !important;
+      }
     }
 
     .set-circle-btn {
@@ -1883,4 +1925,1192 @@ body.light .custom-options{background:#fff!important}
 }
 #progress-overview-content .gf-chart-grid > article:first-child .gf-soft-badge{
   background:rgba(184,192,200,.055)!important;
+}
+
+/* =========================================================
+   GYMFlow Fluid Bottom Navigation
+   UI-only refinement. Existing routine-builder UI restored.
+   ========================================================= */
+.bottom-nav{
+  --liquid-x: 50%;
+  --liquid-w: 62px;
+  position:fixed;
+  isolation:isolate;
+  backdrop-filter:blur(18px) saturate(1.1);
+  -webkit-backdrop-filter:blur(18px) saturate(1.1);
+  padding:0 8px;
+  overflow:visible;
+}
+.bottom-nav::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 58%);
+  pointer-events:none;
+  z-index:0;
+}
+.nav-liquid-indicator{
+  position:absolute;
+  z-index:0;
+  left:calc(var(--liquid-x) - (var(--liquid-w) / 2));
+  top:50%;
+  width:var(--liquid-w);
+  height:48px;
+  border-radius:18px 22px 19px 21px / 20px 18px 22px 19px;
+  transform:translateY(-50%);
+  background:rgba(136,249,20,.15);
+  box-shadow:
+    0 0 0 1px rgba(136,249,20,.12),
+    0 7px 22px rgba(136,249,20,.11),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  transition:
+    left .58s cubic-bezier(.22,1,.36,1),
+    width .38s cubic-bezier(.22,1,.36,1),
+    border-radius .44s cubic-bezier(.22,1,.36,1),
+    background .28s ease,
+    box-shadow .28s ease;
+  pointer-events:none;
+  will-change:left,width,border-radius;
+}
+.nav-liquid-indicator::after{
+  content:"";
+  position:absolute;
+  inset:5px 7px;
+  border-radius:inherit;
+  background:rgba(136,249,20,.045);
+  filter:blur(7px);
+  pointer-events:none;
+}
+.bottom-nav.is-moving .nav-liquid-indicator{
+  border-radius:24px 15px 22px 17px / 18px 24px 16px 22px;
+  background:rgba(136,249,20,.18);
+  box-shadow:
+    0 0 0 1px rgba(136,249,20,.16),
+    0 9px 24px rgba(136,249,20,.16),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+.mobile-nav-btn{
+  position:relative;
+  z-index:2;
+  min-width:0;
+  color:var(--muted);
+  gap:4px;
+  border-radius:18px;
+  transition:
+    color .28s ease,
+    transform .42s cubic-bezier(.22,1,.36,1);
+}
+.mobile-nav-btn svg{
+  width:19px;
+  height:19px;
+  transition:
+    transform .42s cubic-bezier(.22,1,.36,1),
+    opacity .28s ease,
+    stroke-width .28s ease;
+}
+.mobile-nav-btn span{
+  transition:
+    transform .38s cubic-bezier(.22,1,.36,1),
+    opacity .28s ease,
+    color .28s ease;
+}
+.mobile-nav-btn:not(.active):hover{ color:var(--text); }
+.mobile-nav-btn.active{
+  color:var(--lime)!important;
+  transform:translateY(-1px);
+}
+.mobile-nav-btn.active svg{
+  transform:translateY(-1px) scale(1.06);
+  opacity:1;
+}
+.mobile-nav-btn.active span{
+  transform:translateY(-.5px) scale(1.02);
+  color:var(--lime);
+}
+.mobile-nav-btn:focus-visible{
+  outline:2px solid rgba(136,249,20,.55)!important;
+  outline-offset:3px;
+}
+.mobile-nav-btn:active{
+  transform:translateY(0) scale(.985);
+}
+@media (min-width:900px){ .bottom-nav{display:none!important;} }
+
+/* =========================================================
+   GYMFlow Routines + Capsule Liquid Navigation Refinement
+   Visual-only polish; existing data/routing/workout logic is preserved.
+   ========================================================= */
+
+/* --- Compact capsule bottom navigation --- */
+.bottom-nav{
+  width:calc(100% - 28px);
+  max-width:430px;
+  height:64px;
+  left:50%;
+  right:auto;
+  bottom:max(12px, env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  padding:5px 6px;
+  gap:2px;
+  background:rgba(13,18,15,.96)!important;
+  border:1px solid rgba(144,166,153,.15)!important;
+  border-radius:999px!important;
+  box-shadow:0 14px 30px rgba(0,0,0,.34), 0 0 0 1px rgba(0,0,0,.14) inset!important;
+  overflow:hidden;
+}
+.bottom-nav::before{
+  inset:1px;
+  border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 54%);
+}
+.nav-liquid-indicator{
+  top:50%;
+  height:50px;
+  min-width:52px;
+  border-radius:22px 25px 20px 24px / 22px 20px 25px 21px;
+  background:rgba(136,249,20,.14);
+  box-shadow:0 0 0 1px rgba(136,249,20,.08), 0 5px 18px rgba(136,249,20,.06), inset 0 1px 0 rgba(255,255,255,.035);
+  transition:left .54s cubic-bezier(.22,1,.36,1),width .34s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),background .2s ease,box-shadow .2s ease;
+}
+.nav-liquid-indicator::after{
+  inset:6px 8px;
+  background:rgba(136,249,20,.05);
+  filter:blur(8px);
+}
+.bottom-nav.is-moving .nav-liquid-indicator{
+  border-radius:28px 17px 25px 18px / 19px 27px 16px 24px;
+  background:rgba(136,249,20,.18);
+  box-shadow:0 0 0 1px rgba(136,249,20,.11), 0 7px 20px rgba(136,249,20,.10), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.mobile-nav-btn{
+  flex:1 1 0;
+  height:54px;
+  min-height:54px;
+  border-radius:20px!important;
+  gap:2px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:-.01em;
+  transition:color .24s ease,transform .36s cubic-bezier(.22,1,.36,1);
+}
+.mobile-nav-btn svg{
+  width:18px!important;
+  height:18px!important;
+  stroke-width:1.9;
+  transition:transform .36s cubic-bezier(.22,1,.36,1),opacity .22s ease,stroke-width .22s ease;
+}
+.mobile-nav-btn span{
+  font-size:9px!important;
+  line-height:1;
+  opacity:.82;
+  transition:transform .34s cubic-bezier(.22,1,.36,1),opacity .22s ease,color .22s ease;
+}
+.mobile-nav-btn.active{
+  color:var(--lime)!important;
+  transform:translateY(-1px)!important;
+}
+.mobile-nav-btn.active svg{transform:translateY(-1px) scale(1.05);stroke-width:2.15;}
+.mobile-nav-btn.active span{opacity:1;color:var(--lime);transform:translateY(-.5px) scale(1.01);}
+.mobile-nav-btn:not(.active){color:var(--muted)!important;}
+.mobile-nav-btn:not(.active):hover{color:var(--text)!important;}
+.mobile-nav-btn:focus-visible{outline:2px solid rgba(136,249,20,.55)!important;outline-offset:-2px;border-radius:18px!important;}
+.mobile-nav-btn:active{transform:scale(.975)!important;}
+
+/* --- Routines page --- */
+.gf-routines-page{padding:0 0 88px;}
+.gf-routines-header{margin-bottom:13px;}
+.gf-routines-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.gf-routines-heading h2{
+  margin:0;
+  font-size:clamp(26px,5vw,33px);
+  line-height:1;
+  letter-spacing:-.05em;
+  font-weight:850;
+}
+.gf-routines-heading p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+.gf-routines-create{
+  width:38px;
+  height:38px;
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:var(--lime);
+  color:#142009;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+  box-shadow:0 4px 14px rgba(136,249,20,.08);
+  transition:transform .2s ease,filter .2s ease,box-shadow .2s ease;
+}
+.gf-routines-create span{display:none;}
+.gf-routines-create svg{width:16px;height:16px;stroke-width:2.8;}
+.gf-routines-create:hover{filter:brightness(1.04);transform:translateY(-1px);box-shadow:0 7px 18px rgba(136,249,20,.12);}
+.gf-routines-create:active{transform:scale(.96);}
+.gf-routines-create:focus-visible{outline:2px solid rgba(136,249,20,.55);outline-offset:3px;}
+
+.gf-routines-filters{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  overflow-x:auto;
+  padding:1px 1px 6px;
+  margin:0 0 13px;
+  scrollbar-width:none;
+  scroll-snap-type:x proximity;
+}
+.gf-routines-filters::-webkit-scrollbar{display:none;}
+.gf-routine-filter{
+  flex:none;
+  min-height:31px;
+  padding:0 11px;
+  border-radius:999px;
+  border:1px solid rgba(144,166,153,.12);
+  background:rgba(20,24,21,.48);
+  color:var(--muted);
+  font-size:10px;
+  font-weight:750;
+  white-space:nowrap;
+  scroll-snap-align:start;
+  transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease;
+}
+.gf-routine-filter:hover{color:var(--text);border-color:rgba(136,249,20,.28);}
+.gf-routine-filter.active{
+  background:var(--lime);
+  border-color:var(--lime);
+  color:#142009;
+  box-shadow:none;
+}
+.gf-routine-filter:active{transform:scale(.98);}
+.gf-routine-filter:focus-visible{outline:2px solid rgba(136,249,20,.5);outline-offset:2px;}
+
+.gf-routines-list-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 1px 9px;
+}
+.gf-routines-list-head>div{min-width:0;}
+.gf-routines-list-kicker{
+  display:block;
+  color:var(--muted);
+  font-size:8px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.gf-routines-list-head strong{
+  display:block;
+  margin-top:3px;
+  color:var(--text);
+  font-size:12px;
+  line-height:1.2;
+  font-weight:850;
+  letter-spacing:-.02em;
+}
+.gf-routines-list-note{
+  flex:none;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.2;
+}
+
+.gf-routines-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.gf-routine-card{
+  position:relative;
+  min-width:0;
+  padding:13px;
+  overflow:hidden;
+  border:1px solid rgba(144,166,153,.12);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(20,24,21,.98),rgba(16,20,17,.98));
+  box-shadow:0 6px 18px rgba(0,0,0,.11);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.gf-routine-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(136,249,20,.22);
+  box-shadow:0 9px 22px rgba(0,0,0,.15);
+}
+.gf-routine-card-topline{
+  position:absolute;
+  left:13px;
+  top:0;
+  width:31px;
+  height:2px;
+  background:var(--lime);
+  opacity:.8;
+  border-radius:0 0 99px 99px;
+}
+.gf-routine-card-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.gf-routine-card-title-wrap{min-width:0;}
+.gf-routine-card h3{
+  margin:0;
+  font-size:14px;
+  line-height:1.15;
+  letter-spacing:-.025em;
+  font-weight:850;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.gf-routine-card h3:hover{color:var(--lime);}
+.gf-routine-card p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.35;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:1;
+  line-clamp:1;
+  overflow:hidden;
+}
+.gf-routine-card-actions{display:flex;gap:3px;flex:none;}
+.gf-routine-icon-btn{
+  width:26px;
+  height:26px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--muted);
+  transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
+}
+.gf-routine-icon-btn svg{width:13px;height:13px;}
+.gf-routine-icon-btn:hover{background:var(--surface-2);color:var(--text);border-color:var(--line);}
+.gf-routine-icon-btn.danger:hover{color:var(--danger);border-color:rgba(251,113,133,.22);}
+.gf-routine-icon-btn:focus-visible{outline:2px solid rgba(136,249,20,.5);outline-offset:2px;}
+
+.gf-routine-focus-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:10px;
+}
+.gf-routine-focus-pill{
+  min-width:0;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(136,249,20,.07);
+  color:var(--lime);
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.gf-routine-focus-pill svg{width:10px;height:10px;}
+.gf-routine-days{display:flex;align-items:center;gap:3px;min-width:0;}
+.gf-routine-days span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:18px;
+  height:18px;
+  padding:0 4px;
+  border-radius:999px;
+  background:var(--surface-2);
+  color:var(--muted);
+  font-size:7px;
+  font-weight:800;
+}
+.gf-routine-days span:first-child{color:var(--text);}
+.gf-routine-day-muted{font-size:7px!important;padding:0 6px!important;}
+
+.gf-routine-stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin-top:11px;
+  padding-top:10px;
+  border-top:1px solid rgba(144,166,153,.10);
+}
+.gf-routine-stats div{min-width:0;padding-right:7px;}
+.gf-routine-stats div+div{padding-left:8px;border-left:1px solid rgba(144,166,153,.09);}
+.gf-routine-stats strong,
+.gf-routine-stats span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gf-routine-stats strong{font-size:9px;line-height:1.2;color:var(--text);font-weight:850;}
+.gf-routine-stats span{margin-top:3px;color:var(--muted);font-size:7px;line-height:1.2;}
+
+.gf-routine-play{
+  width:100%;
+  min-height:35px;
+  margin-top:11px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:0 7px 0 11px;
+  border:1px solid rgba(136,249,20,.16);
+  border-radius:999px;
+  background:rgba(136,249,20,.055);
+  color:var(--text);
+  font-size:10px;
+  font-weight:800;
+  transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.gf-routine-play:hover{background:rgba(136,249,20,.09);border-color:rgba(136,249,20,.34);transform:translateY(-1px);}
+.gf-routine-play:active{transform:scale(.99);}
+.gf-routine-play:focus-visible{outline:2px solid rgba(136,249,20,.5);outline-offset:2px;}
+.gf-routine-play-icon{
+  width:25px;
+  height:25px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--lime);
+  color:#142009;
+}
+.gf-routine-play-icon svg{width:12px;height:12px;stroke-width:2.7;}
+
+.gf-routines-empty{
+  min-height:210px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:25px 18px;
+  text-align:center;
+  border:1px dashed rgba(144,166,153,.16);
+  border-radius:16px;
+  background:rgba(20,24,21,.35);
+}
+.gf-routines-empty-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  margin-bottom:10px;
+  border-radius:10px;
+  background:rgba(136,249,20,.07);
+  color:var(--lime);
+}
+.gf-routines-empty-icon svg{width:15px;height:15px;}
+.gf-routines-empty h3{margin:0;font-size:14px;font-weight:850;letter-spacing:-.02em;}
+.gf-routines-empty p{max-width:280px;margin:6px 0 14px;color:var(--muted);font-size:10px;line-height:1.5;}
+.gf-routines-empty-cta{
+  min-height:35px;
+  padding:0 13px;
+  border:0;
+  border-radius:999px;
+  background:var(--lime);
+  color:#142009;
+  font-size:10px;
+  font-weight:800;
+}
+
+@media (max-width:899px){
+  .gf-routines-page{padding-top:0;}
+  .gf-routines-heading{align-items:center;}
+  .gf-routines-heading h2{font-size:27px;}
+  .gf-routines-create{width:38px;height:38px;}
+  .gf-routines-grid{grid-template-columns:1fr;gap:9px;}
+  .gf-routine-card{padding:13px;}
+}
+@media (min-width:900px){
+  .gf-routines-page{max-width:1120px;}
+  .gf-routines-create{width:auto;height:38px;border-radius:999px;padding:0 14px;}
+  .gf-routines-create span{display:inline;}
+}
+@media (max-width:560px){
+  .bottom-nav{height:62px;width:calc(100% - 24px);bottom:max(10px,env(safe-area-inset-bottom));padding:5px;}
+  .nav-liquid-indicator{height:48px;min-width:50px;}
+  .mobile-nav-btn{height:52px;min-height:52px;}
+  .gf-routines-heading{gap:10px;}
+  .gf-routines-heading p{font-size:10px;}
+  .gf-routines-filters{margin-bottom:12px;}
+  .gf-routines-list-head{margin-bottom:8px;}
+  .gf-routines-list-note{font-size:8px;}
+  .gf-routine-card h3{font-size:14px;}
+  .gf-routine-card p{font-size:8px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .bottom-nav,
+  .nav-liquid-indicator,
+  .mobile-nav-btn,
+  .mobile-nav-btn svg,
+  .mobile-nav-btn span,
+  .gf-routines-create,
+  .gf-routine-filter,
+  .gf-routine-card,
+  .gf-routine-play,
+  .gf-routine-icon-btn{transition:none!important;animation:none!important;}
+}
+
+
+/* =========================================================
+   GYMFlow — Reference Capsule Navbar
+   Based directly on the supplied navbar CSS reference.
+   ========================================================= */
+.bottom-nav{
+  position:fixed !important;
+  bottom:20px !important;
+  left:16px !important;
+  right:16px !important;
+  width:auto !important;
+  max-width:480px !important;
+  height:72px !important;
+  margin:0 auto !important;
+  background:var(--surface) !important;
+  border:1px solid var(--line) !important;
+  border-radius:999px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-around !important;
+  padding:0 12px !important;
+  gap:0 !important;
+  box-shadow:0 16px 32px rgba(0,0,0,.4) !important;
+  z-index:50 !important;
+  overflow:visible !important;
+}
+
+.mobile-nav-btn{
+  position:relative !important;
+  z-index:2 !important;
+  flex:1 1 0 !important;
+  min-width:0 !important;
+  height:100% !important;
+  min-height:48px !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:none !important;
+  color:var(--muted) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  cursor:pointer !important;
+  gap:3px !important;
+  border-radius:18px !important;
+  font-size:11px !important;
+  font-weight:600 !important;
+  letter-spacing:-.01em !important;
+  transition:color .20s ease, transform .20s ease !important;
+}
+
+.mobile-nav-btn span:last-child{
+  display:block !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  letter-spacing:-.01em !important;
+  opacity:1 !important;
+  transition:color .20s ease, transform .20s ease, opacity .20s ease !important;
+}
+
+.mobile-nav-btn > svg{
+  width:20px !important;
+  height:20px !important;
+  stroke-width:2 !important;
+  transition:transform .20s ease, opacity .20s ease, color .20s ease !important;
+}
+
+.mobile-nav-btn.active:not(.center-fab-btn){
+  color:var(--lime) !important;
+  transform:translateY(-4px) !important;
+}
+
+.mobile-nav-btn.active:not(.center-fab-btn) > svg{
+  transform:scale(1.04) !important;
+  opacity:1 !important;
+}
+
+.mobile-nav-btn.active:not(.center-fab-btn) span:last-child{
+  color:var(--lime) !important;
+  transform:translateY(-.25px) !important;
+}
+
+.mobile-nav-btn:not(.active):hover{color:var(--text) !important;}
+
+.mobile-nav-btn:focus-visible{
+  outline:2px solid rgba(136,249,20,.55) !important;
+  outline-offset:-3px !important;
+}
+
+.mobile-nav-btn:active{
+  transform:scale(.985) !important;
+}
+
+.mobile-nav-btn.center-fab-btn{
+  position:relative !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+}
+
+.mobile-nav-btn.center-fab-btn .fab-circle{
+  position:absolute !important;
+  top:-10px !important;
+  left:50% !important;
+  width:38px !important;
+  height:38px !important;
+  transform:translate(-50%,0) !important;
+  background:var(--lime) !important;
+  color:#142009 !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:0 4px 12px rgba(188,240,74,.25) !important;
+  border:2px solid var(--bg) !important;
+  z-index:3 !important;
+  pointer-events:none !important;
+  transition:transform .25s cubic-bezier(.4,0,.2,1), filter .2s ease, box-shadow .25s ease !important;
+}
+
+.mobile-nav-btn.center-fab-btn .fab-circle svg{
+  width:16px !important;
+  height:16px !important;
+  stroke-width:2.2px !important;
+}
+
+.mobile-nav-btn.center-fab-btn span:last-child{
+  margin-top:6px !important;
+  color:var(--muted) !important;
+}
+
+.mobile-nav-btn.center-fab-btn:hover .fab-circle,
+.mobile-nav-btn.center-fab-btn:focus-visible .fab-circle{
+  transform:translate(-50%,-2px) !important;
+  filter:brightness(1.05) !important;
+}
+
+.mobile-nav-btn.center-fab-btn.active .fab-circle{
+  transform:translate(-50%,-4px) !important;
+  box-shadow:0 6px 16px rgba(188,240,74,.40) !important;
+}
+
+.mobile-nav-btn.center-fab-btn.active span:last-child{
+  color:var(--lime) !important;
+  transform:translateY(-.25px) !important;
+}
+
+/* Existing JS may create this helper for the previous liquid implementation;
+   keep it functional for state updates but remove it from the visual layer. */
+.nav-liquid-indicator{display:none !important;}
+
+@media (max-width:899px){
+  .bottom-nav{
+    bottom:max(10px,env(safe-area-inset-bottom)) !important;
+    width:calc(100% - 24px) !important;
+    max-width:480px !important;
+    height:72px !important;
+    padding:0 10px !important;
+  }
+  .mobile-nav-btn{height:100% !important;min-height:48px !important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .bottom-nav,
+  .mobile-nav-btn,
+  .mobile-nav-btn > svg,
+  .mobile-nav-btn span:last-child,
+  .mobile-nav-btn.center-fab-btn .fab-circle{
+    transition:none !important;
+    animation:none !important;
+  }
+}
+
+/* ===== Final navbar geometry fix ===== */
+.bottom-nav{
+  position:fixed !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:20px !important;
+  width:min(480px, calc(100vw - 32px)) !important;
+  max-width:none !important;
+  margin:0 !important;
+  transform:translateX(-50%) !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:stretch !important;
+  padding:0 10px !important;
+  overflow:visible !important;
+}
+
+.mobile-nav-btn{
+  flex:1 1 20% !important;
+  width:20% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  box-sizing:border-box !important;
+}
+
+.mobile-nav-btn > svg,
+.mobile-nav-btn .fab-circle{
+  flex:0 0 auto !important;
+}
+
+@media (max-width:899px){
+  .bottom-nav{
+    left:50% !important;
+    right:auto !important;
+    width:calc(100vw - 24px) !important;
+    max-width:480px !important;
+    bottom:max(10px, env(safe-area-inset-bottom)) !important;
+    transform:translateX(-50%) !important;
+  }
+  .mobile-nav-btn{
+    flex:1 1 20% !important;
+    width:20% !important;
+  }
+}
+
+@media (min-width:900px){
+  .bottom-nav{display:none !important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .bottom-nav{transform:translateX(-50%) !important;}
+}
+
+/* ===== GYMFlow CTA Arrow Micro-interaction ===== */
+.gf-routine-play-icon{
+  flex:0 0 25px;
+  overflow:visible;
+}
+.gf-routine-play-icon svg{
+  transform-box:fill-box;
+  transform-origin:center;
+  transition:transform .22s cubic-bezier(.22,.8,.28,1);
+  will-change:transform;
+}
+
+/* Default: ↗  |  Interaction: → */
+@media (hover:hover){
+  .gf-routine-play:hover .gf-routine-play-icon svg{
+    transform:translateX(1px) rotate(45deg) scale(1.03);
+  }
+}
+
+.gf-routine-play:focus-visible .gf-routine-play-icon svg,
+.gf-routine-play:active .gf-routine-play-icon svg{
+  transform:translateX(1px) rotate(45deg) scale(1.03);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .gf-routine-play-icon svg{
+    transition:none!important;
+    will-change:auto;
+  }
+}
+
+/* ===== GYMFlow Bottom Navbar — Frosted Glass ===== */
+.bottom-nav{
+  background:rgba(10,16,13,.58) !important;
+  border:1px solid rgba(154,181,162,.15) !important;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.025) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(135%) !important;
+  backdrop-filter:blur(18px) saturate(135%) !important;
+  isolation:isolate !important;
+}
+
+.bottom-nav::before{
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)) !important;
+  border:0 !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+}
+
+body.light .bottom-nav{
+  background:rgba(255,255,255,.64) !important;
+  border-color:rgba(73,96,81,.16) !important;
+  box-shadow:
+    0 10px 28px rgba(22,34,27,.10),
+    inset 0 1px 0 rgba(255,255,255,.55) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(125%) !important;
+  backdrop-filter:blur(18px) saturate(125%) !important;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .bottom-nav{
+    -webkit-backdrop-filter:blur(12px) saturate(115%) !important;
+    backdrop-filter:blur(12px) saturate(115%) !important;
+  }
+}
+
+/* =========================================================
+   GYMFlow — Routines Light Mode Refinement
+   Scoped only to the Routines page + its mobile navbar state.
+   Dark mode remains unchanged.
+   ========================================================= */
+body.light #routines .gf-routines-heading h2{
+  color:#172019!important;
+}
+
+body.light #routines .gf-routines-heading p,
+body.light #routines .gf-routines-list-kicker,
+body.light #routines .gf-routines-list-note,
+body.light #routines .gf-routine-card p,
+body.light #routines .gf-routine-stats span{
+  color:#66736b!important;
+}
+
+body.light #routines .gf-routines-filters{
+  scrollbar-color:transparent transparent;
+}
+
+body.light #routines .gf-routine-filter{
+  background:#f7f9f7!important;
+  border-color:rgba(56,78,61,.14)!important;
+  color:#65736a!important;
+  box-shadow:none!important;
+}
+
+body.light #routines .gf-routine-filter:hover{
+  background:#ffffff!important;
+  border-color:rgba(114,210,13,.30)!important;
+  color:#263229!important;
+}
+
+body.light #routines .gf-routine-filter.active{
+  background:#72d20d!important;
+  border-color:#72d20d!important;
+  color:#153009!important;
+}
+
+body.light #routines .gf-routines-list-head strong{
+  color:#172019!important;
+}
+
+body.light #routines .gf-routine-card{
+  background:#ffffff!important;
+  border:1px solid rgba(56,78,61,.13)!important;
+  box-shadow:0 8px 24px rgba(28,43,33,.065)!important;
+  color:#172019!important;
+}
+
+body.light #routines .gf-routine-card:hover{
+  transform:translateY(-1px);
+  border-color:rgba(114,210,13,.34)!important;
+  box-shadow:0 12px 28px rgba(28,43,33,.085)!important;
+}
+
+body.light #routines .gf-routine-card-topline{
+  background:#72d20d!important;
+  opacity:.85;
+}
+
+body.light #routines .gf-routine-card h3{
+  color:#172019!important;
+}
+
+body.light #routines .gf-routine-icon-btn{
+  color:#7a877f!important;
+  background:transparent!important;
+  border-color:transparent!important;
+}
+
+body.light #routines .gf-routine-icon-btn:hover{
+  background:#f1f5f1!important;
+  color:#2c3931!important;
+  border-color:rgba(56,78,61,.10)!important;
+}
+
+body.light #routines .gf-routine-icon-btn.danger:hover{
+  color:#c75868!important;
+  border-color:rgba(199,88,104,.16)!important;
+}
+
+body.light #routines .gf-routine-focus-pill{
+  background:rgba(114,210,13,.10)!important;
+  color:#4d8610!important;
+}
+
+body.light #routines .gf-routine-days span{
+  background:#eef2ee!important;
+  color:#69766e!important;
+}
+
+body.light #routines .gf-routine-days span:first-child{
+  color:#2d3a32!important;
+}
+
+body.light #routines .gf-routine-stats{
+  border-top-color:rgba(56,78,61,.10)!important;
+}
+
+body.light #routines .gf-routine-stats div+div{
+  border-left-color:rgba(56,78,61,.10)!important;
+}
+
+body.light #routines .gf-routine-stats strong{
+  color:#233028!important;
+}
+
+body.light #routines .gf-routine-play{
+  background:rgba(114,210,13,.075)!important;
+  border-color:rgba(114,210,13,.20)!important;
+  color:#243128!important;
+}
+
+body.light #routines .gf-routine-play:hover{
+  background:rgba(114,210,13,.12)!important;
+  border-color:rgba(114,210,13,.38)!important;
+}
+
+body.light #routines .gf-routine-play-icon{
+  background:#72d20d!important;
+  color:#17300b!important;
+}
+
+body.light #routines .gf-routines-empty{
+  background:#ffffff!important;
+  border-color:rgba(56,78,61,.16)!important;
+  box-shadow:0 8px 24px rgba(28,43,33,.055)!important;
+}
+
+body.light #routines .gf-routines-empty-icon{
+  background:rgba(114,210,13,.10)!important;
+  color:#579d0a!important;
+}
+
+body.light #routines .gf-routines-empty h3{
+  color:#172019!important;
+}
+
+body.light #routines .gf-routines-empty p{
+  color:#66736b!important;
+}
+
+/* Let the translucent capsule navbar blend into the light Routine page. */
+@supports selector(body:has(#routines.active)){
+  body.light:has(#routines.active) .bottom-nav{
+    background:rgba(255,255,255,.76)!important;
+    border-color:rgba(56,78,61,.14)!important;
+    box-shadow:0 12px 30px rgba(28,43,33,.08)!important;
+    -webkit-backdrop-filter:blur(14px) saturate(120%);
+    backdrop-filter:blur(14px) saturate(120%);
+  }
+}
+
+@media (max-width:899px){
+  body.light #routines .gf-routine-card{
+    border-radius:16px!important;
+    box-shadow:0 7px 20px rgba(28,43,33,.06)!important;
+  }
+}
+
+/* =========================================================
+   GYMFlow — Routine Card Action Icon Refinement
+   Edit = muted positive accent green
+   Delete = soft destructive red
+   Scoped only to Routine card action buttons.
+   ========================================================= */
+#routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine{
+  color:#79b95a !important;
+  background:transparent !important;
+  border-color:transparent !important;
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine{
+  color:#d88492 !important;
+  background:transparent !important;
+  border-color:transparent !important;
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:hover,
+#routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:focus-visible{
+  color:#9ad477 !important;
+  background:rgba(136,249,20,.075) !important;
+  border-color:rgba(136,249,20,.14) !important;
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:hover,
+#routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:focus-visible{
+  color:#ec9aa7 !important;
+  background:rgba(251,113,133,.065) !important;
+  border-color:rgba(251,113,133,.14) !important;
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:active{
+  color:#6aa94d !important;
+  transform:scale(.95);
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:active{
+  color:#c96d7c !important;
+  transform:scale(.95);
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine svg,
+#routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine svg{
+  width:13px !important;
+  height:13px !important;
+  stroke-width:2.1;
+  transition:transform .18s ease,color .18s ease,opacity .18s ease;
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:hover svg{
+  transform:scale(1.04);
+}
+
+#routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:hover svg{
+  transform:scale(1.04);
+}
+
+/* Light Mode: slightly deeper tones for clarity on white surfaces. */
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine{
+  color:#5c942f !important;
+}
+
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine{
+  color:#b85b6b !important;
+}
+
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:hover,
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:focus-visible{
+  color:#4f8427 !important;
+  background:rgba(92,148,47,.075) !important;
+  border-color:rgba(92,148,47,.14) !important;
+}
+
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:hover,
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:focus-visible{
+  color:#a94f60 !important;
+  background:rgba(184,91,107,.07) !important;
+  border-color:rgba(184,91,107,.14) !important;
+}
+
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:active{
+  color:#477d23 !important;
+}
+
+body.light #routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:active{
+  color:#974555 !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  #routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine:active,
+  #routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine:active{
+    transform:none;
+  }
+  #routines .gf-routine-card-actions .gf-routine-icon-btn.edit-routine svg,
+  #routines .gf-routine-card-actions .gf-routine-icon-btn.delete-routine svg{
+    transition:none;
+  }
+}
+
+
+/* =========================================================
+   GYMFlow Routine Reordering — Move Up/Down + Long-Press Drag
+   Scoped to #routines so other UI remains untouched.
+   ========================================================= */
+#routines .gf-routine-card{
+  cursor:grab;
+  touch-action:pan-y;
+  will-change:transform;
+}
+#routines .gf-routine-card:active{cursor:grabbing;}
+#routines .gf-routine-card.is-dragging{
+  opacity:.78;
+  transform:scale(.985) rotate(.2deg);
+  border-color:rgba(136,249,20,.42)!important;
+  box-shadow:0 14px 28px rgba(0,0,0,.20),0 0 0 1px rgba(136,249,20,.12)!important;
+  z-index:20;
+}
+#routines .gf-routine-card.is-drop-target{
+  border-color:rgba(136,249,20,.70)!important;
+  box-shadow:0 0 0 2px rgba(136,249,20,.12),0 10px 22px rgba(0,0,0,.14)!important;
+}
+#routines .gf-routine-card.is-drop-target::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:-5px;
+  height:2px;
+  border-radius:999px;
+  background:var(--lime);
+  opacity:.9;
+  pointer-events:none;
+}
+#routines .gf-routine-card-actions .order-routine{
+  color:var(--muted);
+}
+#routines .gf-routine-card-actions .order-routine:hover,
+#routines .gf-routine-card-actions .order-routine:focus-visible{
+  color:var(--lime);
+  background:rgba(136,249,20,.065);
+  border-color:rgba(136,249,20,.14);
+}
+#routines .gf-routine-card-actions .order-routine:active{
+  transform:scale(.94);
+}
+#routines .gf-routine-card-actions .order-routine:disabled{
+  opacity:.28;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+#routines .gf-routine-card-actions .order-routine svg{
+  width:12px;
+  height:12px;
+  stroke-width:2.25;
+}
+body.light #routines .gf-routine-card.is-dragging{
+  border-color:rgba(92,148,47,.44)!important;
+  box-shadow:0 16px 28px rgba(34,52,39,.14),0 0 0 1px rgba(92,148,47,.10)!important;
+}
+body.light #routines .gf-routine-card.is-drop-target{
+  border-color:rgba(92,148,47,.55)!important;
+  box-shadow:0 0 0 2px rgba(92,148,47,.10),0 10px 22px rgba(34,52,39,.11)!important;
+}
+body.light #routines .gf-routine-card.is-drop-target::after{
+  background:#5c8114;
+}
+body.light #routines .gf-routine-card-actions .order-routine:hover,
+body.light #routines .gf-routine-card-actions .order-routine:focus-visible{
+  color:#5c942f;
+  background:rgba(92,148,47,.065);
+  border-color:rgba(92,148,47,.14);
+}
+@media (max-width:560px){
+  #routines .gf-routine-card{touch-action:pan-y;}
+  #routines .gf-routine-card-actions{gap:2px;}
+  #routines .gf-routine-card-actions .gf-routine-icon-btn{
+    width:24px;
+    height:24px;
+    border-radius:7px;
+  }
+  #routines .gf-routine-card-actions .gf-routine-icon-btn svg{width:12px;height:12px;}
+}
+@media (prefers-reduced-motion:reduce){
+  #routines .gf-routine-card,
+  #routines .gf-routine-icon-btn{transition:none!important;animation:none!important;}
 }
