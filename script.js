@@ -6,6 +6,7 @@ const KEY = "gymflow-v3";
     const uid = () => "gf_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     let state, selectedRoutineExercises = [], confirmCallback = null, elapsedInterval = null;
     let currentCalendarDate = new Date();
+    let routineFilter = "all";
     let selectedAnalyticsMuscle = "chest";
     let analyticsPeriod = "30d";
 
@@ -39,6 +40,21 @@ const KEY = "gymflow-v3";
       "Workout Planner": {id:"Perencana Workout", en:"Workout Planner"},
       "Atur program latihan mingguanmu, kelompokkan gerakan terbaik, dan capai target otot maksimal.": {id:"Atur program latihan mingguanmu, kelompokkan gerakan terbaik, dan capai target otot maksimal.", en:"Plan your weekly workouts, group your best movements, and maximize your training goals."},
       "Buat Routine Baru": {id:"Buat Routine Baru", en:"Create New Routine"},
+      "Create Routine": {id:"Buat Routine", en:"Create Routine"},
+      "Your personalized workout plans": {id:"Rencana workout personalmu", en:"Your personalized workout plans"},
+      "All": {id:"Semua", en:"All"},
+      "My Routines": {id:"Routine Saya", en:"My Routines"},
+      "Templates": {id:"Template", en:"Templates"},
+      "Upper Body": {id:"Upper Body", en:"Upper Body"},
+      "Lower Body": {id:"Lower Body", en:"Lower Body"},
+      "Full Body": {id:"Full Body", en:"Full Body"},
+      "No routines yet": {id:"Belum ada routine", en:"No routines yet"},
+      "Create your first workout plan and keep your weekly training easy to follow.": {id:"Buat rencana workout pertamamu dan jaga latihan mingguan tetap mudah diikuti.", en:"Create your first workout plan and keep your weekly training easy to follow."},
+      "Workout planner": {id:"Perencana workout", en:"Workout planner"},
+      "Beginner": {id:"Pemula", en:"Beginner"},
+      "Intermediate": {id:"Menengah", en:"Intermediate"},
+      "Advanced": {id:"Lanjutan", en:"Advanced"},
+      "No routines match this filter yet.": {id:"Belum ada routine yang cocok dengan filter ini.", en:"No routines match this filter yet."},
       "Belum Ada Routine Latihan": {id:"Belum Ada Routine Latihan", en:"No Workout Routines Yet"},
       "Mulai rancang jadwal dan rangkaian gerakan latihan pertamamu sekarang.": {id:"Mulai rancang jadwal dan rangkaian gerakan latihan pertamamu sekarang.", en:"Start planning your first workout schedule and exercise sequence now."},
       "Buat Routine Sekarang": {id:"Buat Routine Sekarang", en:"Create Routine Now"},
@@ -999,56 +1015,321 @@ const KEY = "gymflow-v3";
       resume.classList.toggle("hidden",!active);
     }
     
+    function getRoutineMeta(r){
+      const exerciseIds = Array.isArray(r.exerciseIds) ? r.exerciseIds : [];
+      const exerciseItems = (r.exercises || []).map(item => item?.id || item).filter(Boolean);
+      const ids = exerciseItems.length ? exerciseItems : exerciseIds;
+      const exercises = ids.map(exerciseById).filter(Boolean);
+      const musclesUsed = [...new Set(exercises.map(ex => ex.muscle).filter(Boolean))];
+      const upperMuscles = ["Chest","Back","Shoulders","Arms"];
+      const hasUpper = musclesUsed.some(m => upperMuscles.includes(m));
+      const hasLower = musclesUsed.includes("Legs");
+      const hasCore = musclesUsed.includes("Core");
+      let focus = "Full Body";
+      if (hasUpper && hasLower) focus = "Full Body";
+      else if (hasLower) focus = "Lower Body";
+      else if (hasUpper) focus = "Upper Body";
+      else if (hasCore) focus = "Core";
+      else if (musclesUsed.includes("Cardio")) focus = "Cardio";
+      else if (musclesUsed[0]) focus = musclesUsed[0];
+
+      let totalSets = 0;
+      if(Array.isArray(r.exercises)){
+        r.exercises.forEach(item => { totalSets += Array.isArray(item?.sets) && item.sets.length ? item.sets.length : 1; });
+      } else {
+        totalSets = Math.max(exerciseIds.length * 3, exerciseIds.length);
+      }
+      const estimatedMinutes = Math.max(10, Math.round(((exerciseIds.length * 2.5) + (totalSets * 2.4)) / 5) * 5);
+      let difficultyKey = "Intermediate";
+      if(totalSets <= 6 && exerciseIds.length <= 3) difficultyKey = "Beginner";
+      if(totalSets >= 13 || exerciseIds.length >= 7) difficultyKey = "Advanced";
+
+      return { focus, totalSets, estimatedMinutes, difficultyKey };
+    }
+
+    function routineMatchesFilter(r, filter){
+      if(filter === "templates") return false;
+      if(filter === "all" || filter === "mine") return true;
+      const meta = getRoutineMeta(r);
+      if(filter === "upper") return meta.focus === "Upper Body";
+      if(filter === "lower") return meta.focus === "Lower Body";
+      if(filter === "full") return meta.focus === "Full Body";
+      return true;
+    }
+
+    function captureRoutineCardRects(){
+      const list = document.getElementById("routine-list");
+      if(!list) return new Map();
+      return new Map(Array.from(list.children).map(card => [card.dataset.routineId, card.getBoundingClientRect()]));
+    }
+
+    function animateRoutineReflow(previousRects){
+      const list = document.getElementById("routine-list");
+      if(!list || !previousRects?.size) return;
+      requestAnimationFrame(() => {
+        Array.from(list.children).forEach(card => {
+          const previous = previousRects.get(card.dataset.routineId);
+          if(!previous) return;
+          const next = card.getBoundingClientRect();
+          const dx = previous.left - next.left;
+          const dy = previous.top - next.top;
+          if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+          card.animate(
+            [
+              { transform: `translate3d(${dx}px, ${dy}px, 0)` },
+              { transform: "translate3d(0, 0, 0)" }
+            ],
+            { duration: 250, easing: "cubic-bezier(.22,.8,.24,1)" }
+          );
+        });
+      });
+    }
+
+    function reorderRoutineByIndex(routineId, delta){
+      const fromIndex = state.routines.findIndex(r => r.id === routineId);
+      if(fromIndex < 0) return;
+      const toIndex = fromIndex + delta;
+      if(toIndex < 0 || toIndex >= state.routines.length) return;
+
+      const previousRects = captureRoutineCardRects();
+      const [item] = state.routines.splice(fromIndex, 1);
+      state.routines.splice(toIndex, 0, item);
+      save();
+      populateSelects();
+      renderRoutines();
+      animateRoutineReflow(previousRects);
+    }
+
+    function reorderRoutineBefore(draggedId, targetId, placeAfter = false){
+      const fromIndex = state.routines.findIndex(r => r.id === draggedId);
+      const targetIndexRaw = state.routines.findIndex(r => r.id === targetId);
+      if(fromIndex < 0 || targetIndexRaw < 0 || fromIndex === targetIndexRaw) return;
+
+      const previousRects = captureRoutineCardRects();
+      const [item] = state.routines.splice(fromIndex, 1);
+      let targetIndex = state.routines.findIndex(r => r.id === targetId);
+      if(placeAfter) targetIndex += 1;
+      state.routines.splice(targetIndex, 0, item);
+      save();
+      populateSelects();
+      renderRoutines();
+      animateRoutineReflow(previousRects);
+    }
+
+    function clearRoutineDragUI(){
+      const list = document.getElementById("routine-list");
+      if(!list) return;
+      list.querySelectorAll(".gf-routine-card.is-dragging, .gf-routine-card.is-drop-target").forEach(card => {
+        card.classList.remove("is-dragging", "is-drop-target");
+        card.removeAttribute("aria-grabbed");
+      });
+    }
+
+    function initRoutineReordering(){
+      const list = document.getElementById("routine-list");
+      if(!list || list.dataset.reorderInit === "1") return;
+      list.dataset.reorderInit = "1";
+
+      const dragState = {
+        id: null,
+        pointerId: null,
+        timer: null,
+        active: false,
+        sourceCard: null,
+        targetId: null,
+        startX: 0,
+        startY: 0
+      };
+
+      const cancelLongPress = () => {
+        if(dragState.timer){
+          clearTimeout(dragState.timer);
+          dragState.timer = null;
+        }
+      };
+
+      const getCardAtPoint = (x, y) => {
+        const element = document.elementFromPoint(x, y);
+        const card = element?.closest?.(".gf-routine-card");
+        return card && list.contains(card) ? card : null;
+      };
+
+      const beginPointerDrag = (card, event) => {
+        if(dragState.active) return;
+        dragState.active = true;
+        dragState.id = card.dataset.routineId;
+        dragState.sourceCard = card;
+        dragState.targetId = null;
+        card.classList.add("is-dragging");
+        card.setAttribute("aria-grabbed", "true");
+        try { card.setPointerCapture(event.pointerId); } catch {}
+      };
+
+      list.addEventListener("pointerdown", event => {
+        if(event.pointerType === "mouse" && event.button !== 0) return;
+        if(event.target.closest("button, a, input, textarea, select")) return;
+        const card = event.target.closest(".gf-routine-card");
+        if(!card) return;
+
+        dragState.pointerId = event.pointerId;
+        dragState.startX = event.clientX;
+        dragState.startY = event.clientY;
+        cancelLongPress();
+        dragState.timer = setTimeout(() => beginPointerDrag(card, event), 360);
+      });
+
+      list.addEventListener("pointermove", event => {
+        if(dragState.pointerId !== event.pointerId) return;
+        const moved = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
+        if(!dragState.active && moved > 8){
+          cancelLongPress();
+          return;
+        }
+        if(!dragState.active) return;
+
+        event.preventDefault();
+        const targetCard = getCardAtPoint(event.clientX, event.clientY);
+        list.querySelectorAll(".gf-routine-card.is-drop-target").forEach(card => card.classList.remove("is-drop-target"));
+
+        if(targetCard && targetCard !== dragState.sourceCard){
+          dragState.targetId = targetCard.dataset.routineId;
+          targetCard.classList.add("is-drop-target");
+          const rect = targetCard.getBoundingClientRect();
+          const placeAfter = event.clientY > rect.top + rect.height / 2;
+          targetCard.dataset.dropPlace = placeAfter ? "after" : "before";
+        } else {
+          dragState.targetId = null;
+        }
+      }, {passive:false});
+
+      const finishPointerDrag = event => {
+        if(dragState.pointerId !== event.pointerId) return;
+        cancelLongPress();
+
+        if(dragState.active){
+          event.preventDefault();
+          const sourceId = dragState.id;
+          const targetId = dragState.targetId;
+          const target = targetId ? list.querySelector(`.gf-routine-card[data-routine-id="${CSS.escape(targetId)}"]`) : null;
+          const placeAfter = target?.dataset.dropPlace === "after";
+          clearRoutineDragUI();
+          dragState.active = false;
+          dragState.sourceCard = null;
+          dragState.targetId = null;
+          dragState.id = null;
+          dragState.pointerId = null;
+          if(targetId) reorderRoutineBefore(sourceId, targetId, placeAfter);
+          return;
+        }
+
+        dragState.pointerId = null;
+      };
+
+      list.addEventListener("pointerup", finishPointerDrag);
+      list.addEventListener("pointercancel", finishPointerDrag);
+      list.addEventListener("pointerleave", () => {
+        if(!dragState.active) cancelLongPress();
+      });
+
+      list.addEventListener("dragstart", event => {
+        const card = event.target.closest?.(".gf-routine-card");
+        if(!card || event.target.closest("button, a, input, textarea, select")) return event.preventDefault();
+        event.preventDefault();
+      });
+    }
+
     function renderRoutines(){
       const list=document.getElementById("routine-list"), empty=document.getElementById("routine-empty");
-      list.innerHTML=""; 
-      empty.classList.toggle("hidden", state.routines.length !== 0);
-      
-      state.routines.forEach(r => {
-        const el = document.createElement("article"); 
-        el.className = "panel p-6 flex flex-col justify-between transition-all duration-200 hover:border-[var(--lime)]/50 group";
-        
-        const previewExercises = r.exerciseIds.slice(0, 3).map(id => {
-          const ex = exerciseById(id);
-          return ex ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--surface-2)] text-xs font-medium text-[var(--text)] border border-[var(--line)]"><i data-lucide="dumbbell" class="w-3 h-3 text-[var(--lime)]"></i>${esc(ex.name)}</span>` : "";
-        }).join("");
-        
-        const remainingCount = r.exerciseIds.length > 3 ? `<span class="inline-flex items-center px-2 py-1 rounded-lg bg-[var(--surface-2)] text-xs font-medium muted">+${r.exerciseIds.length - 3} lainnya</span>` : "";
+      if(!list || !empty) return;
+
+      const filteredRoutines = state.routines.filter(r => routineMatchesFilter(r, routineFilter));
+      list.innerHTML="";
+
+      const routineCount = document.getElementById("routine-list-count");
+      if (routineCount) {
+        const count = filteredRoutines.length;
+        routineCount.textContent = currentLanguage()==="en"
+          ? `${count} ${count === 1 ? "routine" : "routines"}`
+          : `${count} routine${count === 1 ? "" : ""}`;
+      }
+
+      document.querySelectorAll(".gf-routine-filter").forEach(btn => {
+        const active = btn.dataset.routineFilter === routineFilter;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-selected", String(active));
+      });
+
+      empty.classList.toggle("hidden", filteredRoutines.length !== 0);
+      const emptyTitle = empty.querySelector("h3");
+      const emptyCopy = empty.querySelector("p");
+      const emptyButton = empty.querySelector(".gf-routines-empty-cta");
+      const noMatch = filteredRoutines.length === 0 && state.routines.length > 0;
+      if(emptyTitle) emptyTitle.textContent = noMatch ? tr("No routines yet") : tr("No routines yet");
+      if(emptyCopy) emptyCopy.textContent = noMatch ? tr("No routines match this filter yet.") : tr("Create your first workout plan and keep your weekly training easy to follow.");
+      if(emptyButton) emptyButton.textContent = tr("Create Routine");
+
+      filteredRoutines.forEach(r => {
+        const meta = getRoutineMeta(r);
+        const el = document.createElement("article");
+        el.className = "gf-routine-card group";
+        const routineStateIndex = state.routines.findIndex(item => item.id === r.id);
+        const isFirstRoutine = routineStateIndex <= 0;
+        const isLastRoutine = routineStateIndex === state.routines.length - 1;
+        el.dataset.routineId = r.id;
+        el.dataset.routineIndex = String(routineStateIndex);
+        el.setAttribute("aria-label", `${esc(r.name)} routine`);
+        el.setAttribute("data-reorderable", "true");
+        const daysHTML = r.days?.length
+          ? r.days.slice(0,5).map(d => `<span>${esc(d)}</span>`).join("")
+          : `<span class="gf-routine-day-muted">${currentLanguage()==="en" ? "Flexible" : "Fleksibel"}</span>`;
+
+        const exerciseText = currentLanguage()==="en"
+          ? `${r.exerciseIds.length} ${r.exerciseIds.length === 1 ? "exercise" : "exercises"}`
+          : `${r.exerciseIds.length} exercise`;
+        const durationText = currentLanguage()==="en" ? `${meta.estimatedMinutes} min` : `${meta.estimatedMinutes} mnt`;
+        const metaLabels = {
+          focus: meta.focus === "Upper Body" || meta.focus === "Lower Body" || meta.focus === "Full Body" || meta.focus === "Core" || meta.focus === "Cardio" ? tr(meta.focus) : esc(meta.focus),
+          difficulty: tr(meta.difficultyKey)
+        };
 
         el.innerHTML = `
-          <div>
-            <div class="flex items-start justify-between gap-3 mb-3">
-              <div>
-                <h3 class="font-extrabold text-xl tracking-tight group-hover:text-[var(--lime)] transition-colors">${esc(r.name)}</h3>
-                <p class="muted text-sm mt-1 leading-relaxed">${esc(r.description || "Tidak ada deskripsi rutin.")}</p>
-              </div>
-              <button class="icon-btn edit-routine shrink-0 hover:bg-[var(--surface-2)] hover:border-[var(--lime)]/40 transition-colors" data-id="${r.id}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
-                <i data-lucide="pencil" class="w-4 h-4"></i>
+          <div class="gf-routine-card-topline"></div>
+          <div class="gf-routine-card-head">
+            <div class="gf-routine-card-title-wrap">
+              <h3>${esc(r.name)}</h3>
+              <p>${esc(r.description || (currentLanguage()==="en" ? "Ready for your next session." : "Siap untuk sesi latihan berikutnya."))}</p>
+            </div>
+            <div class="gf-routine-card-actions">
+              <button class="gf-routine-icon-btn order-routine move-up" type="button" data-id="${r.id}" data-move="up" aria-label="${currentLanguage()==="en" ? "Move up" : "Pindah ke atas"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Up" : "Pindah ke Atas"}" ${isFirstRoutine ? "disabled" : ""}>
+                <i data-lucide="chevron-up"></i>
+              </button>
+              <button class="gf-routine-icon-btn order-routine move-down" type="button" data-id="${r.id}" data-move="down" aria-label="${currentLanguage()==="en" ? "Move down" : "Pindah ke bawah"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Down" : "Pindah ke Bawah"}" ${isLastRoutine ? "disabled" : ""}>
+                <i data-lucide="chevron-down"></i>
+              </button>
+              <button class="gf-routine-icon-btn edit-routine" type="button" data-id="${r.id}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
+                <i data-lucide="pencil"></i>
+              </button>
+              <button class="gf-routine-icon-btn delete-routine danger" type="button" data-id="${r.id}" aria-label="${currentLanguage()==="en" ? "Delete" : "Hapus"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Delete Routine" : "Hapus Routine"}">
+                <i data-lucide="trash-2"></i>
               </button>
             </div>
-            
-            <div class="flex flex-wrap gap-1.5 my-4">
-              ${r.days.map(d => `<span class="px-2.5 py-1 rounded-md bg-[var(--lime)]/10 text-[var(--lime)] border border-[var(--lime)]/20 text-xs font-bold">${d}</span>`).join("")}
-              ${!r.days.length ? `<span class="muted text-xs italic">Belum ada hari dijadwalkan</span>` : ""}
-            </div>
-
-            <div class="pt-3 border-t border-[var(--line)]">
-              <p class="text-xs font-bold uppercase tracking-wider muted mb-2">Daftar Gerakan (${r.exerciseIds.length})</p>
-              <div class="flex flex-wrap gap-1.5">
-                ${previewExercises || `<span class="muted text-xs italic">Belum ada exercise</span>`}
-                ${remainingCount}
-              </div>
-            </div>
           </div>
 
-          <div class="flex items-center gap-2.5 mt-6 pt-4 border-t border-[var(--line)]">
-            <button class="lime-btn px-4 flex-1 flex items-center justify-center gap-2 start-routine" data-id="${r.id}">
-              <i data-lucide="play" class="w-4 h-4 fill-current"></i> Mulai Latihan
-            </button>
-            <button class="danger-btn px-3 flex items-center justify-center delete-routine hover:bg-rose-500/20 transition-colors" data-id="${r.id}" aria-label="Hapus ${esc(r.name)}" title="Hapus Routine">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
+          <div class="gf-routine-focus-row">
+            <span class="gf-routine-focus-pill"><i data-lucide="target"></i>${metaLabels.focus}</span>
+            <div class="gf-routine-days">${daysHTML}</div>
           </div>
+
+          <div class="gf-routine-stats">
+            <div><strong>${exerciseText}</strong><span>${currentLanguage()==="en" ? "volume" : "gerakan"}</span></div>
+            <div><strong>${durationText}</strong><span>${currentLanguage()==="en" ? "estimated" : "perkiraan"}</span></div>
+            <div><strong>${metaLabels.difficulty}</strong><span>${currentLanguage()==="en" ? "difficulty" : "tingkat"}</span></div>
+          </div>
+
+          <button class="gf-routine-play start-routine" type="button" data-id="${r.id}">
+            <span>${currentLanguage()==="en" ? "Start Workout" : "Mulai Workout"}</span>
+            <span class="gf-routine-play-icon"><i data-lucide="arrow-up-right"></i></span>
+          </button>
         `;
         list.appendChild(el);
       });
@@ -3582,6 +3863,12 @@ function buildExportBrandMark(size = 38) {
       document.getElementById("dashboard-start").onclick=()=>handleTabNavigation("workout");
       document.getElementById("resume-workout").onclick=()=>handleTabNavigation("workout");
       document.getElementById("open-routine-builder").onclick=()=>openRoutineBuilder();
+      document.querySelectorAll(".gf-routine-filter").forEach(btn => {
+        btn.addEventListener("click", () => {
+          routineFilter = btn.dataset.routineFilter || "all";
+          renderRoutines();
+        });
+      });
       document.getElementById("open-exercise-builder").onclick=()=>openModal("exercise-modal");
       document.querySelectorAll(".close-modal").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
       document.getElementById("confirm-cancel").onclick=()=>closeModal("confirm-modal");
@@ -3593,6 +3880,10 @@ function buildExportBrandMark(size = 38) {
         const b=e.target.closest("button");
         if(!b)return;
         const id=b.dataset.id;
+        if(b.classList.contains("order-routine")){
+          reorderRoutineByIndex(id, b.dataset.move === "up" ? -1 : 1);
+          return;
+        }
         if(b.classList.contains("start-routine")) startWorkout(id);
         if(b.classList.contains("edit-routine")) openRoutineBuilder(id);
         if(b.classList.contains("delete-routine")) {
@@ -3606,6 +3897,8 @@ function buildExportBrandMark(size = 38) {
           });
         }
       };
+
+      initRoutineReordering();
 
       document.getElementById("start-workout-button").onclick = () => {
         const selectedRoutineVal = document.querySelector("#custom-workout-routine .custom-option.selected")?.dataset.value;
@@ -3858,3 +4151,55 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(typeof gfRefreshProgressMotion === "function") gfRefreshProgressMotion();
   },120);
 });
+
+/* =========================================================
+   GYMFlow Fluid Bottom Navigation
+   Existing routine-builder logic remains unchanged.
+   ========================================================= */
+function gfUpdateLiquidNav(targetTab, animate=true){
+  const nav = document.getElementById("gymflow-navbar-routine-builder");
+  if(!nav) return;
+  const buttons = [...nav.querySelectorAll(".mobile-nav-btn")];
+  const active = buttons.find(btn => btn.dataset.tab === targetTab) || nav.querySelector(".mobile-nav-btn.active");
+  const indicator = nav.querySelector(".nav-liquid-indicator");
+  if(!active || !indicator) return;
+
+  buttons.forEach(btn => {
+    const isActive = btn === active;
+    btn.classList.toggle("active", isActive);
+    if(isActive) btn.setAttribute("aria-current","page");
+    else btn.removeAttribute("aria-current");
+  });
+
+  const navRect = nav.getBoundingClientRect();
+  const buttonRect = active.getBoundingClientRect();
+  const x = buttonRect.left - navRect.left + buttonRect.width/2;
+  const w = Math.min(72, Math.max(54, buttonRect.width - 10));
+
+  nav.style.setProperty("--liquid-x", `${x}px`);
+  nav.style.setProperty("--liquid-w", `${w}px`);
+
+  if(animate){
+    nav.classList.remove("is-moving");
+    void nav.offsetWidth;
+    nav.classList.add("is-moving");
+    window.clearTimeout(nav._liquidTimer);
+    nav._liquidTimer = window.setTimeout(()=>nav.classList.remove("is-moving"), 520);
+  }
+}
+
+function navigate(tab){
+  document.querySelectorAll(".tab").forEach(el => el.classList.toggle("active", el.id === tab));
+  document.querySelectorAll("[data-tab]").forEach(el => el.classList.toggle("active", el.dataset.tab === tab));
+  if(tab==="workout") renderWorkout();
+  if(tab==="history"){ renderHistory(); renderOverviewMetrics(); }
+  if(tab==="routines") renderRoutines();
+  gfUpdateLiquidNav(tab, true);
+}
+
+window.addEventListener("resize", () => gfUpdateLiquidNav(document.querySelector(".mobile-nav-btn.active")?.dataset.tab || "dashboard", false));
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", () => gfUpdateLiquidNav("dashboard", false), {once:true});
+}else{
+  requestAnimationFrame(() => gfUpdateLiquidNav(document.querySelector(".mobile-nav-btn.active")?.dataset.tab || "dashboard", false));
+}
