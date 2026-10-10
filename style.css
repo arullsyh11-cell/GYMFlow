@@ -3116,346 +3116,143 @@ body.light #routines .gf-routine-card-actions .order-routine:focus-visible{
 }
 
 /* =========================================================
-   GYMFlow — Routines Subtle UI Scale Up
-   Scoped only to the Routines page.
-   Keeps navbar geometry/functionality unchanged.
+   Routines Typography + Icon Scale Tune
+   Scoped to the Routines page and bottom navigation only.
+   Keeps layout/card sizing intact while improving readability.
    ========================================================= */
-#routines .gf-routines-page{
-  font-size:1.06rem;
-}
-
 #routines .gf-routines-heading h2{
-  font-size:clamp(29px,3.2vw,36px)!important;
-  line-height:1.06!important;
+  font-size:clamp(28px,5.3vw,35px);
 }
-
 #routines .gf-routines-heading p{
-  font-size:clamp(11px,1.15vw,13px)!important;
-  line-height:1.4!important;
+  font-size:12px;
 }
-
-#routines .gf-routines-create{
-  width:42px!important;
-  height:42px!important;
-}
-
-#routines .gf-routines-create i{
-  width:18px!important;
-  height:18px!important;
-}
-
-#routines .gf-routines-filters{
-  gap:9px!important;
-  margin-top:15px!important;
-  margin-bottom:15px!important;
-}
-
 #routines .gf-routine-filter{
-  min-height:38px!important;
-  padding:0 15px!important;
-  font-size:10px!important;
+  font-size:11px;
 }
-
-#routines .gf-routines-list-head{
-  margin-bottom:10px!important;
-}
-
 #routines .gf-routines-list-kicker{
-  font-size:9px!important;
-  letter-spacing:.12em!important;
+  font-size:9px;
 }
-
 #routines .gf-routines-list-head strong{
-  margin-top:3px!important;
-  font-size:16px!important;
+  font-size:13px;
 }
-
 #routines .gf-routines-list-note{
-  font-size:9px!important;
+  font-size:10px;
 }
-
-#routines .gf-routines-grid{
-  gap:11px!important;
-}
-
-#routines .gf-routine-card{
-  padding:15px!important;
-  border-radius:17px!important;
-}
-
-#routines .gf-routine-card-topline{
-  left:15px!important;
-  width:34px!important;
-  height:3px!important;
-}
-
-#routines .gf-routine-card-head{
-  gap:10px!important;
-}
-
 #routines .gf-routine-card h3{
-  font-size:16px!important;
-  line-height:1.18!important;
+  font-size:15px;
 }
-
 #routines .gf-routine-card p{
-  margin-top:5px!important;
-  font-size:9.5px!important;
-  line-height:1.4!important;
+  font-size:10px;
 }
-
-#routines .gf-routine-card-actions{
-  gap:4px!important;
-}
-
-#routines .gf-routine-icon-btn{
-  width:28px!important;
-  height:28px!important;
-  border-radius:8px!important;
-}
-
 #routines .gf-routine-icon-btn svg{
-  width:14px!important;
-  height:14px!important;
+  width:14px;
+  height:14px;
 }
-
-#routines .gf-routine-focus-row{
-  margin-top:11px!important;
-  gap:10px!important;
-}
-
 #routines .gf-routine-focus-pill{
-  gap:5px!important;
-  padding:5px 8px!important;
-  font-size:9px!important;
+  font-size:9px;
 }
-
 #routines .gf-routine-focus-pill svg{
-  width:11px!important;
-  height:11px!important;
+  width:11px;
+  height:11px;
 }
-
-#routines .gf-routine-days{
-  gap:4px!important;
-}
-
 #routines .gf-routine-days span{
-  min-width:20px!important;
-  height:20px!important;
-  padding:0 5px!important;
-  font-size:7.5px!important;
+  min-width:19px;
+  height:19px;
+  font-size:8px;
 }
-
 #routines .gf-routine-day-muted{
-  font-size:7.5px!important;
-  padding:0 7px!important;
+  font-size:8px !important;
 }
-
-#routines .gf-routine-stats{
-  margin-top:12px!important;
-  padding-top:11px!important;
-}
-
-#routines .gf-routine-stats div{
-  padding-right:8px!important;
-}
-
-#routines .gf-routine-stats div+div{
-  padding-left:9px!important;
-}
-
 #routines .gf-routine-stats strong{
-  font-size:10px!important;
-  line-height:1.25!important;
+  font-size:10px;
 }
-
 #routines .gf-routine-stats span{
-  margin-top:3px!important;
-  font-size:7.5px!important;
-  line-height:1.25!important;
+  font-size:8px;
 }
-
 #routines .gf-routine-play{
-  min-height:39px!important;
-  margin-top:12px!important;
-  padding:0 8px 0 12px!important;
-  font-size:10.5px!important;
+  font-size:11px;
 }
-
 #routines .gf-routine-play-icon{
-  width:28px!important;
-  height:28px!important;
-  flex-basis:28px!important;
+  width:27px;
+  height:27px;
 }
-
 #routines .gf-routine-play-icon svg{
-  width:13px!important;
-  height:13px!important;
+  width:13px;
+  height:13px;
+}
+#routines .gf-routine-card-actions .order-routine svg{
+  width:13px;
+  height:13px;
 }
 
-#routines .gf-routines-empty{
-  min-height:225px!important;
-  padding:28px 20px!important;
+/* Bottom navigation: slightly larger type/icon, same geometry. */
+.bottom-nav .mobile-nav-btn > svg{
+  width:19px !important;
+  height:19px !important;
 }
-
-#routines .gf-routines-empty-icon{
-  width:38px!important;
-  height:38px!important;
-  margin-bottom:11px!important;
+.bottom-nav .mobile-nav-btn span{
+  font-size:10px !important;
 }
-
-#routines .gf-routines-empty-icon svg{
-  width:17px!important;
-  height:17px!important;
-}
-
-#routines .gf-routines-empty h3{
-  font-size:15px!important;
-}
-
-#routines .gf-routines-empty p{
-  font-size:10.5px!important;
-}
-
-#routines .gf-routines-empty-cta{
-  min-height:38px!important;
-  padding:0 15px!important;
-  font-size:10.5px!important;
-}
-
-@media (max-width:899px){
-  #routines .gf-routines-heading h2{
-    font-size:29px!important;
-  }
-  #routines .gf-routines-heading p{
-    font-size:10.5px!important;
-  }
-  #routines .gf-routines-create{
-    width:40px!important;
-    height:40px!important;
-  }
-  #routines .gf-routine-card{
-    padding:15px!important;
-  }
-  #routines .gf-routine-card h3{
-    font-size:15.5px!important;
-  }
-  #routines .gf-routine-card p{
-    font-size:9px!important;
-  }
+.bottom-nav .mobile-nav-btn.center-fab-btn .fab-circle svg{
+  width:17px !important;
+  height:17px !important;
 }
 
 @media (max-width:560px){
-  #routines .gf-routines-filters{
-    gap:8px!important;
-    margin-top:13px!important;
-    margin-bottom:13px!important;
-  }
-  #routines .gf-routine-filter{
-    min-height:37px!important;
-    padding:0 14px!important;
-    font-size:9.5px!important;
-  }
-  #routines .gf-routines-list-head{
-    margin-bottom:9px!important;
-  }
-  #routines .gf-routines-list-kicker{
-    font-size:8.5px!important;
-  }
-  #routines .gf-routines-list-head strong{
-    font-size:15px!important;
-  }
-  #routines .gf-routines-list-note{
-    font-size:8.5px!important;
-  }
-  #routines .gf-routines-grid{
-    gap:10px!important;
-  }
-  #routines .gf-routine-card{
-    padding:15px!important;
-    border-radius:17px!important;
-  }
-  #routines .gf-routine-card h3{
-    font-size:15px!important;
-  }
-  #routines .gf-routine-card p{
-    font-size:8.8px!important;
-  }
-  #routines .gf-routine-icon-btn{
-    width:28px!important;
-    height:28px!important;
-  }
-  #routines .gf-routine-icon-btn svg{
-    width:14px!important;
-    height:14px!important;
-  }
-  #routines .gf-routine-focus-pill{
-    font-size:8.8px!important;
-  }
-  #routines .gf-routine-days span{
-    min-width:20px!important;
-    height:20px!important;
-    font-size:7.5px!important;
-  }
-  #routines .gf-routine-stats strong{
-    font-size:10px!important;
-  }
-  #routines .gf-routine-stats span{
-    font-size:7.5px!important;
-  }
-  #routines .gf-routine-play{
-    min-height:39px!important;
-    font-size:10px!important;
-  }
+  #routines .gf-routine-icon-btn svg{width:14px;height:14px;}
+  #routines .gf-routine-card-actions .order-routine svg{width:13px;height:13px;}
 }
 
-@media (prefers-reduced-motion:reduce){
-  #routines .gf-routine-card,
-  #routines .gf-routine-play,
-  #routines .gf-routine-icon-btn,
-  #routines .gf-routine-filter,
-  #routines .gf-routines-create{
-    transition:none!important;
-  }
-}
+/* =========================================================
+   GYMFlow — Exercises density tune + Light Mode glass nav
+   Visual-only refinement. Layout, data, routing and behavior unchanged.
+   ========================================================= */
 
-/* ===== GYMFlow Exercises: subtle scale-down refinement ===== */
+/* Exercises: bring visual scale closer to the Routines benchmark. */
 #exercises > .panel:first-child{
-  padding:22px !important;
-  margin-bottom:20px !important;
+  padding:20px !important;
+  margin-bottom:18px !important;
 }
 #exercises > .panel:first-child h2{
-  font-size:22px !important;
+  font-size:clamp(22px,4.5vw,28px) !important;
+  line-height:1.08 !important;
 }
 #exercises > .panel:first-child p{
-  font-size:13px !important;
+  font-size:12.5px !important;
+  line-height:1.4 !important;
   margin-top:5px !important;
 }
-#exercises > .panel:first-child .w-12.h-12,
-#exercises > .panel:first-child .w-10.h-10{
-  transform:scale(.94);
+#exercises > .panel:first-child .bg-\[var\(--lime\)\]\/15{
+  font-size:10px !important;
+  padding:4px 9px !important;
 }
 #exercises > .panel:first-child .lime-btn{
-  min-height:40px !important;
+  min-height:38px !important;
+  padding:0 14px !important;
   font-size:12px !important;
-  padding-left:14px !important;
-  padding-right:14px !important;
+  gap:6px !important;
 }
 #exercises > .panel:first-child .lime-btn svg{
   width:15px !important;
   height:15px !important;
 }
-#exercises > .grid.md\:grid-cols-\[1fr_260px\] > #exercise-search,
-#exercises > .grid.md\:grid-cols-\[1fr_260px\] .custom-select-trigger{
-  min-height:42px !important;
-  font-size:12px !important;
-  padding-top:9px !important;
-  padding-bottom:9px !important;
-}
+
 #exercises > .grid.md\:grid-cols-\[1fr_260px\]{
   gap:10px !important;
-  margin-bottom:20px !important;
+  margin-bottom:18px !important;
 }
+#exercises #exercise-search,
+#exercises #custom-muscle-filter .field{
+  min-height:40px !important;
+  border-radius:10px !important;
+  font-size:12px !important;
+  padding:8px 11px !important;
+}
+#exercises #custom-muscle-filter .field svg{
+  width:15px !important;
+  height:15px !important;
+}
+
 #exercise-list{
   gap:12px !important;
 }
@@ -3463,13 +3260,17 @@ body.light #routines .gf-routine-card-actions .order-routine:focus-visible{
   border-radius:16px !important;
 }
 .exercise-directory-inner{
-  padding:18px 18px 17px !important;
+  padding:18px 18px 16px !important;
+}
+.exercise-directory-heading{
+  gap:10px !important;
 }
 .exercise-directory-title{
-  font-size:17px !important;
+  font-size:18px !important;
+  line-height:1.18 !important;
 }
 .exercise-directory-equipment{
-  margin-top:9px !important;
+  margin-top:10px !important;
   gap:7px !important;
   font-size:13px !important;
 }
@@ -3478,7 +3279,10 @@ body.light #routines .gf-routine-card-actions .order-routine:focus-visible{
   height:16px !important;
 }
 .exercise-directory-divider{
-  margin:14px 0 12px !important;
+  margin:15px 0 12px !important;
+}
+.exercise-directory-footer{
+  gap:6px !important;
 }
 .exercise-directory-chip{
   min-height:29px !important;
@@ -3486,55 +3290,112 @@ body.light #routines .gf-routine-card-actions .order-routine:focus-visible{
   border-radius:9px !important;
   font-size:11px !important;
 }
-@media (max-width: 899px){
+.exercise-delete-btn{
+  width:32px !important;
+  height:32px !important;
+}
+.exercise-delete-btn svg{
+  width:14px !important;
+  height:14px !important;
+}
+
+#exercise-empty{
+  padding:34px !important;
+}
+#exercise-empty > div:first-child{
+  width:52px !important;
+  height:52px !important;
+  border-radius:16px !important;
+  margin-bottom:13px !important;
+}
+#exercise-empty > div:first-child svg{
+  width:24px !important;
+  height:24px !important;
+}
+#exercise-empty h3{font-size:16px !important;}
+#exercise-empty p{font-size:12px !important;}
+
+@media (max-width:899px){
   #exercises > .panel:first-child{
-    padding:20px !important;
-    margin-bottom:18px !important;
+    padding:18px !important;
+    margin-bottom:16px !important;
   }
   #exercises > .panel:first-child h2{
-    font-size:21px !important;
+    font-size:22px !important;
   }
   #exercises > .panel:first-child p{
     font-size:12px !important;
-    line-height:1.45 !important;
   }
   #exercises > .panel:first-child .lime-btn{
-    min-height:40px !important;
-    font-size:12px !important;
+    min-height:38px !important;
+    width:100% !important;
   }
   #exercises > .grid.md\:grid-cols-\[1fr_260px\]{
     gap:8px !important;
-    margin-bottom:18px !important;
-  }
-  #exercises > .grid.md\:grid-cols-\[1fr_260px\] > #exercise-search,
-  #exercises > .grid.md\:grid-cols-\[1fr_260px\] .custom-select-trigger{
-    min-height:41px !important;
-    font-size:11.5px !important;
-    border-radius:9px !important;
+    margin-bottom:16px !important;
   }
   #exercise-list{
-    gap:12px !important;
-  }
-  .exercise-directory-card{
-    border-radius:15px !important;
+    gap:11px !important;
   }
   .exercise-directory-inner{
-    padding:18px 18px 16px !important;
+    padding:16px 16px 15px !important;
   }
   .exercise-directory-title{
     font-size:17px !important;
-    line-height:1.2 !important;
   }
   .exercise-directory-equipment{
-    margin-top:8px !important;
     font-size:12.5px !important;
   }
   .exercise-directory-divider{
     margin:13px 0 11px !important;
   }
   .exercise-directory-chip{
-    min-height:29px !important;
-    font-size:11px !important;
-    padding:0 10px !important;
+    min-height:28px !important;
+    font-size:10.5px !important;
+    padding:0 9px !important;
+  }
+}
+
+/* Light Mode bottom navbar: same frosted-glass concept as Dark Mode. */
+body.light .bottom-nav{
+  background:rgba(255,255,255,.64) !important;
+  border:1px solid rgba(56,78,61,.14) !important;
+  box-shadow:
+    0 12px 30px rgba(28,43,33,.10),
+    inset 0 1px 0 rgba(255,255,255,.62) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(125%) !important;
+  backdrop-filter:blur(18px) saturate(125%) !important;
+}
+body.light .bottom-nav::before{
+  background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.02)) !important;
+  opacity:1 !important;
+}
+body.light .mobile-nav-btn:not(.active){
+  color:#66736b !important;
+}
+body.light .mobile-nav-btn:not(.active):hover{
+  color:#172019 !important;
+}
+body.light .mobile-nav-btn.active,
+body.light .mobile-nav-btn.active span{
+  color:#5a9f0b !important;
+}
+body.light .nav-liquid-indicator{
+  background:rgba(114,210,13,.12) !important;
+  box-shadow:
+    0 0 0 1px rgba(114,210,13,.12),
+    0 6px 18px rgba(83,122,28,.10),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+body.light .mobile-nav-btn.center-fab-btn .fab-circle{
+  background:linear-gradient(180deg,#8df21b,#72d20d) !important;
+  color:#17300b !important;
+  box-shadow:0 7px 16px rgba(83,122,28,.15) !important;
+}
+
+@media (prefers-reduced-motion:reduce){
+  body.light .bottom-nav{
+    -webkit-backdrop-filter:blur(12px) saturate(115%) !important;
+    backdrop-filter:blur(12px) saturate(115%) !important;
   }
 }
