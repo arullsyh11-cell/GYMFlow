@@ -204,7 +204,7 @@ function importPanelMarkup() {
     <section class="gf-import-panel" aria-labelledby="gf-import-title">
       <div class="gf-import-heading-row">
         <div>
-          <p class="gf-import-kicker">TAHAP D</p>
+          <p class="gf-import-kicker">MIGRASI DATA</p>
           <h3 id="gf-import-title">Impor progress lama</h3>
         </div>
         <span class="gf-import-status-pill">LocalStorage</span>
