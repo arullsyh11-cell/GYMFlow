@@ -335,32 +335,29 @@ const KEY = "gymflow-v3";
       };
     }
 
-    function loadState(){ 
-      try { 
-        let rawData = localStorage.getItem(KEY);
+    function loadState(){
+      try {
         let loaded = null;
-
-        if (rawData) {
-          loaded = JSON.parse(rawData);
+        if (window.__GYMFLOW_REMOTE_MODE && window.__GYMFLOW_REMOTE_STATE) {
+          // Authenticated mode uses Supabase as the source of truth and never overwrites legacy LocalStorage.
+          loaded = JSON.parse(JSON.stringify(window.__GYMFLOW_REMOTE_STATE));
         } else {
-          for (let oldKey of LEGACY_KEYS) {
-            let oldData = localStorage.getItem(oldKey);
-            if (oldData) {
-              try {
-                loaded = JSON.parse(oldData);
-                break;
-              } catch(err) {}
+          let rawData = localStorage.getItem(KEY);
+          if (rawData) {
+            loaded = JSON.parse(rawData);
+          } else {
+            for (let oldKey of LEGACY_KEYS) {
+              let oldData = localStorage.getItem(oldKey);
+              if (oldData) {
+                try { loaded = JSON.parse(oldData); break; } catch(err) {}
+              }
             }
           }
         }
 
-        if (!loaded) {
-          loaded = seedState();
-        }
-        
+        if (!loaded) loaded = seedState();
         const existingCustoms = (loaded.exercises || []).filter(e => e.isCustom);
         loaded.exercises = [...seedExercises, ...existingCustoms];
-
         if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"};
         if(loaded.settings.weight === undefined) loaded.settings.weight = 65;
         if(loaded.settings.height === undefined) loaded.settings.height = 170;
@@ -370,11 +367,9 @@ const KEY = "gymflow-v3";
         if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
         if(loaded.settings.userName === undefined) loaded.settings.userName = "COYY";
         if(loaded.settings.language !== "en" && loaded.settings.language !== "id") loaded.settings.language = "id";
-
-        if(!loaded.weightHistory) {
-          loaded.weightHistory = [];
-        }
-
+        if(!Array.isArray(loaded.routines)) loaded.routines = [];
+        if(!Array.isArray(loaded.history)) loaded.history = [];
+        if(!Array.isArray(loaded.weightHistory)) loaded.weightHistory = [];
         if (loaded.history) {
           loaded.history = loaded.history.map(s => {
             if (s.caloriesBurned === undefined) {
@@ -385,13 +380,41 @@ const KEY = "gymflow-v3";
             return s;
           });
         }
-
-        localStorage.setItem(KEY, JSON.stringify(loaded));
+        if (!window.__GYMFLOW_REMOTE_MODE) localStorage.setItem(KEY, JSON.stringify(loaded));
         return loaded;
-      } catch(e){ return seedState(); } 
+      } catch(e) {
+        console.error("GYMFlow state load failed:", e);
+        if (window.__GYMFLOW_REMOTE_MODE) throw e;
+        return seedState();
+      }
     }
 
-    function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+    function save(){
+      if (window.__GYMFLOW_REMOTE_MODE) {
+        if (typeof window.__GYMFLOW_QUEUE_SAVE !== "function") {
+          const error = new Error("Koneksi penyimpanan Supabase belum siap. Perubahan belum tersimpan.");
+          window.__GYMFLOW_SET_SYNC_STATUS?.("error", error.message);
+          const failed = Promise.reject(error);
+          failed.catch(() => {});
+          window.__GYMFLOW_LAST_SAVE = failed;
+          return failed;
+        }
+        const snapshot = JSON.parse(JSON.stringify(state));
+        const promise = window.__GYMFLOW_QUEUE_SAVE(snapshot).then(result => {
+          window.__GYMFLOW_REMOTE_STATE = snapshot;
+          return result;
+        }).finally(() => {
+          window.dispatchEvent(new Event("gymflow:remote-save-complete"));
+        });
+        // The UI observes this promise through toast(); keep standalone save() calls from
+        // becoming unhandled rejections while preserving rejection for explicit awaiters.
+        promise.catch(() => {});
+        window.__GYMFLOW_LAST_SAVE = promise;
+        return promise;
+      }
+      localStorage.setItem(KEY, JSON.stringify(state));
+      return Promise.resolve({ status: "local-saved" });
+    }
     function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
     function fmtKg(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kg"; }
     function fmtKkal(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kkal"; }
@@ -406,7 +429,23 @@ const KEY = "gymflow-v3";
     }
     function routineById(id){ return state.routines.find(r=>r.id===id); }
     function exerciseById(id){ return state.exercises.find(e=>e.id===id); }
-    function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove("show"),3200); }
+    function toast(msg){
+      const show = text => {
+        const el=document.getElementById("toast");
+        if(!el) return;
+        el.textContent=text;
+        el.classList.add("show");
+        clearTimeout(el._timer);
+        el._timer=setTimeout(()=>el.classList.remove("show"),3600);
+      };
+      const looksLikeSaveSuccess = /(tersimpan|berhasil|successfully|success|updated|saved|logged|added|deleted|dihapus|diperbarui|ditambahkan)/i.test(String(msg));
+      const pending = window.__GYMFLOW_REMOTE_MODE ? window.__GYMFLOW_LAST_SAVE : null;
+      if (looksLikeSaveSuccess && pending && typeof pending.then === "function") {
+        pending.then(() => show(msg)).catch(error => show(`Gagal menyimpan ke server: ${error?.message || "periksa koneksi"}`));
+        return;
+      }
+      show(msg);
+    }
     function openModal(id){ document.getElementById(id).classList.add("open"); }
     function closeModal(id){ document.getElementById(id).classList.remove("open"); }
     function showConfirm(title,message,actionText,cb){ document.getElementById("confirm-title").textContent=title; document.getElementById("confirm-message").textContent=message; document.getElementById("confirm-action").textContent=actionText; confirmCallback=cb; openModal("confirm-modal"); }
@@ -652,40 +691,43 @@ const KEY = "gymflow-v3";
     // --- ROUTINE BUILDER DENGAN PENYESUAIAN CARDIO (MENIT & KM) ---
     function openRoutineBuilder(routineId = null) {
       const isEdit = routineId !== null;
+      const dayPicker = document.getElementById("day-picker");
+      const routine = isEdit ? routineById(routineId) : null;
+
       document.getElementById("routine-modal-title").textContent = isEdit ? "Edit Routine" : "Routine Builder";
       document.getElementById("routine-id").value = routineId || "";
-      
       selectedRoutineExercises = [];
-      
-      if (isEdit) {
-        const routine = routineById(routineId);
-        if (routine) {
-          document.getElementById("routine-name").value = routine.name;
-          document.getElementById("routine-description").value = routine.description || "";
-          
-          selectedRoutineExercises = (routine.exercises || routine.exerciseIds.map(id => ({
-            id: id,
-            sets: [{ reps: 10, weight: 0 }, { reps: 10, weight: 0 }, { reps: 10, weight: 0 }]
-          }))).map(item => {
-            const ex = exerciseById(item.id || item);
-            const isCardio = ex && ex.muscle === "Cardio";
-            return {
-              id: item.id || item,
-              sets: item.sets && item.sets.length > 0 ? [...item.sets] : (isCardio ? [{ reps: 15, weight: 2 }] : [{ reps: 10, weight: 0 }])
-            };
-          });
 
-          document.querySelectorAll("#day-picker .day-chip").forEach(chip => {
-            chip.classList.toggle("active", routine.days.includes(chip.dataset.day));
-          });
-        }
+      // Always render all seven workout-day chips first.
+      // This fixes Edit Routine so previously saved days are available immediately.
+      dayPicker.innerHTML = days.map(d => `<button type="button" class="chip day-chip" data-day="${d}">${d}</button>`).join("");
+
+      if (routine) {
+        document.getElementById("routine-name").value = routine.name || "";
+        document.getElementById("routine-description").value = routine.description || "";
+
+        selectedRoutineExercises = (routine.exercises || (routine.exerciseIds || []).map(id => ({
+          id: id,
+          sets: [{ reps: 10, weight: 0 }, { reps: 10, weight: 0 }, { reps: 10, weight: 0 }]
+        }))).map(item => {
+          const ex = exerciseById(item.id || item);
+          const isCardio = ex && ex.muscle === "Cardio";
+          return {
+            id: item.id || item,
+            sets: item.sets && item.sets.length > 0 ? [...item.sets] : (isCardio ? [{ reps: 15, weight: 2 }] : [{ reps: 10, weight: 0 }])
+          };
+        });
+
+        const savedDays = Array.isArray(routine.days) ? routine.days : [];
+        dayPicker.querySelectorAll(".day-chip").forEach(chip => {
+          chip.classList.toggle("active", savedDays.includes(chip.dataset.day));
+        });
       } else {
         document.getElementById("routine-name").value = "";
         document.getElementById("routine-description").value = "";
-        document.querySelectorAll("#day-picker .day-chip").forEach(chip => chip.classList.remove("active"));
-        document.getElementById("day-picker").innerHTML = days.map(d => `<button type="button" class="chip day-chip" data-day="${d}">${d}</button>`).join("");
+        dayPicker.querySelectorAll(".day-chip").forEach(chip => chip.classList.remove("active"));
       }
-      
+
       renderBuilderSelectedExercises();
       renderBuilderLibrary();
       openModal("routine-modal");
@@ -1300,16 +1342,16 @@ const KEY = "gymflow-v3";
               <p>${esc(r.description || (currentLanguage()==="en" ? "Ready for your next session." : "Siap untuk sesi latihan berikutnya."))}</p>
             </div>
             <div class="gf-routine-card-actions">
-              <button class="gf-routine-icon-btn order-routine move-up" type="button" data-id="${r.id}" data-move="up" aria-label="${currentLanguage()==="en" ? "Move up" : "Pindah ke atas"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Up" : "Pindah ke Atas"}" ${isFirstRoutine ? "disabled" : ""}>
+              <button class="gf-routine-icon-btn order-routine move-up" type="button" data-id="${esc(r.id)}" data-move="up" aria-label="${currentLanguage()==="en" ? "Move up" : "Pindah ke atas"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Up" : "Pindah ke Atas"}" ${isFirstRoutine ? "disabled" : ""}>
                 <i data-lucide="chevron-up"></i>
               </button>
-              <button class="gf-routine-icon-btn order-routine move-down" type="button" data-id="${r.id}" data-move="down" aria-label="${currentLanguage()==="en" ? "Move down" : "Pindah ke bawah"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Down" : "Pindah ke Bawah"}" ${isLastRoutine ? "disabled" : ""}>
+              <button class="gf-routine-icon-btn order-routine move-down" type="button" data-id="${esc(r.id)}" data-move="down" aria-label="${currentLanguage()==="en" ? "Move down" : "Pindah ke bawah"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Down" : "Pindah ke Bawah"}" ${isLastRoutine ? "disabled" : ""}>
                 <i data-lucide="chevron-down"></i>
               </button>
-              <button class="gf-routine-icon-btn edit-routine" type="button" data-id="${r.id}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
+              <button class="gf-routine-icon-btn edit-routine" type="button" data-id="${esc(r.id)}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
                 <i data-lucide="pencil"></i>
               </button>
-              <button class="gf-routine-icon-btn delete-routine danger" type="button" data-id="${r.id}" aria-label="${currentLanguage()==="en" ? "Delete" : "Hapus"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Delete Routine" : "Hapus Routine"}">
+              <button class="gf-routine-icon-btn delete-routine danger" type="button" data-id="${esc(r.id)}" aria-label="${currentLanguage()==="en" ? "Delete" : "Hapus"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Delete Routine" : "Hapus Routine"}">
                 <i data-lucide="trash-2"></i>
               </button>
             </div>
@@ -1326,7 +1368,7 @@ const KEY = "gymflow-v3";
             <div><strong>${metaLabels.difficulty}</strong><span>${currentLanguage()==="en" ? "difficulty" : "tingkat"}</span></div>
           </div>
 
-          <button class="gf-routine-play start-routine" type="button" data-id="${r.id}">
+          <button class="gf-routine-play start-routine" type="button" data-id="${esc(r.id)}">
             <span>${currentLanguage()==="en" ? "Start Workout" : "Mulai Workout"}</span>
             <span class="gf-routine-play-icon"><i data-lucide="arrow-up-right"></i></span>
           </button>
@@ -1446,7 +1488,7 @@ function renderExercises(){
       } else {
         workoutOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Pilih routine...</div>';
         state.routines.forEach(r => {
-          workoutOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${r.id}">${esc(r.name)}</div>`);
+          workoutOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${esc(r.id)}">${esc(r.name)}</div>`);
         });
         document.querySelector("#custom-workout-routine .selected-label").textContent = "Pilih routine...";
       }
@@ -1594,9 +1636,12 @@ function renderExercises(){
         if(a.restRemaining<=0){
           a.restRemaining=0;
           a.restPaused=true;
+          save();
           toast(currentLanguage()==="en" ? "Rest time is over. Ready for the next set!" : "Waktu istirahat selesai. Siap set berikutnya!");
+        } else if (a.restRemaining % 10 === 0) {
+          // Persist transient rest countdown roughly every 10 seconds, not every second.
+          save();
         }
-        save();
       }
       updateTimers();
     }
@@ -1712,14 +1757,14 @@ function renderExercises(){
         el.innerHTML=`
           <div>
             <h3 class="font-extrabold text-base">${esc(r?.name||"Routine dihapus")}</h3>
-            <p class="muted text-xs mt-0.5">${dateStr}</p>
+            <p class="muted text-xs mt-0.5">${esc(dateStr)}</p>
             <div class="flex items-center gap-6 mt-3">
               <div><p class="muted text-[10px] font-bold uppercase tracking-wider">Set</p><strong class="text-sm">${setTotal}</strong></div>
               <div><p class="muted text-[10px] font-bold uppercase tracking-wider">Kalori</p><strong class="text-sm text-lime-300"><i data-lucide="flame" class="w-3 h-3 inline text-amber-400"></i> ${calText}</strong></div>
             </div>
           </div>
           <div>
-            <button class="danger-btn px-3 py-2 delete-history-session" data-id="${s.id}" title="Hapus sesi ini"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            <button class="danger-btn px-3 py-2 delete-history-session" data-id="${esc(s.id)}" title="Hapus sesi ini"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
           </div>
         `;
         list.appendChild(el);
@@ -3729,7 +3774,9 @@ function buildExportBrandMark(size = 38) {
       });
     });
 
-    document.addEventListener("DOMContentLoaded",()=>{
+    function initGymFlowApp(){
+      if (window.__GYMFLOW_APP_INITIALIZED) return;
+      window.__GYMFLOW_APP_INITIALIZED = true;
       setTimeout(() => {
         const splash = document.getElementById("splash-screen");
         if(splash) {
@@ -4070,7 +4117,50 @@ function buildExportBrandMark(size = 38) {
         renderDashboard();
         toast(currentLanguage()==="en" ? "Routine saved successfully!" : "Routine berhasil disimpan!");
       };
-    });
+      // Runtime bridge used by the authenticated Supabase live-sync layer.
+      // Remote state is applied only when there are no pending writes or user edits in progress.
+      window.__GYMFLOW_GET_CURRENT_STATE = () => JSON.parse(JSON.stringify(state));
+      window.__GYMFLOW_CAN_APPLY_REMOTE_STATE = () => {
+        const saveStatus = window.__GYMFLOW_QUEUE_SAVE?.getStatus?.();
+        if (saveStatus && (saveStatus.revision !== saveStatus.persistedRevision || saveStatus.isFlushing || saveStatus.lastError)) return false;
+        if (document.querySelector(".modal-layer.open")) return false;
+        const active = document.activeElement;
+        if (active?.matches?.("input, textarea, select, [contenteditable='true']")) return false;
+        return true;
+      };
+      window.__GYMFLOW_APPLY_REMOTE_STATE = nextState => {
+        if (!nextState || typeof nextState !== "object" || Array.isArray(nextState) ||
+            !nextState.settings || !Array.isArray(nextState.exercises) ||
+            !Array.isArray(nextState.routines) || !Array.isArray(nextState.history) ||
+            !Array.isArray(nextState.weightHistory) ||
+            !(nextState.activeSession === null || (typeof nextState.activeSession === "object" && !Array.isArray(nextState.activeSession)))) {
+          throw new Error("Data terbaru dari Supabase memiliki struktur yang tidak valid.");
+        }
+        window.__GYMFLOW_REMOTE_STATE = JSON.parse(JSON.stringify(nextState));
+        state = loadState();
+        setTheme();
+        populateSelects();
+        renderDashboard();
+        renderRoutines();
+        renderExercises();
+        renderWorkout();
+        renderHistory();
+        renderWeightTab();
+        renderOverviewMetrics();
+        renderStatisticsAnalytics();
+        updateHeaderInitial();
+        applyLanguage();
+        if (window.lucide) window.lucide.createIcons();
+      };
+
+      window.__GYMFLOW_APP_READY = true;
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initGymFlowApp, { once: true });
+    } else {
+      initGymFlowApp();
+    }
 
 
 /* ==================== PHASE 4 MOTION HELPERS ==================== */
@@ -4146,11 +4236,13 @@ function gfRefreshProgressMotion(){
   gfRunProgressMotion(history);
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
+function initGymFlowProgressMotion(){
   setTimeout(()=>{
     if(typeof gfRefreshProgressMotion === "function") gfRefreshProgressMotion();
   },120);
-});
+}
+if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initGymFlowProgressMotion, { once:true });
+else initGymFlowProgressMotion();
 
 /* =========================================================
    GYMFlow Fluid Bottom Navigation
