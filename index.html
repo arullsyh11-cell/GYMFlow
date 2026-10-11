@@ -14,10 +14,37 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  
+  <script>
+    /* Apply the saved GYMFlow appearance before first paint. Legacy "dark" maps to Original Green. */
+    (function () {
+      try {
+        var keys = ["gymflow-v3", "gymflow-v2", "gymflow-v1"];
+        for (var i = 0; i < keys.length; i++) {
+          var raw = localStorage.getItem(keys[i]);
+          if (!raw) continue;
+          var settings = (JSON.parse(raw) || {}).settings || {};
+          var saved = settings.theme;
+          document.documentElement.dataset.theme = saved === "light" ? "light" : saved === "deep-olive" ? "deep-olive" : "original-green";
+          return;
+        }
+      } catch (e) {}
+      document.documentElement.dataset.theme = "original-green";
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="auth.css">
 </head>
-<body class="w-full">
+<body class="w-full dashboard-active">
+<script>
+  /* Mirror the preloaded theme onto body before the first application section paints. */
+  (function () {
+    var theme = document.documentElement.dataset.theme || "original-green";
+    document.body.dataset.theme = theme;
+    document.body.classList.toggle("light", theme === "light");
+    document.body.classList.toggle("theme-original-green", theme === "original-green");
+    document.body.classList.toggle("theme-deep-olive", theme === "deep-olive");
+  })();
+</script>
 
 <div id="splash-screen">
   <div class="logo-splash">
@@ -53,80 +80,125 @@
             <img src="new_logoprofile.png" alt="Logo" class="w-full h-full object-cover">
           </div>
           <div>
-            <h1 class="font-extrabold text-2xl tracking-tight">GYMFlow</h1>
+            <h1 id="main-area-title" class="font-extrabold text-2xl tracking-tight">Workouts</h1>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span> 
+        <div class="flex items-center gap-2 gf-main-header-actions">
+          <span id="offline-badge" class="chip hidden"><i data-lucide="wifi-off" class="w-3 h-3 mr-1"></i>Offline</span>
+          <button id="dashboard-add-routine-btn" type="button" class="icon-btn gf-dashboard-header-action gf-dashboard-add-action" aria-label="Buat routine baru" title="Create routine"><i data-lucide="plus"></i></button>
           <button id="open-profile-btn" type="button" aria-label="Profil & Target" title="Profil & Target">A</button>
         </div>
       </header>
       
       <!-- DASHBOARD TAB -->
       <section id="dashboard" class="tab active" aria-label="Dashboard">
-        <div id="weekly-target-container" class="panel p-5 mb-5 relative overflow-hidden">
-          <div class="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-lime-300 opacity-10"></div>
-          <p id="siap-bergerak-label" class="text-lime-300 font-bold text-sm relative tracking-wider">SELAMAT PAGI, <span id="profile-name-display">COYY</span>?</p>
-          <p id="next-workout-copy" class="muted mt-2 relative text-sm">Pilih routine dan mulai saat kamu siap.</p>
+        <!-- Retained compatibility hooks used by the existing dashboard renderer. -->
+        <div class="sr-only">
+          <p id="siap-bergerak-label">SELAMAT PAGI, <span id="profile-name-display">COYY</span></p>
+          <p id="next-workout-copy">Pilih routine dan mulai saat kamu siap.</p>
+          <span id="dashboard-routine-count">0</span>
+          <span id="dashboard-routine-name">No routines yet</span>
+          <span id="dashboard-routine-meta">Create a routine to get started.</span>
+        </div>
 
-          <!-- KARTU TARGET MINGGUAN MODERN (THIS WEEK) -->
-          <div class="mt-4 p-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--line)] relative">
-            <!-- Header: Judul & Pill Badge -->
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-extrabold text-lg tracking-tight">This Week</h3>
-              <span id="weekly-pill-count" class="px-3 py-1 rounded-full bg-[var(--lime)] text-[#142009] font-extrabold text-xs">0/4</span>
+        <div class="gf-dashboard-summary-grid">
+          <article class="panel gf-dashboard-summary-card gf-dashboard-workouts-summary" aria-label="Total Workouts">
+            <div class="gf-dashboard-summary-top">
+              <button id="dashboard-total-workouts-open" type="button" class="gf-dashboard-metric-icon" aria-label="Open workout history" title="Workout history"><i data-lucide="activity" aria-hidden="true"></i></button>
+              <span class="gf-dashboard-summary-kicker">ALL TIME</span>
             </div>
+            <div class="gf-dashboard-total-workouts-value"><strong id="dashboard-total-workouts">0</strong></div>
+            <div class="gf-dashboard-summary-bottom">
+              <h3>Total Workouts</h3>
+              <p id="dashboard-total-workouts-meta" class="muted">All recorded sessions</p>
+            </div>
+          </article>
 
-            <!-- Baris Hari Mingguan (Mon - Sun) -->
-            <div id="weekly-days-bar" class="grid grid-cols-7 gap-1 text-center mb-4"></div>
+          <article class="panel gf-dashboard-summary-card gf-dashboard-weight-summary" aria-label="Body weight">
+            <div class="gf-dashboard-summary-top">
+              <button id="dashboard-weight-open" type="button" class="gf-dashboard-metric-icon" aria-label="Log body weight" title="Log weight"><i data-lucide="scale" aria-hidden="true"></i></button>
+              <span class="gf-dashboard-summary-kicker">BODY METRIC</span>
+            </div>
+            <div class="gf-dashboard-weight-value"><strong id="dashboard-current-weight">65</strong><span>kg</span></div>
+            <div class="gf-dashboard-summary-bottom">
+              <h3>Body weight</h3>
+              <p id="dashboard-weight-meta" class="muted">Current profile weight</p>
+            </div>
+          </article>
+        </div>
 
-            <!-- Progress Bar & Persentase -->
+        <div id="weekly-target-container" class="panel gf-dashboard-weekly mb-5">
+          <div class="gf-dashboard-section-head">
             <div>
-              <div class="flex justify-between text-xs font-bold muted mb-1.5">
-                <span>Weekly target progress</span>
-                <span id="weekly-progress-percent" class="text-[var(--text)]">0%</span>
-              </div>
-              <div class="progress-line">
-                <span id="weekly-progress-bar-fill" style="width: 0%"></span>
-              </div>
+              <span class="gf-dashboard-eyebrow">WEEKLY GOAL</span>
+              <h3 class="font-extrabold text-lg tracking-tight">This Week</h3>
+            </div>
+            <span id="weekly-pill-count" class="gf-dashboard-week-pill">0/4</span>
+          </div>
+          <div id="weekly-days-bar" class="gf-dashboard-week-days"></div>
+          <div class="gf-dashboard-week-progress">
+            <div class="gf-dashboard-progress-meta">
+              <span class="muted text-xs font-bold">Weekly target progress</span>
+              <span id="weekly-progress-percent" class="text-xs font-bold">0%</span>
+            </div>
+            <div class="progress-line"><span id="weekly-progress-bar-fill" style="width:0%"></span></div>
+          </div>
+          <div class="gf-dashboard-week-action"><button id="dashboard-start" class="lime-btn w-full" type="button">Start Workout</button></div>
+        </div>
+
+
+        <!-- Three-month activity view, based on the real workout history. -->
+        <div class="panel gf-dashboard-activity-card mb-5">
+          <div class="gf-dashboard-section-head gf-dashboard-activity-head">
+            <div>
+              <span class="gf-dashboard-eyebrow">WORKOUT ACTIVITY</span>
+              <h3 id="calendar-month-title" class="font-extrabold text-lg">August – October 2026</h3>
+            </div>
+            <div class="gf-dashboard-calendar-controls">
+              <button type="button" class="icon-btn" onclick="changeCalendarMonth(-1)" aria-label="Periode sebelumnya"><i data-lucide="chevron-left"></i></button>
+              <button type="button" class="icon-btn" onclick="changeCalendarMonth(1)" aria-label="Periode berikutnya"><i data-lucide="chevron-right"></i></button>
             </div>
           </div>
-
-          <div class="mt-4 pt-4 border-t border-[var(--line)] relative text-xs">
-            <button id="dashboard-start" class="lime-btn px-5 w-full relative">Mulai Workout</button>
+          <div id="calendar-days-grid" class="gf-activity-months-grid" aria-label="Kalender aktivitas workout"></div>
+          <div class="gf-dashboard-activity-footer">
+            <div class="gf-dashboard-activity-detail">
+              <span class="gf-dashboard-eyebrow" id="dashboard-activity-date">TODAY</span>
+              <strong id="dashboard-last-workout-name">No workout recorded</strong>
+              <small id="dashboard-activity-summary" class="muted">Select a day to inspect activity.</small>
+            </div>
+            <button type="button" class="secondary-btn gf-dashboard-history-action" data-tab="history">History <i data-lucide="arrow-up-right"></i></button>
           </div>
         </div>
 
-        <!-- KALENDER BULANAN -->
-        <div class="panel p-5 mb-5">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="calendar" class="w-5 h-5 text-lime-300"></i>
-              <h3 id="calendar-month-title" class="font-extrabold text-lg">September 2026</h3>
+        <div class="gf-dashboard-lower-grid">
+          <article class="panel gf-dashboard-volume-card">
+            <div>
+              <span class="gf-dashboard-eyebrow">TRAINING VOLUME</span>
+              <h3>Volume lifted</h3>
+              <p id="dashboard-volume-meta" class="muted">0 sessions · Last 7 days</p>
             </div>
-            <div class="flex items-center gap-1">
-              <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(-1)" aria-label="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-              <button type="button" class="icon-btn !w-8 !h-8" onclick="changeCalendarMonth(1)" aria-label="Bulan berikutnya"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-            </div>
-          </div>
-          
-          <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold muted mb-2">
-            <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
-          </div>
-          <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+            <div class="gf-dashboard-volume-bottom"><strong id="dashboard-volume-value">0 kg</strong><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i></div>
+          </article>
+          <button type="button" id="dashboard-create-routine-card" class="panel gf-dashboard-create-card">
+            <span class="gf-dashboard-create-icon"><i data-lucide="plus"></i></span>
+            <strong>Create Routine</strong>
+            <small>Build a plan for your next session</small>
+          </button>
         </div>
-
-        <!-- SESI AKTIF -->
-        <div class="panel p-5 mb-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <p class="muted text-xs font-bold uppercase tracking-wider">Sesi Aktif</p>
-            <i data-lucide="activity" class="w-4 h-4 text-lime-300"></i>
+        <div class="panel gf-dashboard-active-card mb-5">
+          <div class="gf-dashboard-section-head">
+            <div>
+              <span class="gf-dashboard-eyebrow">WORKOUT STATUS</span>
+              <h3 class="font-extrabold text-base">Active Session</h3>
+            </div>
+            <i data-lucide="activity" class="gf-dashboard-card-mark" aria-hidden="true"></i>
           </div>
-          <div class="mt-3 flex items-center justify-between gap-2">
+          <div class="gf-dashboard-active-copy">
             <p id="active-session-copy" class="muted text-sm font-medium m-0">Belum ada sesi aktif.</p>
-            <button id="resume-workout" class="secondary-btn px-3 py-1.5 text-xs hidden shrink-0">Lanjutkan</button>
+            <button id="resume-workout" class="secondary-btn px-3 py-1.5 text-xs hidden shrink-0" type="button">Lanjutkan</button>
           </div>
         </div>
+
       </section>
       
       <!-- ROUTINES TAB -->
@@ -542,6 +614,7 @@
     
     <!-- BOTTOM NAVIGATION -->
     <nav id="gymflow-navbar-routine-builder" class="bottom-nav" aria-label="Bottom Navigation">
+      <span class="nav-liquid-indicator" aria-hidden="true"></span>
       <button class="mobile-nav-btn active" data-tab="dashboard" title="Home" aria-current="page">
         <i data-lucide="layout-grid"></i>
         <span>Home</span>
@@ -617,25 +690,25 @@
             <input id="profile-age-input" class="field" type="number" min="10" max="120" placeholder="Contoh: 28">
           </div>
 
-          <div class="grid grid-cols-2 gap-3 items-end">
+          <div class="grid grid-cols-2 gap-3 items-end gf-profile-unit-row gf-profile-height-row">
             <div>
               <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-tb">Height (<span id="height-unit-label">cm</span>)</label>
               <input id="profile-tb" class="field" type="number" min="50" max="250" required placeholder="178">
             </div>
-            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)]">
-              <button type="button" id="unit-cm" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" onclick="setHeightUnit('cm')">cm</button>
-              <button type="button" id="unit-ft" class="flex-1 py-2 text-xs font-bold rounded-lg muted transition-all" onclick="setHeightUnit('ft')">ft</button>
+            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)] gf-unit-toggle">
+              <button type="button" id="unit-cm" class="gf-unit-option flex-1 py-2 text-xs font-bold rounded-lg is-active" aria-pressed="true" onclick="setHeightUnit('cm')">cm</button>
+              <button type="button" id="unit-ft" class="gf-unit-option flex-1 py-2 text-xs font-bold rounded-lg" aria-pressed="false" onclick="setHeightUnit('ft')">ft</button>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3 items-end">
+          <div class="grid grid-cols-2 gap-3 items-end gf-profile-unit-row gf-profile-weight-row">
             <div>
               <label class="block text-[11px] font-bold uppercase tracking-wider muted mb-1" for="profile-bb">Weight (<span id="weight-unit-label">kg</span>)</label>
               <input id="profile-bb" class="field" type="number" step="0.5" min="20" max="300" required placeholder="78">
             </div>
-            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)]">
-              <button type="button" id="unit-kg" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" onclick="setWeightUnit('kg')">kg</button>
-              <button type="button" id="unit-lbs" class="flex-1 py-2 text-xs font-bold rounded-lg muted transition-all" onclick="setWeightUnit('lbs')">lbs</button>
+            <div class="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--line)] gf-unit-toggle">
+              <button type="button" id="unit-kg" class="gf-unit-option flex-1 py-2 text-xs font-bold rounded-lg is-active" aria-pressed="true" onclick="setWeightUnit('kg')">kg</button>
+              <button type="button" id="unit-lbs" class="gf-unit-option flex-1 py-2 text-xs font-bold rounded-lg" aria-pressed="false" onclick="setWeightUnit('lbs')">lbs</button>
             </div>
           </div>
         </div>
@@ -664,12 +737,24 @@
           <h3 class="text-xs font-bold uppercase tracking-wider muted">Appearance</h3>
           <p id="dark-mode-desc" class="muted text-xs mt-1">Currently dark</p>
         </div>
-        <div class="gf-theme-switcher" role="group" aria-label="Appearance theme">
-          <button type="button" id="theme-dark-option" class="gf-theme-option active" onclick="setProfileTheme('dark')" aria-pressed="true">
-            <i data-lucide="moon"></i> Dark
+        <div class="gf-theme-switcher gf-theme-switcher--cards" role="group" aria-label="Appearance theme">
+          <button type="button" id="theme-dark-option" class="gf-theme-option gf-theme-option--card active" onclick="setProfileTheme('original-green')" aria-pressed="true">
+            <span class="gf-theme-preview gf-theme-preview--original" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="gf-theme-name">Original Green</span>
+            <span class="gf-theme-desc">Classic black, charcoal &amp; neon green</span>
+            <span class="gf-theme-check" aria-hidden="true"><i data-lucide="check"></i></span>
           </button>
-          <button type="button" id="theme-light-option" class="gf-theme-option" onclick="setProfileTheme('light')" aria-pressed="false">
-            <i data-lucide="sun"></i> Light
+          <button type="button" id="theme-olive-option" class="gf-theme-option gf-theme-option--card" onclick="setProfileTheme('deep-olive')" aria-pressed="false">
+            <span class="gf-theme-preview gf-theme-preview--olive" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="gf-theme-name">Deep Dark</span>
+            <span class="gf-theme-desc">Near-black, charcoal &amp; neutral gray</span>
+            <span class="gf-theme-check" aria-hidden="true"><i data-lucide="check"></i></span>
+          </button>
+          <button type="button" id="theme-light-option" class="gf-theme-option gf-theme-option--card gf-theme-option--light" onclick="setProfileTheme('light')" aria-pressed="false">
+            <span class="gf-theme-preview gf-theme-preview--light" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="gf-theme-name">Light Mode</span>
+            <span class="gf-theme-desc">Clean grayscale surfaces and contrast</span>
+            <span class="gf-theme-check" aria-hidden="true"><i data-lucide="check"></i></span>
           </button>
         </div>
         <!-- Hidden compatibility hook for older calls -->
@@ -819,6 +904,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite">Profil & target diperbarui secara otomatis.</div>
   
   <!-- SCRIPT -->
-<script type="module" src="auth.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
