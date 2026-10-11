@@ -6,6 +6,7 @@ const KEY = "gymflow-v3";
     const uid = () => "gf_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     let state, selectedRoutineExercises = [], confirmCallback = null, elapsedInterval = null;
     let currentCalendarDate = new Date();
+    let selectedCalendarDate = new Date();
     let routineFilter = "all";
     let selectedAnalyticsMuscle = "chest";
     let analyticsPeriod = "30d";
@@ -99,6 +100,11 @@ const KEY = "gymflow-v3";
       "Weight": {id:"Berat", en:"Weight"},
       "History": {id:"Riwayat", en:"History"},
       "Total Workouts": {id:"Total Workout", en:"Total Workouts"},
+      "ALL TIME": {id:"SEPANJANG WAKTU", en:"ALL TIME"},
+      "BODY METRIC": {id:"BERAT BADAN", en:"BODY METRIC"},
+      "All recorded sessions": {id:"Semua sesi tercatat", en:"All recorded sessions"},
+      "Latest log": {id:"Catatan terbaru", en:"Latest log"},
+      "Current profile weight": {id:"Berat profil saat ini", en:"Current profile weight"},
       "Total Calories": {id:"Total Kalori", en:"Total Calories"},
       "Total Time": {id:"Total Waktu", en:"Total Time"},
       "Avg Duration": {id:"Durasi Rata-rata", en:"Avg Duration"},
@@ -132,6 +138,15 @@ const KEY = "gymflow-v3";
       "Dark Mode": {id:"Mode Gelap", en:"Dark Mode"},
       "Currently dark": {id:"Saat ini gelap", en:"Currently dark"},
       "Currently light": {id:"Saat ini terang", en:"Currently light"},
+      "Original Green": {id:"Original Green", en:"Original Green"},
+      "Classic black, charcoal & neon green": {id:"Hitam klasik, charcoal & hijau neon", en:"Classic black, charcoal & neon green"},
+      "Deep Olive": {id:"Deep Olive", en:"Deep Olive"},
+      "Near-black, deep charcoal & refined lime": {id:"Near-black, deep charcoal & lime yang lebih halus", en:"Near-black, deep charcoal & refined lime"},
+      "Light Mode": {id:"Mode Terang", en:"Light Mode"},
+      "Soft light surfaces with clear contrast": {id:"Permukaan terang dengan kontras yang jelas", en:"Soft light surfaces with clear contrast"},
+      "Using Original Green": {id:"Menggunakan Original Green", en:"Using Original Green"},
+      "Using Deep Olive": {id:"Menggunakan Deep Olive", en:"Using Deep Olive"},
+      "Using Deep Dark": {id:"Menggunakan Deep Dark", en:"Using Deep Dark"},
       "Data & Storage": {id:"Data & Penyimpanan", en:"Data & Storage"},
       "Workout sessions": {id:"Sesi workout", en:"Workout sessions"},
       "Weight entries": {id:"Catatan berat", en:"Weight entries"},
@@ -326,7 +341,7 @@ const KEY = "gymflow-v3";
 
     function seedState() {
       return {
-        settings:{theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"},
+        settings:{theme:"original-green",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"},
         exercises:seedExercises,
         routines:[],
         activeSession:null,
@@ -335,30 +350,33 @@ const KEY = "gymflow-v3";
       };
     }
 
-    function loadState(){
-      try {
+    function loadState(){ 
+      try { 
+        let rawData = localStorage.getItem(KEY);
         let loaded = null;
-        if (window.__GYMFLOW_REMOTE_MODE && window.__GYMFLOW_REMOTE_STATE) {
-          // Authenticated mode uses Supabase as the source of truth and never overwrites legacy LocalStorage.
-          loaded = JSON.parse(JSON.stringify(window.__GYMFLOW_REMOTE_STATE));
+
+        if (rawData) {
+          loaded = JSON.parse(rawData);
         } else {
-          let rawData = localStorage.getItem(KEY);
-          if (rawData) {
-            loaded = JSON.parse(rawData);
-          } else {
-            for (let oldKey of LEGACY_KEYS) {
-              let oldData = localStorage.getItem(oldKey);
-              if (oldData) {
-                try { loaded = JSON.parse(oldData); break; } catch(err) {}
-              }
+          for (let oldKey of LEGACY_KEYS) {
+            let oldData = localStorage.getItem(oldKey);
+            if (oldData) {
+              try {
+                loaded = JSON.parse(oldData);
+                break;
+              } catch(err) {}
             }
           }
         }
 
-        if (!loaded) loaded = seedState();
+        if (!loaded) {
+          loaded = seedState();
+        }
+        
         const existingCustoms = (loaded.exercises || []).filter(e => e.isCustom);
         loaded.exercises = [...seedExercises, ...existingCustoms];
-        if(!loaded.settings) loaded.settings = {theme:"dark",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"};
+
+        if(!loaded.settings) loaded.settings = {theme:"original-green",restSeconds:90, weight:65, height:170, age:25, heightUnit:"cm", weightUnit:"kg", weeklyGoal:4, userName:"COYY", language:"id"};
         if(loaded.settings.weight === undefined) loaded.settings.weight = 65;
         if(loaded.settings.height === undefined) loaded.settings.height = 170;
         if(loaded.settings.age === undefined) loaded.settings.age = 25;
@@ -367,9 +385,12 @@ const KEY = "gymflow-v3";
         if(loaded.settings.weeklyGoal === undefined) loaded.settings.weeklyGoal = 4;
         if(loaded.settings.userName === undefined) loaded.settings.userName = "COYY";
         if(loaded.settings.language !== "en" && loaded.settings.language !== "id") loaded.settings.language = "id";
-        if(!Array.isArray(loaded.routines)) loaded.routines = [];
-        if(!Array.isArray(loaded.history)) loaded.history = [];
-        if(!Array.isArray(loaded.weightHistory)) loaded.weightHistory = [];
+        loaded.settings.theme = normalizeThemeChoice(loaded.settings.theme);
+
+        if(!loaded.weightHistory) {
+          loaded.weightHistory = [];
+        }
+
         if (loaded.history) {
           loaded.history = loaded.history.map(s => {
             if (s.caloriesBurned === undefined) {
@@ -380,40 +401,24 @@ const KEY = "gymflow-v3";
             return s;
           });
         }
-        if (!window.__GYMFLOW_REMOTE_MODE) localStorage.setItem(KEY, JSON.stringify(loaded));
+
+        localStorage.setItem(KEY, JSON.stringify(loaded));
         return loaded;
-      } catch(e) {
-        console.error("GYMFlow state load failed:", e);
-        if (window.__GYMFLOW_REMOTE_MODE) throw e;
-        return seedState();
-      }
+      } catch(e){ return seedState(); } 
     }
 
-    function save(){
-      if (window.__GYMFLOW_REMOTE_MODE) {
-        if (typeof window.__GYMFLOW_QUEUE_SAVE !== "function") {
-          const error = new Error("Koneksi penyimpanan Supabase belum siap. Perubahan belum tersimpan.");
-          window.__GYMFLOW_SET_SYNC_STATUS?.("error", error.message);
-          const failed = Promise.reject(error);
-          failed.catch(() => {});
-          window.__GYMFLOW_LAST_SAVE = failed;
-          return failed;
-        }
-        const snapshot = JSON.parse(JSON.stringify(state));
-        const promise = window.__GYMFLOW_QUEUE_SAVE(snapshot).then(result => {
-          window.__GYMFLOW_REMOTE_STATE = snapshot;
-          return result;
-        }).finally(() => {
-          window.dispatchEvent(new Event("gymflow:remote-save-complete"));
-        });
-        // The UI observes this promise through toast(); keep standalone save() calls from
-        // becoming unhandled rejections while preserving rejection for explicit awaiters.
-        promise.catch(() => {});
-        window.__GYMFLOW_LAST_SAVE = promise;
-        return promise;
-      }
-      localStorage.setItem(KEY, JSON.stringify(state));
-      return Promise.resolve({ status: "local-saved" });
+    function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+    function normalizeThemeChoice(theme){
+      if(theme === "light") return "light";
+      if(theme === "deep-olive") return "deep-olive";
+      // Backward compatibility: the old "dark" theme is the Original Green theme.
+      return "original-green";
+    }
+    function getThemeAccent(){
+      return getComputedStyle(document.body).getPropertyValue("--lime").trim() || "#88F914";
+    }
+    function getThemeAccentRgb(){
+      return getComputedStyle(document.body).getPropertyValue("--accent-rgb").trim() || "136, 249, 20";
     }
     function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
     function fmtKg(n){ return new Intl.NumberFormat("id-ID").format(Math.round(n||0))+" kg"; }
@@ -429,52 +434,52 @@ const KEY = "gymflow-v3";
     }
     function routineById(id){ return state.routines.find(r=>r.id===id); }
     function exerciseById(id){ return state.exercises.find(e=>e.id===id); }
-    function toast(msg){
-      const show = text => {
-        const el=document.getElementById("toast");
-        if(!el) return;
-        el.textContent=text;
-        el.classList.add("show");
-        clearTimeout(el._timer);
-        el._timer=setTimeout(()=>el.classList.remove("show"),3600);
-      };
-      const looksLikeSaveSuccess = /(tersimpan|berhasil|successfully|success|updated|saved|logged|added|deleted|dihapus|diperbarui|ditambahkan)/i.test(String(msg));
-      const pending = window.__GYMFLOW_REMOTE_MODE ? window.__GYMFLOW_LAST_SAVE : null;
-      if (looksLikeSaveSuccess && pending && typeof pending.then === "function") {
-        pending.then(() => show(msg)).catch(error => show(`Gagal menyimpan ke server: ${error?.message || "periksa koneksi"}`));
-        return;
-      }
-      show(msg);
-    }
+    function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove("show"),3200); }
     function openModal(id){ document.getElementById(id).classList.add("open"); }
     function closeModal(id){ document.getElementById(id).classList.remove("open"); }
     function showConfirm(title,message,actionText,cb){ document.getElementById("confirm-title").textContent=title; document.getElementById("confirm-message").textContent=message; document.getElementById("confirm-action").textContent=actionText; confirmCallback=cb; openModal("confirm-modal"); }
 
+    function syncUnitToggle(buttonIds, activeUnit, units) {
+      buttonIds.forEach((id, index) => {
+        const button = document.getElementById(id);
+        if (!button) return;
+        const active = units[index] === activeUnit;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    }
+
     function setHeightUnit(unit) {
-      state.settings.heightUnit = unit;
-      document.getElementById("height-unit-label").textContent = unit;
-      document.getElementById("unit-cm").className = unit === 'cm' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
-      document.getElementById("unit-ft").className = unit === 'ft' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
+      state.settings.heightUnit = unit === "ft" ? "ft" : "cm";
+      const label = document.getElementById("height-unit-label");
+      if (label) label.textContent = state.settings.heightUnit;
+      syncUnitToggle(["unit-cm", "unit-ft"], state.settings.heightUnit, ["cm", "ft"]);
     }
 
     function setWeightUnit(unit) {
-      state.settings.weightUnit = unit;
-      document.getElementById("weight-unit-label").textContent = unit;
-      document.getElementById("unit-kg").className = unit === 'kg' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
-      document.getElementById("unit-lbs").className = unit === 'lbs' ? "flex-1 py-2 text-xs font-bold rounded-lg bg-[var(--surface)] text-[var(--text)] transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg muted transition-all";
+      state.settings.weightUnit = unit === "lbs" ? "lbs" : "kg";
+      const label = document.getElementById("weight-unit-label");
+      if (label) label.textContent = state.settings.weightUnit;
+      syncUnitToggle(["unit-kg", "unit-lbs"], state.settings.weightUnit, ["kg", "lbs"]);
     }
 
     function setProfileTheme(theme) {
-      const nextTheme = theme === "light" ? "light" : "dark";
+      const nextTheme = normalizeThemeChoice(theme);
       state.settings.theme = nextTheme;
       save();
       setTheme();
       renderProfileModal();
+      renderDashboard();
+      renderHistory();
+      renderOverviewMetrics();
+      renderWeightTab();
+      renderStatisticsAnalytics();
+      applyLanguage();
       if (window.lucide) lucide.createIcons();
     }
 
     function toggleProfileDarkMode() {
-      setProfileTheme(state.settings.theme === "dark" ? "light" : "dark");
+      setProfileTheme(state.settings.theme === "light" ? "original-green" : "light");
     }
 
     function updateHeaderInitial() {
@@ -509,17 +514,26 @@ const KEY = "gymflow-v3";
         p.classList.toggle("active", val === state.settings.weeklyGoal);
       });
 
-      // Refined theme controls
-      const isDark = state.settings.theme !== "light";
-      document.getElementById("dark-mode-desc").textContent = isDark ? tr("Currently dark") : tr("Currently light");
-      const darkOption = document.getElementById("theme-dark-option");
-      const lightOption = document.getElementById("theme-light-option");
-      if(darkOption && lightOption){
-        darkOption.classList.toggle("active", isDark);
-        lightOption.classList.toggle("active", !isDark);
-        darkOption.setAttribute("aria-pressed", String(isDark));
-        lightOption.setAttribute("aria-pressed", String(!isDark));
-      }
+      // Three appearance choices share the same component system.
+      const currentTheme = normalizeThemeChoice(state.settings.theme);
+      const themeDescriptions = {
+        "original-green": tr("Using Original Green"),
+        "deep-olive": tr("Using Deep Dark"),
+        "light": tr("Currently light")
+      };
+      document.getElementById("dark-mode-desc").textContent = themeDescriptions[currentTheme];
+      const themeOptions = [
+        { id: "theme-dark-option", value: "original-green" },
+        { id: "theme-olive-option", value: "deep-olive" },
+        { id: "theme-light-option", value: "light" }
+      ];
+      themeOptions.forEach(({id, value}) => {
+        const option = document.getElementById(id);
+        if (!option) return;
+        const active = value === currentTheme;
+        option.classList.toggle("active", active);
+        option.setAttribute("aria-pressed", String(active));
+      });
       
       updateHeaderInitial();
 
@@ -678,11 +692,11 @@ const KEY = "gymflow-v3";
       area.innerHTML = `
         <svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik Berat Badan">
           <line x1="25" y1="${h-25}" x2="${w-25}" y2="${h-25}" stroke="var(--line)"/>
-          <polyline fill="none" stroke="#bcf04a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>
+          <polyline fill="none" stroke="var(--lime)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>
           ${history.map((p, i) => {
             const x = history.length === 1 ? w/2 : 25 + i * (w - 50) / (history.length - 1);
             const y = h - 25 - (p.weight - min) / range * (h - 55);
-            return `<circle cx="${x}" cy="${y}" r="5" fill="#bcf04a"/><text x="${x}" y="${h-7}" text-anchor="middle" fill="var(--muted)" font-size="10">${p.date.slice(5)}</text>`;
+            return `<circle cx="${x}" cy="${y}" r="5" fill="var(--lime)"/><text x="${x}" y="${h-7}" text-anchor="middle" fill="var(--muted)" font-size="10">${p.date.slice(5)}</text>`;
           }).join("")}
         </svg>
       `;
@@ -873,22 +887,31 @@ const KEY = "gymflow-v3";
     });
 
     function setTheme(){
-      const light = state.settings.theme === "light";
+      const theme = normalizeThemeChoice(state.settings.theme);
+      state.settings.theme = theme;
+      const light = theme === "light";
+      const root = document.documentElement;
+      root.dataset.theme = theme;
+      document.body.dataset.theme = theme;
       document.body.classList.toggle("light", light);
-      document.documentElement.style.colorScheme = light ? "light" : "dark";
+      document.body.classList.toggle("theme-original-green", theme === "original-green");
+      document.body.classList.toggle("theme-deep-olive", theme === "deep-olive");
+      root.style.colorScheme = light ? "light" : "dark";
       let meta = document.querySelector('meta[name="theme-color"]');
       if(!meta){
         meta = document.createElement("meta");
         meta.name = "theme-color";
         document.head.appendChild(meta);
       }
-      meta.content = light ? "#f4f7f4" : "#080d0a";
-      document.body.dataset.theme = light ? "light" : "dark";
+      meta.content = theme === "light" ? "#F5F5F5" : theme === "deep-olive" ? "#000000" : "#080d0a";
     }
     
     function navigate(tab){
       document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",el.id===tab));
       document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
+      document.body.classList.toggle("dashboard-active", tab === "dashboard");
+      const mainTitle = document.getElementById("main-area-title");
+      if (mainTitle) mainTitle.textContent = tab === "dashboard" ? "Workouts" : "GYMFlow";
       if(tab==="workout") renderWorkout(); 
       if(tab==="history") {
         renderHistory();
@@ -898,66 +921,104 @@ const KEY = "gymflow-v3";
     }
     
     function changeCalendarMonth(direction) {
-      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+      currentCalendarDate = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + direction, 1);
+      const maxDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0).getDate();
+      const preferredDay = Math.min(selectedCalendarDate.getDate(), maxDay);
+      selectedCalendarDate = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), preferredDay);
       renderCalendar();
     }
 
     function renderCalendar() {
-      const year = currentCalendarDate.getFullYear();
-      const month = currentCalendarDate.getMonth();
-      
-      const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      document.getElementById("calendar-month-title").textContent = `${monthNames[month]} ${year}`;
+      const base = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+      const monthNames = currentLanguage() === "en"
+        ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        : ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const shortMonths = currentLanguage() === "en"
+        ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        : ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      const rangeStart = new Date(base.getFullYear(), base.getMonth() - 2, 1);
+      const title = document.getElementById("calendar-month-title");
+      if (title) {
+        const startLabel = shortMonths[rangeStart.getMonth()];
+        const endLabel = shortMonths[base.getMonth()];
+        title.textContent = rangeStart.getFullYear() === base.getFullYear()
+          ? `${startLabel} – ${endLabel} ${base.getFullYear()}`
+          : `${startLabel} ${rangeStart.getFullYear()} – ${endLabel} ${base.getFullYear()}`;
+      }
 
       const grid = document.getElementById("calendar-days-grid");
-      grid.innerHTML = "";
+      if (!grid) return;
+      const now = new Date();
+      const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+      const selectedKey = `${selectedCalendarDate.getFullYear()}-${String(selectedCalendarDate.getMonth()+1).padStart(2,"0")}-${String(selectedCalendarDate.getDate()).padStart(2,"0")}`;
+      const sessionsByDate = new Map();
+      (state.history || []).forEach(session => {
+        const d = new Date(session.endedAt);
+        if (Number.isNaN(d.getTime())) return;
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+        if (!sessionsByDate.has(key)) sessionsByDate.set(key, []);
+        sessionsByDate.get(key).push(session);
+      });
 
-      const firstDayOfMonth = new Date(year, month, 1);
-      const lastDayOfMonth = new Date(year, month + 1, 0);
-      
-      let startingDay = firstDayOfMonth.getDay() - 1;
-      if (startingDay === -1) startingDay = 6; 
-
-      const totalDays = lastDayOfMonth.getDate();
-      const prevMonthLastDay = new Date(year, month, 0).getDate();
-
-      const workoutDates = new Set(state.history.map(s => new Date(s.endedAt).toDateString()));
-
-      let html = "";
-
-      for (let i = startingDay - 1; i >= 0; i--) {
-        const d = prevMonthLastDay - i;
-        html += `<div class="py-2 text-[var(--muted)] opacity-40 text-xs">${d}</div>`;
-      }
-
-      const todayStr = new Date().toDateString();
-      for (let day = 1; day <= totalDays; day++) {
-        const thisDate = new Date(year, month, day);
-        const dateStr = thisDate.toDateString();
-        const hasWorkout = workoutDates.has(dateStr);
-        const isToday = dateStr === todayStr;
-
-        let ringClass = "";
-        let bgStyle = "";
-        if (hasWorkout) {
-          ringClass = "border border-lime-400 bg-lime-400/15 font-bold text-lime-300 rounded-full";
-        } else if (isToday) {
-          bgStyle = "border border-[var(--lime)] rounded-full font-bold";
+      const chunks = [];
+      for (let offset = -2; offset <= 0; offset++) {
+        const monthDate = new Date(base.getFullYear(), base.getMonth() + offset, 1);
+        const y = monthDate.getFullYear();
+        const m = monthDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const mondayOffset = (firstDay + 6) % 7;
+        const totalDays = new Date(y, m + 1, 0).getDate();
+        const dots = [];
+        for (let blank = 0; blank < mondayOffset; blank++) dots.push('<span class="gf-activity-dot-spacer" aria-hidden="true"></span>');
+        for (let day = 1; day <= totalDays; day++) {
+          const key = `${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+          const sessions = sessionsByDate.get(key) || [];
+          const classes = ["gf-activity-dot"];
+          if (sessions.length) classes.push("is-workout");
+          if (key === todayKey) classes.push("is-today");
+          if (key === selectedKey) classes.push("is-selected");
+          const dateLabel = new Date(y, m, day).toLocaleDateString(currentLanguage() === "en" ? "en-US" : "id-ID", {day:"numeric", month:"short", year:"numeric"});
+          const activityLabel = sessions.length
+            ? `${sessions.length} ${currentLanguage() === "en" ? (sessions.length === 1 ? "workout" : "workouts") : "workout"}`
+            : (currentLanguage() === "en" ? "No workout" : "Tidak ada workout");
+          dots.push(`<button type="button" class="${classes.join(" ")}" data-date="${key}" aria-label="${dateLabel}: ${activityLabel}" aria-pressed="${key === selectedKey ? "true" : "false"}" title="${dateLabel} · ${activityLabel}"><span aria-hidden="true"></span></button>`);
         }
+        const cells = Math.ceil((mondayOffset + totalDays) / 7) * 7;
+        while (dots.length < cells) dots.push('<span class="gf-activity-dot-spacer" aria-hidden="true"></span>');
+        chunks.push(`
+          <section class="gf-activity-month" aria-label="${monthNames[m]} ${y}">
+            <h4 class="gf-activity-month-title">${shortMonths[m]} <small>${y}</small></h4>
+            <div class="gf-activity-dot-grid">${dots.join("")}</div>
+          </section>
+        `);
+      }
+      grid.innerHTML = chunks.join("");
 
-        let fireIconHtml = hasWorkout ? `<i data-lucide="flame" class="w-3 h-3 text-amber-400 absolute -bottom-1"></i>` : "";
-
-        html += `<div class="py-1.5 flex flex-col items-center justify-center relative"><span class="w-8 h-8 flex items-center justify-center text-xs ${ringClass} ${bgStyle}">${day}</span>${fireIconHtml}</div>`;
+      const selected = new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth(), selectedCalendarDate.getDate());
+      const selectedSessions = sessionsByDate.get(selectedKey) || [];
+      const dateText = selected.toLocaleDateString(currentLanguage() === "en" ? "en-US" : "id-ID", {day:"numeric", month:"short", year:"numeric"});
+      const dateLabel = document.getElementById("dashboard-activity-date");
+      const activitySummary = document.getElementById("dashboard-activity-summary");
+      const lastWorkoutName = document.getElementById("dashboard-last-workout-name");
+      if (dateLabel) dateLabel.textContent = dateText.toUpperCase();
+      if (activitySummary) activitySummary.textContent = selectedSessions.length
+        ? `${selectedSessions.length} ${currentLanguage() === "en" ? (selectedSessions.length === 1 ? "workout recorded" : "workouts recorded") : "workout tercatat"}`
+        : (currentLanguage() === "en" ? "No workout recorded on this day" : "Tidak ada workout pada tanggal ini");
+      if (lastWorkoutName) {
+        const mostRecentSelected = [...selectedSessions].sort((a,b) => new Date(b.endedAt) - new Date(a.endedAt))[0];
+        lastWorkoutName.textContent = mostRecentSelected
+          ? (routineById(mostRecentSelected.routineId)?.name || "Workout")
+          : (currentLanguage() === "en" ? "No workout recorded" : "Belum ada workout");
       }
 
-      const totalCells = startingDay + totalDays;
-      const nextDaysCount = totalCells <= 35 ? (35 - totalCells) : (42 - totalCells);
-      for (let i = 1; i <= nextDaysCount; i++) {
-        html += `<div class="py-2 text-[var(--muted)] opacity-30 text-xs">${i}</div>`;
-      }
-
-      grid.innerHTML = html;
-      lucide.createIcons();
+      grid.querySelectorAll(".gf-activity-dot[data-date]").forEach(button => {
+        button.addEventListener("click", () => {
+          const [y,m,d] = button.dataset.date.split("-").map(Number);
+          selectedCalendarDate = new Date(y, m - 1, d);
+          renderCalendar();
+        });
+      });
+      if (window.lucide) lucide.createIcons();
     }
 
     function renderWeeklyTargetCard() {
@@ -1011,21 +1072,13 @@ const KEY = "gymflow-v3";
       if (daysBar) {
         const dayNames = currentLanguage()==="en" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
         daysBar.innerHTML = weekDates.map((item, idx) => {
-          let circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-medium text-[var(--muted)]";
-          let indicatorStyle = "h-1 w-full rounded-full bg-[var(--line)] mb-2";
-
-          if (item.hasWorkout) {
-            circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-extrabold bg-[var(--lime)] text-[#142009] shadow-sm";
-            indicatorStyle = "h-1 w-full rounded-full bg-[var(--lime)] mb-2";
-          } else if (item.isToday) {
-            circleStyle = "w-8 h-8 rounded-full flex items-center justify-center text-xs mx-auto font-extrabold border-2 border-[var(--lime)] text-[var(--lime)]";
-          }
-
+          const dayClass = `gf-week-day-number${item.hasWorkout ? " is-workout" : ""}${item.isToday ? " is-today" : ""}`;
+          const lineClass = `gf-week-day-line${item.hasWorkout ? " is-workout" : ""}`;
           return `
-            <div class="flex flex-col items-center">
-              <span class="text-[11px] font-bold muted mb-1.5">${dayNames[idx]}</span>
-              <div class="${indicatorStyle}"></div>
-              <div class="${circleStyle}">${item.dateNum}</div>
+            <div class="gf-week-day">
+              <span class="gf-week-day-label">${dayNames[idx]}</span>
+              <span class="${lineClass}" aria-hidden="true"></span>
+              <span class="${dayClass}">${item.dateNum}</span>
             </div>
           `;
         }).join("");
@@ -1051,7 +1104,68 @@ const KEY = "gymflow-v3";
       renderWeeklyTargetCard();
 
       const upcoming=state.routines[0];
-      document.getElementById("next-workout-copy").textContent=upcoming ? (currentLanguage()==="en" ? `${upcoming.name} · ${upcoming.exerciseIds.length} exercises ready.` : `${upcoming.name} · ${upcoming.exerciseIds.length} exercise siap dijalankan.`) : tr("Buat routine pertama untuk mulai mencatat progress.");
+      document.getElementById("next-workout-copy").textContent=upcoming ? (currentLanguage()==="en" ? `${upcoming.name} · ${(upcoming.exerciseIds || []).length} exercises ready.` : `${upcoming.name} · ${(upcoming.exerciseIds || []).length} exercise siap dijalankan.`) : tr("Buat routine pertama untuk mulai mencatat progress.");
+
+      const routineCount = document.getElementById("dashboard-routine-count");
+      const routineName = document.getElementById("dashboard-routine-name");
+      const routineMeta = document.getElementById("dashboard-routine-meta");
+      if (routineCount) routineCount.textContent = String(state.routines.length);
+      if (routineName) routineName.textContent = upcoming ? upcoming.name : (currentLanguage()==="en" ? "No routines yet" : "Belum ada routine");
+      if (routineMeta) {
+        const exCount = upcoming ? ((upcoming.exerciseIds || upcoming.exercises || []).length) : 0;
+        const dayLabels = Array.isArray(upcoming?.days) ? upcoming.days : [];
+        const dayMap = {Sen:"Mon",Sel:"Tue",Rab:"Wed",Kam:"Thu",Jum:"Fri",Sab:"Sat",Min:"Sun"};
+        const dayText = dayLabels.length ? dayLabels.map(d => currentLanguage()==="en" ? (dayMap[d] || d) : d).join(" · ") : (currentLanguage()==="en" ? "No days set" : "Hari belum diatur");
+        routineMeta.textContent = upcoming
+          ? `${exCount} ${currentLanguage()==="en" ? "exercises" : "exercise"} · ${dayText}`
+          : (currentLanguage()==="en" ? "Create a routine to get started." : "Buat routine untuk mulai latihan.");
+      }
+      const locale = currentLanguage()==="en" ? "en-US" : "id-ID";
+      const totalWorkoutCount = (state.history || []).length;
+      const totalWorkoutsNode = document.getElementById("dashboard-total-workouts");
+      if (totalWorkoutsNode) totalWorkoutsNode.textContent = new Intl.NumberFormat(locale).format(totalWorkoutCount);
+      const totalWorkoutsMeta = document.getElementById("dashboard-total-workouts-meta");
+      if (totalWorkoutsMeta) totalWorkoutsMeta.textContent = tr("All recorded sessions");
+
+      const weightEntries = [...(state.weightHistory || [])]
+        .filter(entry => entry && entry.date && Number.isFinite(Number(entry.weight)))
+        .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const latestWeightEntry = weightEntries[0] || null;
+      const currentWeight = document.getElementById("dashboard-current-weight");
+      const visibleWeight = latestWeightEntry ? Number(latestWeightEntry.weight) : (Number(state.settings.weight) || 0);
+      if (currentWeight) currentWeight.textContent = new Intl.NumberFormat(locale, {maximumFractionDigits:1}).format(visibleWeight);
+      const weightMeta = document.getElementById("dashboard-weight-meta");
+      if (weightMeta) {
+        if (latestWeightEntry) {
+          const rawDate = String(latestWeightEntry.date);
+          const parsedDate = new Date(/^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? `${rawDate}T12:00:00` : rawDate);
+          const latestDateLabel = Number.isNaN(parsedDate.getTime()) ? rawDate : parsedDate.toLocaleDateString(locale, {day:"numeric", month:"short"});
+          weightMeta.textContent = `${tr("Latest log")} · ${latestDateLabel}`;
+        } else {
+          weightMeta.textContent = tr("Current profile weight");
+        }
+      }
+
+      const recentCutoff = new Date();
+      recentCutoff.setDate(recentCutoff.getDate() - 6);
+      recentCutoff.setHours(0,0,0,0);
+      const recentSessions = (state.history || []).filter(session => {
+        const time = new Date(session.endedAt).getTime();
+        return Number.isFinite(time) && time >= recentCutoff.getTime() && time <= Date.now();
+      });
+      const volumeTotal = recentSessions.reduce((sum, session) => {
+        const volume = session.stats && Number.isFinite(Number(session.stats.totalVolume))
+          ? Number(session.stats.totalVolume)
+          : calculateSessionMetrics(session, []).totalVolume;
+        return sum + volume;
+      }, 0);
+      const volumeDisplay = document.getElementById("dashboard-volume-value");
+      const volumeMeta = document.getElementById("dashboard-volume-meta");
+      if (volumeDisplay) volumeDisplay.textContent = `${new Intl.NumberFormat(currentLanguage()==="en" ? "en-US" : "id-ID", {maximumFractionDigits:0}).format(volumeTotal)} kg`;
+      if (volumeMeta) volumeMeta.textContent = currentLanguage()==="en"
+        ? `${recentSessions.length} ${recentSessions.length === 1 ? "session" : "sessions"} · Last 7 days`
+        : `${recentSessions.length} sesi · 7 hari terakhir`;
+
       const active=state.activeSession, activeCopy=document.getElementById("active-session-copy"), resume=document.getElementById("resume-workout");
       activeCopy.textContent=active ? (currentLanguage()==="en" ? `Session ${routineById(active.routineId)?.name||"Workout"} is still active.` : `Sesi ${routineById(active.routineId)?.name||"Workout"} masih berjalan.`) : tr("Belum ada sesi aktif.");
       resume.classList.toggle("hidden",!active);
@@ -1342,16 +1456,16 @@ const KEY = "gymflow-v3";
               <p>${esc(r.description || (currentLanguage()==="en" ? "Ready for your next session." : "Siap untuk sesi latihan berikutnya."))}</p>
             </div>
             <div class="gf-routine-card-actions">
-              <button class="gf-routine-icon-btn order-routine move-up" type="button" data-id="${esc(r.id)}" data-move="up" aria-label="${currentLanguage()==="en" ? "Move up" : "Pindah ke atas"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Up" : "Pindah ke Atas"}" ${isFirstRoutine ? "disabled" : ""}>
+              <button class="gf-routine-icon-btn order-routine move-up" type="button" data-id="${r.id}" data-move="up" aria-label="${currentLanguage()==="en" ? "Move up" : "Pindah ke atas"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Up" : "Pindah ke Atas"}" ${isFirstRoutine ? "disabled" : ""}>
                 <i data-lucide="chevron-up"></i>
               </button>
-              <button class="gf-routine-icon-btn order-routine move-down" type="button" data-id="${esc(r.id)}" data-move="down" aria-label="${currentLanguage()==="en" ? "Move down" : "Pindah ke bawah"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Down" : "Pindah ke Bawah"}" ${isLastRoutine ? "disabled" : ""}>
+              <button class="gf-routine-icon-btn order-routine move-down" type="button" data-id="${r.id}" data-move="down" aria-label="${currentLanguage()==="en" ? "Move down" : "Pindah ke bawah"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Move Down" : "Pindah ke Bawah"}" ${isLastRoutine ? "disabled" : ""}>
                 <i data-lucide="chevron-down"></i>
               </button>
-              <button class="gf-routine-icon-btn edit-routine" type="button" data-id="${esc(r.id)}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
+              <button class="gf-routine-icon-btn edit-routine" type="button" data-id="${r.id}" aria-label="Edit ${esc(r.name)}" title="Edit Routine">
                 <i data-lucide="pencil"></i>
               </button>
-              <button class="gf-routine-icon-btn delete-routine danger" type="button" data-id="${esc(r.id)}" aria-label="${currentLanguage()==="en" ? "Delete" : "Hapus"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Delete Routine" : "Hapus Routine"}">
+              <button class="gf-routine-icon-btn delete-routine danger" type="button" data-id="${r.id}" aria-label="${currentLanguage()==="en" ? "Delete" : "Hapus"} ${esc(r.name)}" title="${currentLanguage()==="en" ? "Delete Routine" : "Hapus Routine"}">
                 <i data-lucide="trash-2"></i>
               </button>
             </div>
@@ -1368,7 +1482,7 @@ const KEY = "gymflow-v3";
             <div><strong>${metaLabels.difficulty}</strong><span>${currentLanguage()==="en" ? "difficulty" : "tingkat"}</span></div>
           </div>
 
-          <button class="gf-routine-play start-routine" type="button" data-id="${esc(r.id)}">
+          <button class="gf-routine-play start-routine" type="button" data-id="${r.id}">
             <span>${currentLanguage()==="en" ? "Start Workout" : "Mulai Workout"}</span>
             <span class="gf-routine-play-icon"><i data-lucide="arrow-up-right"></i></span>
           </button>
@@ -1396,7 +1510,7 @@ const KEY = "gymflow-v3";
       else if (/calf/.test(text)) kind = "calf";
       else if (/plank|crunch|sit up|sit-up|leg raise|ab/.test(text)) kind = "core";
 
-      const S = '#92a6b4', A = '#88F914', D = '#2b3943';
+      const S = '#92a6b4', A = 'var(--lime)', D = '#2b3943';
       const line = (x1,y1,x2,y2,sw=5, color=S)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
       const circle = (cx,cy,r=5,fill=S)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;
       const rect = (x,y,w,h,rx=4,fill=D,stroke='none',sw=0)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
@@ -1441,8 +1555,8 @@ const KEY = "gymflow-v3";
       }
 
       return `<svg viewBox="0 0 110 82" class="gf-exercise-art" aria-hidden="true">
-        <defs><linearGradient id="exArtBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(136,249,20,.10)"/><stop offset="100%" stop-color="rgba(70,86,98,.12)"/></linearGradient></defs>
-        <rect x="2" y="2" width="106" height="78" rx="12" fill="url(#exArtBg)" stroke="rgba(136,249,20,.18)"/>
+        <defs><linearGradient id="exArtBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(var(--accent-rgb),.10)"/><stop offset="100%" stop-color="rgba(70,86,98,.12)"/></linearGradient></defs>
+        <rect x="2" y="2" width="106" height="78" rx="12" fill="url(#exArtBg)" stroke="rgba(var(--accent-rgb),.18)"/>
         ${art}
       </svg>`;
     }
@@ -1488,7 +1602,7 @@ function renderExercises(){
       } else {
         workoutOptsContainer.innerHTML = '<div class="custom-option selected" data-value="">Pilih routine...</div>';
         state.routines.forEach(r => {
-          workoutOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${esc(r.id)}">${esc(r.name)}</div>`);
+          workoutOptsContainer.insertAdjacentHTML("beforeend", `<div class="custom-option" data-value="${r.id}">${esc(r.name)}</div>`);
         });
         document.querySelector("#custom-workout-routine .selected-label").textContent = "Pilih routine...";
       }
@@ -1636,12 +1750,9 @@ function renderExercises(){
         if(a.restRemaining<=0){
           a.restRemaining=0;
           a.restPaused=true;
-          save();
           toast(currentLanguage()==="en" ? "Rest time is over. Ready for the next set!" : "Waktu istirahat selesai. Siap set berikutnya!");
-        } else if (a.restRemaining % 10 === 0) {
-          // Persist transient rest countdown roughly every 10 seconds, not every second.
-          save();
         }
+        save();
       }
       updateTimers();
     }
@@ -1757,14 +1868,14 @@ function renderExercises(){
         el.innerHTML=`
           <div>
             <h3 class="font-extrabold text-base">${esc(r?.name||"Routine dihapus")}</h3>
-            <p class="muted text-xs mt-0.5">${esc(dateStr)}</p>
+            <p class="muted text-xs mt-0.5">${dateStr}</p>
             <div class="flex items-center gap-6 mt-3">
               <div><p class="muted text-[10px] font-bold uppercase tracking-wider">Set</p><strong class="text-sm">${setTotal}</strong></div>
               <div><p class="muted text-[10px] font-bold uppercase tracking-wider">Kalori</p><strong class="text-sm text-lime-300"><i data-lucide="flame" class="w-3 h-3 inline text-amber-400"></i> ${calText}</strong></div>
             </div>
           </div>
           <div>
-            <button class="danger-btn px-3 py-2 delete-history-session" data-id="${esc(s.id)}" title="Hapus sesi ini"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            <button class="danger-btn px-3 py-2 delete-history-session" data-id="${s.id}" title="Hapus sesi ini"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
           </div>
         `;
         list.appendChild(el);
@@ -1872,7 +1983,7 @@ function renderExercises(){
         const barHeight = item.count === 0 ? 0 : (item.count / maxCount) * (h - 55);
         const y = (h - 25) - barHeight;
         const label = `${item.date.getDate()} ${monthNamesShort[item.date.getMonth()]}`;
-        svgContent += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="6" fill="#88F914"/>
+        svgContent += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="6" fill="var(--lime)"/>
           <text x="${x + barWidth/2}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="10">${label}</text>`;
       });
       svgContent += `</svg>`;
@@ -1917,15 +2028,15 @@ function renderExercises(){
         <svg viewBox="0 0 ${w} ${h}" class="gf-premium-chart" role="img" aria-label="Volume trend">
           <defs>
             <linearGradient id="gfVolumeFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#88F914" stop-opacity="0.26"/>
-              <stop offset="100%" stop-color="#88F914" stop-opacity="0"/>
+              <stop offset="0%" stop-color="var(--lime)" stop-opacity="0.26"/>
+              <stop offset="100%" stop-color="var(--lime)" stop-opacity="0"/>
             </linearGradient>
           </defs>
           <line x1="${padX}" y1="${h-34}" x2="${w-padX}" y2="${h-34}" stroke="var(--line)"/>
           <line x1="${padX}" y1="${padY+plotH*0.5}" x2="${w-padX}" y2="${padY+plotH*0.5}" stroke="var(--line)" stroke-dasharray="4 5" opacity=".65"/>
           <polygon points="${areaPoints}" fill="url(#gfVolumeFill)"/>
-          <polyline points="${coords}" fill="none" stroke="#88F914" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          ${points.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#0c100d" stroke="#88F914" stroke-width="2.5"><title>${analyticsFormatVolume(p.v)}</title></circle>`).join("")}
+          <polyline points="${coords}" fill="none" stroke="var(--lime)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          ${points.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="var(--surface)" stroke="var(--lime)" stroke-width="2.5"><title>${analyticsFormatVolume(p.v)}</title></circle>`).join("")}
           ${points.map(p=>`<text x="${p.x}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="10">${p.date.getDate()} ${monthNames[p.date.getMonth()]}</text>`).join("")}
           <text x="${padX}" y="${padY-6}" fill="var(--muted)" font-size="10">${analyticsFormatVolume(max)}</text>
         </svg>`;
@@ -1963,8 +2074,8 @@ function renderExercises(){
         <svg viewBox="0 0 ${w} ${h}" class="w-full h-full" role="img" aria-label="Grafik Calories per Workout">
           <defs>
             <linearGradient id="calGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#bcf04a" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#bcf04a" stop-opacity="0.0"/>
+              <stop offset="0%" stop-color="var(--lime)" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="var(--lime)" stop-opacity="0.0"/>
             </linearGradient>
           </defs>
           <line x1="30" y1="${h-25}" x2="${w-30}" y2="${h-25}" stroke="var(--line)"/>
@@ -1973,13 +2084,13 @@ function renderExercises(){
           <text x="15" y="${h-30}" fill="var(--muted)" font-size="10">0</text>
           
           <polygon points="${areaCoords}" fill="url(#calGradient)"/>
-          <polyline fill="none" stroke="#bcf04a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>
+          <polyline fill="none" stroke="var(--lime)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/>
       `;
 
       points.forEach(p => {
         const label = `${p.date.getDate()} ${monthNamesShort[p.date.getMonth()]}`;
         svgContent += `
-          <circle cx="${p.x}" cy="${p.y}" r="4" fill="#bcf04a"/>
+          <circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--lime)"/>
           <text x="${p.x}" y="${h-10}" text-anchor="middle" fill="var(--muted)" font-size="9">${label}</text>
         `;
       });
@@ -2275,7 +2386,7 @@ function renderExercises(){
         const sets = setMap[key] || 0;
         const ratio = sets / maxSets;
         const intensity = sets === 0 ? 0 : 0.16 + ratio * 0.78;
-        el.style.fill = `rgba(136,249,20,${intensity})`;
+        el.style.fill = `rgba(var(--accent-rgb),${intensity})`;
         el.classList.toggle("selected", key === selectedAnalyticsMuscle);
         el.setAttribute("tabindex","0");
         el.setAttribute("role","button");
@@ -3287,7 +3398,7 @@ function buildExportBrandMark(size = 38) {
       ctx.restore();
       const w = Math.min(54*labelScale, Math.max(30*labelScale, textWidth * .26));
       ctx.save();
-      ctx.fillStyle = "#88F914";
+      ctx.fillStyle = getThemeAccent();
       ctx.fillRect(align === "right" ? x - w : x, y + 12*labelScale, w, 4*labelScale);
       ctx.restore();
     }
@@ -3306,7 +3417,7 @@ function buildExportBrandMark(size = 38) {
         ctx.restore();
       } else {
         ctx.save();
-        ctx.fillStyle = "#88F914";
+        ctx.fillStyle = getThemeAccent();
         ctx.fillRect(x,y-mark*.74,32*scale,32*scale);
         ctx.fillStyle = "#0a0f0b";
         ctx.font = `900 ${20*scale}px Arial, sans-serif`;
@@ -3436,7 +3547,7 @@ function buildExportBrandMark(size = 38) {
         row4: layout.row4
       };
       gfCanvasText(ctx,data.period,layout.left,layout.headerY,Math.max(18,27*s),600,"rgba(255,255,255,.78)","left");
-      gfCanvasText(ctx,template==="performance"?"PERFORMANCE":"WORKOUTS",layout.left,layout.titleY,Math.max(13,18*s),900,"#88F914","left");
+      gfCanvasText(ctx,template==="performance"?"PERFORMANCE":"WORKOUTS",layout.left,layout.titleY,Math.max(13,18*s),900,getThemeAccent(),"left");
       gfCanvasText(ctx,`@${username.replace(/^@+/,"")}`,layout.right,layout.headerY,Math.max(14,19*s),700,"rgba(255,255,255,.82)","right");
       if(template==="minimal"){
         gfCanvasLabel(ctx,"WORKOUTS",layout.left,layout.row1,"left",s);gfCanvasText(ctx,String(data.workouts),layout.left,layout.row1+170*s,188*s,900,"#ffffff","left");
@@ -3448,7 +3559,7 @@ function buildExportBrandMark(size = 38) {
         gfCanvasLabel(ctx,"VOLUME",layout.left,perfRow1,"left",s);gfCanvasText(ctx,photoExportFormatNumber(data.volume)+" kg",layout.left,perfRow1+130*s,118*s,900,"#ffffff","left",.7*W);gfCanvasText(ctx,"TOTAL TRAINING LOAD",layout.left,perfRow1+172*s,18*s,800,"rgba(255,255,255,.70)","left");
         gfCanvasMetricResponsive(ctx,layout,layout.left,perfRow2-10*s,"DURATION",formatTimeDetailed(data.duration),"left",60,.38*W);gfCanvasMetricResponsive(ctx,layout,layout.right,perfRow2-10*s,"SETS",String(data.sets),"right",60,.3*W);
         gfCanvasMetricResponsive(ctx,layout,layout.left,perfRow3-10*s,"PERSONAL RECORDS",String(data.prs),"left",60,.4*W);gfCanvasMetricResponsive(ctx,layout,layout.right,perfRow3-10*s,"EXERCISES",String(data.exercises),"right",60,.3*W);
-        if(data.topMuscle&&data.topMuscle!=="—")gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,layout.left,perfRow4,20*s,800,"#88F914","left",.8*W);
+        if(data.topMuscle&&data.topMuscle!=="—")gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,layout.left,perfRow4,20*s,800,getThemeAccent(),"left",.8*W);
       }else if(template==="full"){
         const fullRow1 = compactRows.row1, fullRow2 = compactRows.row2, fullRow3 = compactRows.row3, fullRow4 = compactRows.row4;
         gfCanvasLabel(ctx,"WORKOUTS",layout.left,fullRow1,"left",s);gfCanvasText(ctx,String(data.workouts),layout.left,fullRow1+72*s,86*s,900,"#ffffff","left");
@@ -3457,7 +3568,7 @@ function buildExportBrandMark(size = 38) {
         gfCanvasLabel(ctx,"SETS",W*.53,fullRow2,"left",s);gfCanvasText(ctx,String(data.sets),W*.53,fullRow2+72*s,74*s,900,"#ffffff","left");
         gfCanvasLabel(ctx,"EXERCISES",layout.left,fullRow3,"left",s);gfCanvasText(ctx,String(data.exercises),layout.left,fullRow3+68*s,66*s,900,"#ffffff","left");
         gfCanvasLabel(ctx,"PERSONAL RECORDS",W*.53,fullRow3,"left",s);gfCanvasText(ctx,String(data.prs),W*.53,fullRow3+68*s,66*s,900,"#ffffff","left");
-        if(data.topMuscle&&data.topMuscle!=="—")gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,layout.left,fullRow4,20*s,800,"#88F914","left",.8*W);
+        if(data.topMuscle&&data.topMuscle!=="—")gfCanvasText(ctx,`TOP MUSCLE · ${data.topMuscle.toUpperCase()}`,layout.left,fullRow4,20*s,800,getThemeAccent(),"left",.8*W);
         if(data.muscleGroups?.length)gfCanvasText(ctx,data.muscleGroups.join("  ·  ").toUpperCase(),layout.left,fullRow4+34*s,19*s,700,"rgba(255,255,255,.72)","left",.86*W);
       }else{
         // CLASSIC — match the reference: clean 2×2 stat grid, large values,
@@ -3774,9 +3885,7 @@ function buildExportBrandMark(size = 38) {
       });
     });
 
-    function initGymFlowApp(){
-      if (window.__GYMFLOW_APP_INITIALIZED) return;
-      window.__GYMFLOW_APP_INITIALIZED = true;
+    document.addEventListener("DOMContentLoaded",()=>{
       setTimeout(() => {
         const splash = document.getElementById("splash-screen");
         if(splash) {
@@ -3839,6 +3948,10 @@ function buildExportBrandMark(size = 38) {
 
       document.getElementById("desktop-reset").onclick = triggerReset;
       document.getElementById("open-profile-btn").onclick = openProfileModalCustom;
+      document.getElementById("dashboard-add-routine-btn").onclick = () => openRoutineBuilder();
+      document.getElementById("dashboard-create-routine-card").onclick = () => openRoutineBuilder();
+      document.getElementById("dashboard-total-workouts-open").onclick = () => handleTabNavigation("history");
+      document.getElementById("dashboard-weight-open").onclick = () => openWeightModal();
       document.getElementById("export-pdf-daily").onclick = () => openExportModal("full");
       initCustomSelect("statistics-period-select", (val) => {
         analyticsPeriod = val;
@@ -4117,50 +4230,7 @@ function buildExportBrandMark(size = 38) {
         renderDashboard();
         toast(currentLanguage()==="en" ? "Routine saved successfully!" : "Routine berhasil disimpan!");
       };
-      // Runtime bridge used by the authenticated Supabase live-sync layer.
-      // Remote state is applied only when there are no pending writes or user edits in progress.
-      window.__GYMFLOW_GET_CURRENT_STATE = () => JSON.parse(JSON.stringify(state));
-      window.__GYMFLOW_CAN_APPLY_REMOTE_STATE = () => {
-        const saveStatus = window.__GYMFLOW_QUEUE_SAVE?.getStatus?.();
-        if (saveStatus && (saveStatus.revision !== saveStatus.persistedRevision || saveStatus.isFlushing || saveStatus.lastError)) return false;
-        if (document.querySelector(".modal-layer.open")) return false;
-        const active = document.activeElement;
-        if (active?.matches?.("input, textarea, select, [contenteditable='true']")) return false;
-        return true;
-      };
-      window.__GYMFLOW_APPLY_REMOTE_STATE = nextState => {
-        if (!nextState || typeof nextState !== "object" || Array.isArray(nextState) ||
-            !nextState.settings || !Array.isArray(nextState.exercises) ||
-            !Array.isArray(nextState.routines) || !Array.isArray(nextState.history) ||
-            !Array.isArray(nextState.weightHistory) ||
-            !(nextState.activeSession === null || (typeof nextState.activeSession === "object" && !Array.isArray(nextState.activeSession)))) {
-          throw new Error("Data terbaru dari Supabase memiliki struktur yang tidak valid.");
-        }
-        window.__GYMFLOW_REMOTE_STATE = JSON.parse(JSON.stringify(nextState));
-        state = loadState();
-        setTheme();
-        populateSelects();
-        renderDashboard();
-        renderRoutines();
-        renderExercises();
-        renderWorkout();
-        renderHistory();
-        renderWeightTab();
-        renderOverviewMetrics();
-        renderStatisticsAnalytics();
-        updateHeaderInitial();
-        applyLanguage();
-        if (window.lucide) window.lucide.createIcons();
-      };
-
-      window.__GYMFLOW_APP_READY = true;
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initGymFlowApp, { once: true });
-    } else {
-      initGymFlowApp();
-    }
+    });
 
 
 /* ==================== PHASE 4 MOTION HELPERS ==================== */
@@ -4236,13 +4306,11 @@ function gfRefreshProgressMotion(){
   gfRunProgressMotion(history);
 }
 
-function initGymFlowProgressMotion(){
+document.addEventListener("DOMContentLoaded",()=>{
   setTimeout(()=>{
     if(typeof gfRefreshProgressMotion === "function") gfRefreshProgressMotion();
   },120);
-}
-if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initGymFlowProgressMotion, { once:true });
-else initGymFlowProgressMotion();
+});
 
 /* =========================================================
    GYMFlow Fluid Bottom Navigation
